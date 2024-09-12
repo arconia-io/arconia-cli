@@ -21,17 +21,14 @@ ext {
 }
 
 dependencies {
+    implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
+
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.shell:spring-shell-starter'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.shell:spring-shell-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.shell:spring-shell-dependencies:${springShellVersion}"
-	}
 }
 
 tasks.named('test') {
