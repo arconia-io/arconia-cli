@@ -34,3 +34,7 @@ The security process for reporting vulnerabilities is described in [SECURITY.md]
 ## 🖊️&nbsp; License
 
 This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE) for more information.
+
+## 🙏&nbsp; Acknowledgments
+
+This project draws inspiration from the design strategy adopted by the [Spring CLI](https://github.com/spring-projects/spring-cli/tree/main) and from the superior experience offered by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling).
