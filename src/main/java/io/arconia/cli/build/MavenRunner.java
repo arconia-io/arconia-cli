@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayDeque;
 
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import io.arconia.cli.utils.FileUtils;
 import io.arconia.cli.utils.ProcessUtils;
@@ -21,24 +22,28 @@ public class MavenRunner implements BuildToolRunner {
     @Override
     public void build(BuildOptions buildOptions) {
         var command = constructMavenCommand("install", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void test(BuildOptions buildOptions) {
         var command = constructMavenCommand("test", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
         var command = constructMavenCommand("spring-boot:run", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void imageBuild(BuildOptions buildOptions) {
         var command = constructMavenCommand("spring-boot:build-image", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
@@ -88,11 +93,33 @@ public class MavenRunner implements BuildToolRunner {
             command.add("-Dmaven.test.skip=true");
         }
 
+        if (buildOptions.buildImageOptions() != null) {
+            addBuildImageArguments(command, buildOptions.buildImageOptions());
+        }
+
         if (!CollectionUtils.isEmpty(buildOptions.params())) {
             command.addAll(buildOptions.params());
         }
 
         return command;
+    }
+
+    private void addBuildImageArguments(ArrayDeque<String> command, BuildImageOptions imageOptions) {
+        if (StringUtils.hasText(imageOptions.imageName())) {
+            command.add("-Dspring-boot.build-image.imageName=%s".formatted(imageOptions.imageName()));
+        }
+        if (StringUtils.hasText(imageOptions.builderImage())) {
+            command.add("-Dspring-boot.build-image.builder=%s".formatted(imageOptions.builderImage()));
+        }
+        if (StringUtils.hasText(imageOptions.runImage())) {
+            command.add("-Dspring-boot.build-image.runImage=%s".formatted(imageOptions.runImage()));
+        }
+        if (imageOptions.cleanCache()) {
+            command.add("-Dspring-boot.build-image.cleanCache=true");
+        }
+        if (imageOptions.publishImage()) {
+            command.add("-Dspring-boot.build-image.publish=true");
+        }
     }
     
 }
