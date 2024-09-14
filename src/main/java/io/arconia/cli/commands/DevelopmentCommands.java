@@ -9,16 +9,12 @@ import io.arconia.cli.build.BuildToolRunner;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 
-import io.arconia.cli.core.ArconiaTerminal;
-
 @Command(group = "Development")
 public class DevelopmentCommands {
 
-    private final ArconiaTerminal terminal;
     private final BuildToolRunner buildToolRunner;
 
-    public DevelopmentCommands(ArconiaTerminal terminal) {
-        this.terminal = terminal;
+    public DevelopmentCommands() {
         this.buildToolRunner = BuildToolRunner.create();
     }
 
