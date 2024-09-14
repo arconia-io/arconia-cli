@@ -34,6 +34,12 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
+    public void run(BuildOptions buildOptions) {
+        var command = constructGradleCommand("bootRun", "nativeRun", buildOptions);
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
     public BuildTool getBuildTool() {
         return buildTool;
     }

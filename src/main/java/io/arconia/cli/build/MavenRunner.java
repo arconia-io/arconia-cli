@@ -31,6 +31,12 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
+    public void run(BuildOptions buildOptions) {
+        var command = constructMavenCommand("spring-boot:run", buildOptions);
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
     public BuildTool getBuildTool() {
         return BuildTool.MAVEN;
     }

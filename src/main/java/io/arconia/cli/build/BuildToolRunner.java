@@ -3,13 +3,14 @@ package io.arconia.cli.build;
 import java.io.File;
 
 import io.arconia.cli.utils.FileUtils;
-import io.arconia.cli.utils.SystemUtils;
 
 public interface BuildToolRunner {
     
     void build(BuildOptions buildOptions);
 
     void test(BuildOptions buildOptions);
+
+    void run(BuildOptions buildOptions);
 
     BuildTool getBuildTool();
 

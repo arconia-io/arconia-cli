@@ -52,9 +52,14 @@ public class DevelopmentCommands {
         buildToolRunner.test(buildOptions);
     }
 
-    @Command(command = "run", description = "Run the application.", hidden = true)
-    public void run() {
-        terminal.println("Run started");
+    @Command(command = "run", description = "Run the application.")
+    public void run(
+        @Option(required = false, description = "Additional run parameters") String[] params
+    ) {
+        var buildOptions = BuildOptions.builder()
+            .params(params != null ? Arrays.asList(params) : List.of())
+            .build();
+        buildToolRunner.run(buildOptions);
     }
 
 }
