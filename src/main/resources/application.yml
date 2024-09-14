@@ -10,6 +10,9 @@ spring:
         enabled: false
       script:
         enabled: false
+    option:
+       naming:
+         case-type: kebab
 
 logging:
   pattern:

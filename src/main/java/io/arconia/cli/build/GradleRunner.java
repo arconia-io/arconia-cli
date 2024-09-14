@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayDeque;
 
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import io.arconia.cli.utils.FileUtils;
 import io.arconia.cli.utils.ProcessUtils;
@@ -30,12 +31,21 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public void test(BuildOptions buildOptions) {
         var command = constructGradleCommand("test", "nativeTest", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
         var command = constructGradleCommand("bootRun", "nativeRun", buildOptions);
+        System.out.println(command.toString());
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
+    public void imageBuild(BuildOptions buildOptions) {
+        var command = constructGradleCommand("bootBuildImage", "bootBuildImage", buildOptions);
+        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
@@ -85,11 +95,33 @@ public class GradleRunner implements BuildToolRunner {
             command.add("test");
         }
 
+        if (buildOptions.buildImageOptions() != null) {
+            addBuildImageArguments(command, buildOptions.buildImageOptions());
+        }
+
         if (!CollectionUtils.isEmpty(buildOptions.params())) {
             command.addAll(buildOptions.params());
         }
 
         return command;
+    }
+
+    private void addBuildImageArguments(ArrayDeque<String> command, BuildImageOptions imageOptions) {
+        if (StringUtils.hasText(imageOptions.imageName())) {
+            command.add("--imageName=%s".formatted(imageOptions.imageName()));
+        }
+        if (StringUtils.hasText(imageOptions.builderImage())) {
+            command.add("--builder=%s".formatted(imageOptions.builderImage()));
+        }
+        if (StringUtils.hasText(imageOptions.runImage())) {
+            command.add("--runImage=%s".formatted(imageOptions.runImage()));
+        }
+        if (imageOptions.cleanCache()) {
+            command.add("--cleanCache");
+        }
+        if (imageOptions.publishImage()) {
+            command.add("--publishImage");
+        }
     }
 
 }

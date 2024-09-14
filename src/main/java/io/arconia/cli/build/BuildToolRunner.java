@@ -12,6 +12,8 @@ public interface BuildToolRunner {
 
     void run(BuildOptions buildOptions);
 
+    void imageBuild(BuildOptions buildOptions);
+
     BuildTool getBuildTool();
 
     File getBuildToolWrapper();

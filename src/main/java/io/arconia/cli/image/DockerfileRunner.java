@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import io.arconia.cli.utils.FileUtils;
 import io.arconia.cli.utils.ProcessUtils;
 
-public class DockerfileRunner {
+public class DockerfileRunner implements ImageToolRunner {
 
     private final Path projectDir;
 
@@ -18,17 +18,19 @@ public class DockerfileRunner {
         this.projectDir = FileUtils.getProjectDir();
     }
   
-    public void build(String imageReference, String dockerfile) { 
+    public void build(String imageName, String dockerfile) { 
         var dockerfilePath = getDockerfilePath(dockerfile);
-        var command = constructImageCommand("build", imageReference, dockerfilePath);
+        var command = constructImageCommand("build", imageName, dockerfilePath);
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
+    @Override
     public ImageBuildType getImageBuildType() {
         return ImageBuildType.DOCKERFILE;
     }
 
-    public File getImageBuildExecutable() {
+    @Override
+    public File getImageToolExecutable() {
         return FileUtils.getExecutable("docker");
     }
 
@@ -52,15 +54,15 @@ public class DockerfileRunner {
         return dockerfilePath;
     }
 
-    private ArrayDeque<String> constructImageCommand(String action, String imageReference, Path dockerfilePath) {
+    private ArrayDeque<String> constructImageCommand(String action, String imageName, Path dockerfilePath) {
         ArrayDeque<String> command = new ArrayDeque<>();
 
-        command.add(getImageBuildExecutable().getAbsolutePath());
+        command.add(getImageToolExecutable().getAbsolutePath());
 
         command.add(action);
 
         command.add("--tag");
-        command.add(imageReference);
+        command.add(imageName);
         
         command.add("--file");
         command.add(dockerfilePath.toFile().getAbsolutePath());

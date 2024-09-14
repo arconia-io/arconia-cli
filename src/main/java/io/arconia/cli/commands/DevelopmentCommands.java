@@ -21,7 +21,7 @@ public class DevelopmentCommands {
     @Command(command = "build", description = "Build the current project.")
     public void build(
         @Option(description = "Perform a clean build.") boolean clean,
-        @Option(description = "Skip tests", longNames = "skip-tests") boolean skipTests,
+        @Option(description = "Skip tests") boolean skipTests,
         @Option(description = "Perform a native build", longNames = "native") boolean nativeBuild,
         @Option(required = false, description = "Additional build parameters") String[] params
     ) {

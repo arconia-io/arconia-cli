@@ -7,6 +7,7 @@ public record BuildOptions(
     boolean clean,
     boolean nativeBuild,
     boolean skipTests,
+    BuildImageOptions buildImageOptions,
     List<String> params
 ) {
 
@@ -18,6 +19,7 @@ public record BuildOptions(
         private boolean clean = false;
         private boolean nativeBuild = false;
         private boolean skipTests = false;
+        private BuildImageOptions buildImageOptions;
         private List<String> params = new ArrayList<>();
         
         private Builder() {}
@@ -37,15 +39,20 @@ public record BuildOptions(
             return this;
         }
 
+        public Builder buildImageOptions(BuildImageOptions buildImageOptions) {
+            this.buildImageOptions = buildImageOptions;
+            return this;
+        }
+
         public Builder params(List<String> params) {
             this.params = params;
             return this;
         }
-
-        public BuildOptions build() {
-            return new BuildOptions(clean, nativeBuild, skipTests, params);
-        }
     
+        public BuildOptions build() {
+            return new BuildOptions(clean, nativeBuild, skipTests, buildImageOptions, params);
+        }
+
     }
 
 }

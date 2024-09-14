@@ -37,6 +37,12 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
+    public void imageBuild(BuildOptions buildOptions) {
+        var command = constructMavenCommand("spring-boot:build-image", buildOptions);
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
     public BuildTool getBuildTool() {
         return BuildTool.MAVEN;
     }
