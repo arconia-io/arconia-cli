@@ -8,7 +8,7 @@ with Spring Boot applications.
 > [!IMPORTANT]
 > The Arconia CLI is under active development and may change in a backward-incompatible manner.
 
-## Reference
+## 📙&nbsp; Reference
 
 ```
 AVAILABLE COMMANDS
