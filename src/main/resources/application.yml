@@ -1,3 +1,16 @@
 spring:
   application:
     name: arconia-cli
+  main:
+    banner-mode: off
+    web-application-type: none
+  shell:
+    command:
+      history:
+        enabled: false
+      script:
+        enabled: false
+
+logging:
+  pattern:
+    console:

@@ -23,12 +23,16 @@ ext {
 dependencies {
     implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
 
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.shell:spring-shell-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.shell:spring-shell-starter'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.shell:spring-shell-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.shell:spring-shell-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+springBoot {
+    buildInfo()
 }
 
 tasks.named('test') {
