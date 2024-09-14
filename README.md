@@ -8,6 +8,25 @@ with Spring Boot applications.
 > [!IMPORTANT]
 > The Arconia CLI is under active development and may change in a backward-incompatible manner.
 
+## Reference
+
+```
+AVAILABLE COMMANDS
+
+Built-In Commands
+       help: Display help about available commands
+       version: Show version info
+
+Development
+       build: Build the current project.
+       test: Run tests for the current project.
+       run: Run the application.
+
+Image
+       image build buildpacks: Build a container image using Buildpacks.
+       image build dockerfile: Build a container image using Dockerfile.
+```
+
 ## 🛡️&nbsp; Security
 
 The security process for reporting vulnerabilities is described in [SECURITY.md](SECURITY.md).
