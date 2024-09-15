@@ -1,12 +1,16 @@
 package io.arconia.cli.build;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import io.arconia.cli.openrewrite.OpenRewriteUtils;
+import io.arconia.cli.openrewrite.UpdateOptions;
 import io.arconia.cli.utils.FileUtils;
 import io.arconia.cli.utils.ProcessUtils;
 import io.arconia.cli.utils.SystemUtils;
@@ -48,6 +52,13 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
+    public void update(UpdateOptions updateOptions) {
+        var command = constructUpdateCommand(updateOptions);
+        System.out.println(command.toString());
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
     public BuildTool getBuildTool() {
         return BuildTool.MAVEN;
     }
@@ -71,12 +82,7 @@ public class MavenRunner implements BuildToolRunner {
     private ArrayDeque<String> constructMavenCommand(String action, BuildOptions buildOptions) {
         ArrayDeque<String> command = new ArrayDeque<>();
 
-        File wrapper = getBuildToolWrapper();
-        if (wrapper.exists()) {
-            command.add(wrapper.getAbsolutePath());
-        } else {
-            command.add(getBuildToolExecutable().getAbsolutePath());
-        }
+        command.add(getBuildToolMainCommand());
 
         if (buildOptions.clean()) {
             command.add("clean");
@@ -120,6 +126,31 @@ public class MavenRunner implements BuildToolRunner {
         if (imageOptions.publishImage()) {
             command.add("-Dspring-boot.build-image.publish=true");
         }
+    }
+
+    private ArrayDeque<String> constructUpdateCommand(UpdateOptions updateOptions) {
+        ArrayDeque<String> command = new ArrayDeque<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("-U");
+        
+        if (updateOptions.dryRun()) {
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "LATEST")));
+        } else {
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "LATEST")));
+        }
+
+        command.add("-Drewrite.activeRecipes=" + OpenRewriteUtils.getSpringBootUpdateRecipe(updateOptions));
+
+        command.add("-Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:" + Objects.requireNonNullElse(updateOptions.springRecipesVersion(), "LATEST"));
+        command.add("-Drewrite.exportDatatables=true");
+
+        if (!CollectionUtils.isEmpty(updateOptions.params())) {
+            command.addAll(updateOptions.params());
+        }
+
+        return command;
     }
     
 }

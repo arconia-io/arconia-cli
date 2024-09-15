@@ -1,8 +1,10 @@
 package io.arconia.cli.build;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -10,6 +12,8 @@ import org.springframework.util.StringUtils;
 import io.arconia.cli.utils.FileUtils;
 import io.arconia.cli.utils.ProcessUtils;
 import io.arconia.cli.utils.SystemUtils;
+import io.arconia.cli.openrewrite.OpenRewriteUtils;
+import io.arconia.cli.openrewrite.UpdateOptions;
 
 public class GradleRunner implements BuildToolRunner {
 
@@ -50,6 +54,13 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
+    public void update(UpdateOptions updateOptions) {
+        var command = constructUpdateCommand(updateOptions);
+        System.out.println(command.toString());
+        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+    }
+
+    @Override
     public BuildTool getBuildTool() {
         return buildTool;
     }
@@ -73,12 +84,7 @@ public class GradleRunner implements BuildToolRunner {
     private ArrayDeque<String> constructGradleCommand(String action, String nativeAction, BuildOptions buildOptions) {
         ArrayDeque<String> command = new ArrayDeque<>();
 
-        File wrapper = getBuildToolWrapper();
-        if (wrapper.exists()) {
-            command.add(wrapper.getAbsolutePath());
-        } else {
-            command.add(getBuildToolExecutable().getAbsolutePath());
-        }
+        command.add(getBuildToolMainCommand());
 
         if (buildOptions.clean()) {
             command.add("clean");
@@ -122,6 +128,37 @@ public class GradleRunner implements BuildToolRunner {
         if (imageOptions.publishImage()) {
             command.add("--publishImage");
         }
+    }
+
+    private ArrayDeque<String> constructUpdateCommand(UpdateOptions updateOptions) {
+        ArrayDeque<String> command = new ArrayDeque<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("--init-script");
+
+        try {
+            command.add(FileUtils.copyFileToTemp("openrewrite/init.gradle").toFile().getAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        if (updateOptions.dryRun()) {
+            command.add("rewriteDryRun");
+        } else {
+            command.add("rewriteRun");
+        }
+
+        command.add("-DactiveRecipe=" + OpenRewriteUtils.getSpringBootUpdateRecipe(updateOptions));
+
+        command.add("-PpluginVersion=" + Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "latest.release"));
+        command.add("-PrecipesVersion=" + Objects.requireNonNullElse(updateOptions.springRecipesVersion(), "latest.release"));
+
+        if (!CollectionUtils.isEmpty(updateOptions.params())) {
+            command.addAll(updateOptions.params());
+        }
+
+        return command;
     }
 
 }

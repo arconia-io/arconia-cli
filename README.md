@@ -6,7 +6,7 @@ with Spring Boot applications.
 <img src="arconia-logo.png" alt="The Arconia logo" height="250px" />
 
 > [!IMPORTANT]
-> The Arconia CLI is under active development and may change in a backward-incompatible manner.
+> The Arconia CLI is under active development. Use at your own risk!
 
 ## 🚀&nbsp; Getting Started
 
@@ -14,7 +14,7 @@ with Spring Boot applications.
 
 * Java 22 (GraalVM)
 
-### Build
+### Build the CLI
 
 Package the Arconia CLI as a native executable:
 
@@ -30,7 +30,7 @@ For example, on macOS and Linux:
 sudo cp build/native/nativeCompile/arconia-cli /usr/local/bin/arconia
 ```
 
-### Run
+### Run the CLI
 
 If you defined the Arconia CLI as an executable in your OS Path, you can run it as follows:
 
@@ -57,6 +57,9 @@ Development
 Image
        image build buildpacks: Build a container image using Buildpacks.
        image build dockerfile: Build a container image using Dockerfile.
+
+Migration
+       update: Update project to new Spring Boot version.
 ```
 
 ## 🛡️&nbsp; Security
@@ -69,4 +72,4 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 
 ## 🙏&nbsp; Acknowledgments
 
-This project draws inspiration from the design strategy adopted by the [Spring CLI](https://github.com/spring-projects/spring-cli/tree/main) and from the superior experience offered by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling).
+This project relies on [Spring Shell](https://docs.spring.io/spring-shell/reference/index.html) for building CLI applications and draws inspiration from the superior experience offered by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling).
