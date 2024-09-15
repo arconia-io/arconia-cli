@@ -12,12 +12,6 @@ import org.springframework.shell.command.annotation.Option;
 @Command(group = "Development")
 public class DevelopmentCommands {
 
-    private final BuildToolRunner buildToolRunner;
-
-    public DevelopmentCommands() {
-        this.buildToolRunner = BuildToolRunner.create();
-    }
-
     @Command(command = "build", description = "Build the current project.")
     public void build(
         @Option(description = "Perform a clean build.") boolean clean,
@@ -25,6 +19,7 @@ public class DevelopmentCommands {
         @Option(description = "Perform a native build", longNames = "native") boolean nativeBuild,
         @Option(required = false, description = "Additional build parameters") String[] params
     ) {
+        var buildToolRunner = BuildToolRunner.create();
         var buildOptions = BuildOptions.builder()
             .clean(clean)
             .skipTests(skipTests)
@@ -40,6 +35,7 @@ public class DevelopmentCommands {
         @Option(description = "Run tests in native mode", longNames = "native") boolean nativeBuild,
         @Option(required = false, description = "Additional build parameters") String[] params
     ) {
+        var buildToolRunner = BuildToolRunner.create();
         var buildOptions = BuildOptions.builder()
             .clean(clean)
             .nativeBuild(nativeBuild)
@@ -52,6 +48,7 @@ public class DevelopmentCommands {
     public void run(
         @Option(required = false, description = "Additional run parameters") String[] params
     ) {
+        var buildToolRunner = BuildToolRunner.create();
         var buildOptions = BuildOptions.builder()
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();

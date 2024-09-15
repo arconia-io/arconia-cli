@@ -12,12 +12,6 @@ import org.springframework.shell.command.annotation.Option;
 @Command(group = "Migration")
 public class MigrationCommands {
 
-    private final BuildToolRunner buildToolRunner;
-
-    public MigrationCommands() {
-        this.buildToolRunner = BuildToolRunner.create();
-    }
-
     @Command(command = "update", description = "Update project to new Spring Boot version.")
     public void build(
         @Option(description = "Update in dry-run mode.") boolean dryRun,
@@ -26,6 +20,7 @@ public class MigrationCommands {
         @Option(required = false, description = "OpenRewrite Spring Recipes version.") String springRecipesVersion,
         @Option(required = false, description = "Additional build parameters") String[] params
     ) {
+        var buildToolRunner = BuildToolRunner.create();
         var updateOptions = UpdateOptions.builder()
             .dryRun(dryRun)
             .springBootVersion(springBootVersion)
