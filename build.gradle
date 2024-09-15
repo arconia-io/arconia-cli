@@ -32,20 +32,24 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Application
+
 springBoot {
     buildInfo()
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
 
-cyclonedxBom {
+tasks.named('cyclonedxBom') {
     includeConfigs = ["runtimeClasspath"]
     outputFormat = "json"
     projectType = "library"
     schemaVersion = "1.6"
 }
+
+// Distribution
 
 distributions {
     main {
@@ -54,7 +58,8 @@ distributions {
                 into 'bin'
                 rename { 'arconia' }
             }
-            from("$buildDir/reports/application.cdx.json") {
+            from("$buildDir/reports") {
+                include 'application.cdx.json'
                 rename { 'sbom.cdx.json' }
             }
             from(rootDir) {
@@ -64,10 +69,13 @@ distributions {
     }
 }
 
-tasks.distZip {
+tasks.named('distZip') {
+    onlyIf {
+        gradle.startParameter.taskNames.contains("distZip")
+    }
     archiveFileName = 'arconia-cli.zip'
 }
 
-tasks.distTar {
+tasks.named('distTar') {
     enabled = false
 }
