@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'distribution'
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.graalvm.buildtools.native' version '0.10.2'
@@ -44,4 +45,29 @@ cyclonedxBom {
     outputFormat = "json"
     projectType = "library"
     schemaVersion = "1.6"
+}
+
+distributions {
+    main {
+        contents {
+            from("$buildDir/native/nativeCompile") {
+                into 'bin'
+                rename { 'arconia' }
+            }
+            from("$buildDir/reports/application.cdx.json") {
+                rename { 'sbom.cdx.json' }
+            }
+            from(rootDir) {
+                include 'LICENSE', 'README.md'
+            }
+        }
+    }
+}
+
+tasks.distZip {
+    archiveFileName = 'arconia-cli.zip'
+}
+
+tasks.distTar {
+    enabled = false
 }
