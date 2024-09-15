@@ -1,7 +1,6 @@
 package io.arconia.cli.build;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Objects;
