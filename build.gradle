@@ -74,6 +74,7 @@ tasks.named('distZip') {
         gradle.startParameter.taskNames.contains("distZip")
     }
     archiveFileName = 'arconia-cli.zip'
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.named('distTar') {

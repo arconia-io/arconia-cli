@@ -52,7 +52,7 @@ jobs:
         run: ./gradlew distZip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: arconia-cli-${{ inputs.version }}-${{ matrix.platform }}.zip
           path: build/distributions/arconia-cli.zip

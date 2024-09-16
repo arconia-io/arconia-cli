@@ -42,4 +42,4 @@ jobs:
     with:
       version: 0.0.1-SNAPSHOT
     secrets:  
-      gh-token: ${{ secrets.IMAGE_PUSH_TOKEN }}
+      gh-token: ${{ secrets.GITHUB_TOKEN }}
