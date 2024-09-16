@@ -45,7 +45,7 @@ tasks.named('test') {
 tasks.named('cyclonedxBom') {
     includeConfigs = ["runtimeClasspath"]
     outputFormat = "json"
-    projectType = "library"
+    projectType = "application"
     schemaVersion = "1.6"
 }
 
@@ -56,12 +56,12 @@ distributions {
         contents {
             from("$buildDir/native/nativeCompile") {
                 into 'bin'
+                include 'arconia-cli', 'arconia-cli.exe'
                 rename { filename ->
-                    filename.replaceAll("-cli", "")
+                    filename.replace("arconia-cli", "arconia")
                 }
             }
-            from("$buildDir/reports") {
-                include 'application.cdx.json'
+            from("$buildDir/reports/application.cdx.json") {
                 rename { 'sbom.cdx.json' }
             }
             from(rootDir) {
@@ -76,7 +76,6 @@ tasks.named('distZip') {
         gradle.startParameter.taskNames.contains("distZip")
     }
     archiveFileName = 'arconia-cli.zip'
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.named('distTar') {
