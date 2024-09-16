@@ -12,9 +12,6 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: read
-
 jobs:
   build-native:
     name: Build Native Image
@@ -57,5 +54,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: arconia-cli-${{ inputs.project-version }}-${{ matrix.platform }}.zip
-          path: build/distributions/${{ matrix.artifact_name }}.zip
+          name: arconia-cli-${{ inputs.version }}-${{ matrix.platform }}.zip
+          path: build/distributions/arconia-cli.zip

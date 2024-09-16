@@ -37,8 +37,6 @@ jobs:
   assemble:
     name: Assemble
     needs: [build]
-    permissions:
-      contents: read
     uses: ./.github/workflows/native-image.yml
     if: ${{ github.ref == 'refs/heads/main' }}
     with:
