@@ -51,6 +51,10 @@ release:
 
 distributions:
   arconia-cli:
+    type: BINARY
+    executable:
+      name: arconia
+      windowsExtension: exe
     artifacts:
       - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-macos-aarch64.zip'
         platform: 'osx-aarch_64'
