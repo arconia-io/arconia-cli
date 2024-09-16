@@ -1,10 +1,13 @@
 initscript {
-    def pluginVersion = gradle.startParameter.projectProperties['pluginVersion']
+    def pluginVersion = gradle.startParameter.projectProperties['pluginVersion'] ?: 'latest.release'
     repositories {
         maven { url "https://plugins.gradle.org/m2" }
     }
     dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
 }
+
+def recipesVersion = gradle.startParameter.projectProperties['recipesVersion'] ?: 'latest.release'
+
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {

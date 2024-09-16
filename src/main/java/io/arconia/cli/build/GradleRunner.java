@@ -151,8 +151,12 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("-DactiveRecipe=" + OpenRewriteUtils.getSpringBootUpdateRecipe(updateOptions));
 
-        command.add("-PpluginVersion=" + Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "latest.release"));
-        command.add("-PrecipesVersion=" + Objects.requireNonNullElse(updateOptions.springRecipesVersion(), "latest.release"));
+        if (StringUtils.hasText(updateOptions.rewritePluginVersion())) {
+            command.add("-PpluginVersion=" + updateOptions.rewritePluginVersion());
+        }
+        if (StringUtils.hasText(updateOptions.springRecipesVersion())) {
+            command.add("-PrecipesVersion=" + updateOptions.springRecipesVersion());
+        }
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
             command.addAll(updateOptions.params());
