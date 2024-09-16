@@ -4,14 +4,20 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**/*.md'
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
     steps:
       - name: Check out source code
         uses: actions/checkout@v4
@@ -27,6 +33,13 @@ jobs:
       
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      
+      - name: Set VERSION environment variable
+        id: set_version
+        run: |
+          VERSION=$(./gradlew properties | grep 'version:' | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
 
       - name: Compile and test
         run: ./gradlew build
@@ -40,6 +53,52 @@ jobs:
     uses: ./.github/workflows/native-image.yml
     if: ${{ github.ref == 'refs/heads/main' }}
     with:
-      version: 0.0.1-SNAPSHOT
+      version: ${{ needs.build.outputs.version }}
     secrets:  
       gh-token: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Release
+    needs: [assemble, build]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '22'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: arconia-cli-*
+          merge-multiple: true
+          path: build/distributions
+      
+      - name: Release
+        uses: jreleaser/release-action@v2
+        with:
+          arguments: full-release
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_PROJECT_VERSION: ${{ needs.build.outputs.version }}
+      
+      - name: JReleaser output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: jreleaser-release
+          path: |
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties
