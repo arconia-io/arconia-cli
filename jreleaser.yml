@@ -32,7 +32,6 @@ platform:
 release:
   github:
     overwrite: true
-    sign: true
     discussionCategoryName: Announcements
     issues:
       enabled: true

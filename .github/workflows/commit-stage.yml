@@ -68,16 +68,6 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
-        with:
-          java-version: '22'
-          distribution: 'graalvm-community'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
