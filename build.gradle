@@ -61,7 +61,8 @@ distributions {
                     filename.replace("arconia-cli", "arconia")
                 }
             }
-            from("$buildDir/reports/application.cdx.json") {
+            from("$buildDir/reports") {
+                include 'application.cdx.json'
                 rename { 'sbom.cdx.json' }
             }
             from(rootDir) {
