@@ -56,7 +56,9 @@ distributions {
         contents {
             from("$buildDir/native/nativeCompile") {
                 into 'bin'
-                rename { 'arconia' }
+                rename { filename ->
+                    filename.replaceAll("-cli", "")
+                }
             }
             from("$buildDir/reports") {
                 include 'application.cdx.json'

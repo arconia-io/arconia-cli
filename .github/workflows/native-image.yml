@@ -48,6 +48,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew nativeCompile
       
+      - name: Verify artifact (Unix)
+        if: ${{ matrix.platform != 'windows-amd64' }}
+        run: build/native/nativeCompile/arconia-cli help
+      
+      - name: Verify artifact (Windows)
+        if: ${{ matrix.platform == 'windows-amd64' }}
+        run: build/native/nativeCompile/arconia-cli.exe help
+      
       - name: Assemble distribution
         run: ./gradlew distZip
 
