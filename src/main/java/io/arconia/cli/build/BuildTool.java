@@ -12,7 +12,7 @@ public enum BuildTool {
 
     @Nullable
     public static BuildTool fromProjectDir(Path projectDir) {
-        if (projectDir.resolve("build.gradle").toFile().exists()) {
+        if (projectDir.resolve("build.gradle").toFile().exists() || projectDir.resolve("settings.gradle").toFile().exists()) {
             return GRADLE;
         } else if (projectDir.resolve("build.gradle.kts").toFile().exists()) {
             return GRADLE_KOTLIN;
