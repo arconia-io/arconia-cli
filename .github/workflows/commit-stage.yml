@@ -31,3 +31,15 @@ jobs:
       
       - name: Native compile and test
         run: ./gradlew nativeBuild
+
+  assemble:
+    name: Assemble
+    needs: [build]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/native-image.yml
+    if: ${{ github.ref == 'refs/heads/main' }}
+    with:
+      version: 0.0.1-SNAPSHOT
+    secrets:  
+      gh-token: ${{ secrets.IMAGE_PUSH_TOKEN }}

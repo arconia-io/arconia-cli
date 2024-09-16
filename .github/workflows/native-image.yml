@@ -1,0 +1,64 @@
+name: Native Image
+
+on:
+  workflow_call:
+    secrets:
+      gh-token:
+        description: "Token to interact with the GitHub API without rate limits."
+        required: true
+    inputs:
+      version:
+        description: "The project version."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-native:
+    name: Build Native Image
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux-amd64
+          - os: macos-13
+            platform: macos-amd64
+          - os: macos-latest
+            platform: macos-aarch64
+          - os: windows-latest
+            platform: windows-amd64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '22'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.gh-token }}
+          cache: gradle
+      
+      - name: Version
+        if: endsWith(${{ inputs.project-version }}, '-SNAPSHOT') != true
+        run: |
+          echo ${{ inputs.project-version }} > VERSION
+
+      - name: Build with Gradle
+        run: ./gradlew nativeCompile
+      
+      - name: Assemble distribution
+        run: ./gradlew distZip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: arconia-cli-${{ inputs.project-version }}-${{ matrix.platform }}.zip
+          path: build/distributions/${{ matrix.artifact_name }}.zip
