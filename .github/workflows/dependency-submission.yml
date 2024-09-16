@@ -27,3 +27,6 @@ jobs:
 
     - name: Generate and submit Dependency Graph
       uses: gradle/actions/dependency-submission@v4
+      with:
+        # Exclude dependencies that are only resolved in test classpaths
+        dependency-graph-exclude-configurations: '.*[Tt]est(Compile|Runtime)Classpath'
