@@ -14,7 +14,7 @@ public enum BuildTool {
     public static BuildTool fromProjectDir(Path projectDir) {
         if (projectDir.resolve("build.gradle").toFile().exists()) {
             return GRADLE;
-        } else if (projectDir.resolve("build.gradle").toFile().exists()) {
+        } else if (projectDir.resolve("build.gradle.kts").toFile().exists()) {
             return GRADLE_KOTLIN;
         } else if (projectDir.resolve("pom.xml").toFile().exists()) {
             return MAVEN;
