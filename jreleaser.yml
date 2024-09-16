@@ -1,0 +1,63 @@
+project:
+  name: arconia-cli
+  description: Enhance the developer experience for Spring Boot
+  longDescription: |
+    Arconia CLI is a powerful tool designed to streamline and enhance the developer experience
+    when working with Spring Boot applications. It offers a comprehensive set of convenient
+    commands to build, test, and run Spring Boot applications effortlessly. With Arconia CLI,
+    you can upgrade your applications to the latest Spring Boot version with a single command,
+    saving time and ensuring you're always using the most up-to-date features. Additionally,
+    it simplifies the process of packaging your application as a container image, supporting
+    both Cloud Native Buildpacks and Dockerfiles. Whether you're a seasoned Spring Boot
+    developer or just getting started, Arconia CLI aims to boost your productivity and make
+    your development workflow smoother and more efficient.
+  links:
+    homepage: https://{{repoHost}}/{{repoOwner}}/{{repoName}}
+    faq: https://{{repoHost}}/{{repoOwner}}/{{repoName}}/discussions
+  authors:
+    - Thomas Vitale
+  license: Apache-2.0
+  inceptionYear: "2024"
+  stereotype: CLI
+  vendor: Arconia
+  tags:
+    - spring-boot
+    - developer-experience
+    - java
+
+platform:
+  replacements:
+    aarch_64: aarch64
+
+release:
+  github:
+    overwrite: true
+    sign: true
+    discussionCategoryName: Announcements
+    issues:
+      enabled: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+      extraProperties:
+        categorizeScopes: true
+      hide:
+        categories:
+          - 'merge'
+        contributors:
+          - 'GitHub'
+          - 'dependabot'
+
+distributions:
+  arconia-cli:
+    artifacts:
+      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-macos-aarch64.zip'
+        platform: 'osx-aarch_64'
+      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-macos-amd64.zip'
+        platform: 'osx-x86_64'
+      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-linux-amd64.zip'
+        platform: 'linux-x86_64'
+      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-windows-amd64.zip'
+        platform: 'windows-x86_64'
