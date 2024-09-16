@@ -44,12 +44,9 @@ jobs:
           java-version: '22'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.gh-token }}
-          cache: gradle
       
-      - name: Version
-        if: endsWith(${{ inputs.project-version }}, '-SNAPSHOT') != true
-        run: |
-          echo ${{ inputs.project-version }} > VERSION
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
         run: ./gradlew nativeCompile

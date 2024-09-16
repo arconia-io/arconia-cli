@@ -24,7 +24,9 @@ jobs:
           java-version: '22'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          cache: gradle
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Compile and test
         run: ./gradlew build
