@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.regex.Pattern;
 
@@ -14,7 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 public final class FileUtils {
 
     public static Path getProjectDir() {
-        return Paths.get(System.getProperty("user.dir")).toAbsolutePath();
+        return Path.of(System.getProperty("user.dir")).toAbsolutePath();
     }
 
     public static File getExecutable(String executableName) {
@@ -25,7 +24,7 @@ public final class FileUtils {
     
         String[] pathDirs = pathEnv.split(Pattern.quote(File.pathSeparator));
         for (String dir : pathDirs) {
-            File file = Paths.get(dir).resolve(executableName).toFile();
+            File file = Path.of(dir).resolve(executableName).toFile();
             if (file.exists() && file.canExecute()) {
                 return file;
             }

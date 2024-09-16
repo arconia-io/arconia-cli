@@ -2,7 +2,6 @@ package io.arconia.cli.image;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 
 import org.springframework.util.StringUtils;
@@ -37,7 +36,7 @@ public class DockerfileRunner implements ImageToolRunner {
     private Path getDockerfilePath(String dockerfile) {
         Path dockerfilePath;
         if (StringUtils.hasText(dockerfile)) {
-            dockerfilePath = Paths.get(dockerfile).toAbsolutePath();
+            dockerfilePath = Path.of(dockerfile).toAbsolutePath();
             if (!dockerfilePath.toFile().exists()) {
                 throw new RuntimeException("Cannot find a Dockerfile from " + dockerfile);
             }
