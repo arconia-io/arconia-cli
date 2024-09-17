@@ -62,5 +62,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: arconia-${{ inputs.version }}-${{ matrix.platform }}
+          retention-days: 1
+          name: artifacts
           path: build/distributions/arconia-${{ inputs.version }}-${{ matrix.platform }}.zip

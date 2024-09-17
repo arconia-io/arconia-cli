@@ -55,19 +55,19 @@ distributions:
     executable:
       name: arconia
     artifacts:
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-macos-aarch64.zip'
+      - path: './{{distributionName}}-{{projectVersion}}-macos-aarch64.zip'
         platform: 'osx-aarch_64'
         extraProperties:
           graalVMNativeImage: true
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-macos-amd64.zip'
+      - path: './{{distributionName}}-{{projectVersion}}-macos-amd64.zip'
         platform: 'osx-x86_64'
         extraProperties:
           graalVMNativeImage: true
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-linux-amd64.zip'
+      - path: './{{distributionName}}-{{projectVersion}}-linux-amd64.zip'
         platform: 'linux-x86_64'
         extraProperties:
           graalVMNativeImage: true
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-windows-amd64.zip'
+      - path: './{{distributionName}}-{{projectVersion}}-windows-amd64.zip'
         platform: 'windows-x86_64'
         extraProperties:
           graalVMNativeImage: true
