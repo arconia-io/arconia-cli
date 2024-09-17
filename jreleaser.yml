@@ -31,7 +31,7 @@ platform:
 
 release:
   github:
-    overwrite: true
+    #overwrite: true
     discussionCategoryName: Announcements
     issues:
       enabled: true
