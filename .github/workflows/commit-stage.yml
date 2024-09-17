@@ -72,12 +72,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: arconia-*
-          path: out/jreleaser/assemble/arconia-cli/native-image
+          path: artifacts
       
-      - name: Verify artifacts
+      - name: Inspect artifacts
         run: |
-          echo "Contents of out/jreleaser/assemble/arconia-cli/native-image:"
-          ls -R out/jreleaser/assemble/arconia-cli/native-image
+          echo "Artifacts:"
+          ls -R artifacts
       
       - name: Release
         uses: jreleaser/release-action@v2
