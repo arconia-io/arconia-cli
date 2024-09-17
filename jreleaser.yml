@@ -56,7 +56,7 @@ signing:
   armored: true
 
 distributions:
-  arconia:
+  arconia-cli:
     type: BINARY
     executable:
       name: arconia
