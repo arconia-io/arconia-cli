@@ -71,7 +71,14 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts
+          pattern: arconia-*
+          path: artifacts
+          merge-multiple: true
+      
+      - name: Inspect artifacts
+        run: |
+          echo "Artifacts:"
+          ls -R artifacts
       
       - name: Release
         uses: jreleaser/release-action@v2
