@@ -55,12 +55,17 @@ jobs:
       - name: Verify artifact (Windows)
         if: ${{ matrix.platform == 'windows-amd64' }}
         run: build/native/nativeCompile/arconia-cli.exe help
-      
-      - name: Assemble distribution
-        run: ./gradlew distZip
 
-      - name: Upload artifact
+      - name: Upload artifact (Unix)
+        if: ${{ matrix.platform != 'windows-amd64' }}
         uses: actions/upload-artifact@v4
         with:
-          name: arconia-cli-${{ inputs.version }}-${{ matrix.platform }}.zip
-          path: build/distributions/arconia-cli.zip
+          name: arconia-${{ inputs.version }}-${{ matrix.platform }}
+          path: build/native/nativeCompile/arconia
+      
+      - name: Upload artifact (Windows)
+        if: ${{ matrix.platform == 'windows-amd64' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: arconia-${{ inputs.version }}-${{ matrix.platform }}.exe
+          path: build/native/nativeCompile/arconia.exe

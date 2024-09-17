@@ -50,17 +50,24 @@ release:
           - 'dependabot'
 
 distributions:
-  arconia-cli:
+  arconia:
     type: BINARY
     executable:
       name: arconia
-      windowsExtension: exe
     artifacts:
-      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-macos-aarch64.zip'
+      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-macos-aarch64'
         platform: 'osx-aarch_64'
-      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-macos-amd64.zip'
+        extraProperties:
+          graalVMNativeImage: true
+      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-macos-amd64'
         platform: 'osx-x86_64'
-      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-linux-amd64.zip'
+        extraProperties:
+          graalVMNativeImage: true
+      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-linux-amd64'
         platform: 'linux-x86_64'
-      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-windows-amd64.zip'
+        extraProperties:
+          graalVMNativeImage: true
+      - path: 'out/jreleaser/assemble/arconia-cli/native-image/{{distributionName}}-{{projectVersion}}-windows-amd64'
         platform: 'windows-x86_64'
+        extraProperties:
+          graalVMNativeImage: true

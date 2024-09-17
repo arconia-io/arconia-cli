@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'distribution'
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.graalvm.buildtools.native' version '0.10.3'
@@ -32,10 +31,16 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// Application
-
 springBoot {
     buildInfo()
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName = 'arconia'
+        }
+    }
 }
 
 tasks.named('test') {
@@ -47,38 +52,4 @@ tasks.named('cyclonedxBom') {
     outputFormat = "json"
     projectType = "application"
     schemaVersion = "1.6"
-}
-
-// Distribution
-
-distributions {
-    main {
-        contents {
-            from("$buildDir/native/nativeCompile") {
-                into 'bin'
-                include 'arconia-cli', 'arconia-cli.exe'
-                rename { filename ->
-                    filename.replace("arconia-cli", "arconia")
-                }
-            }
-            from("$buildDir/reports") {
-                include 'application.cdx.json'
-                rename { 'sbom.cdx.json' }
-            }
-            from(rootDir) {
-                include 'LICENSE', 'README.md'
-            }
-        }
-    }
-}
-
-tasks.named('distZip') {
-    onlyIf {
-        gradle.startParameter.taskNames.contains("distZip")
-    }
-    archiveFileName = 'arconia-cli.zip'
-}
-
-tasks.named('distTar') {
-    enabled = false
 }

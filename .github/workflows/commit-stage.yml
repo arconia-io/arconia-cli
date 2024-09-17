@@ -71,7 +71,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: arconia-cli-*
+          pattern: arconia-*
           path: out/jreleaser/assemble/arconia-cli/native-image
       
       - name: Verify artifacts
