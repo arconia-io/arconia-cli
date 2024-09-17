@@ -50,11 +50,11 @@ jobs:
       
       - name: Verify artifact (Unix)
         if: ${{ matrix.platform != 'windows-amd64' }}
-        run: build/native/nativeCompile/arconia-cli help
+        run: build/native/nativeCompile/arconia help
       
       - name: Verify artifact (Windows)
         if: ${{ matrix.platform == 'windows-amd64' }}
-        run: build/native/nativeCompile/arconia-cli.exe help
+        run: build/native/nativeCompile/arconia.exe help
 
       - name: Upload artifact (Unix)
         if: ${{ matrix.platform != 'windows-amd64' }}
