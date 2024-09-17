@@ -64,6 +64,9 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+    outputs:
+      HASHES: ${{ steps.slsa.outputs.HASHES }}
+      TAGNAME: ${{ steps.slsa.outputs.TAGNAME }}
     steps:
       - name: Check out source code
         uses: actions/checkout@v4
@@ -102,3 +105,24 @@ jobs:
           path: |
             out/jreleaser/trace.log
             out/jreleaser/output.properties
+      
+      - name: SLSA
+        shell: bash
+        id: slsa
+        run: |
+          echo "HASHES=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "TAGNAME=$(grep tagName out/jreleaser/output.properties | awk -F'=' '{print $2}')" >> "$GITHUB_OUTPUT"
+
+  provenance:
+    needs: [ build, release ]
+    name: Generate SLSA Provenance
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    with:
+      base64-subjects: ${{ needs.release.outputs.HASHES }}
+      upload-assets: true
+      upload-tag-name: ${{ needs.release.outputs.TAGNAME }}
+      provenance-name: arconia-cli-${{ needs.build.outputs.version }}.intoto.jsonl
