@@ -31,7 +31,9 @@ platform:
 
 release:
   github:
+    releaseName: '{{tagName}}'
     overwrite: true
+    sign: true
     discussionCategoryName: Announcements
     issues:
       enabled: true
@@ -48,6 +50,10 @@ release:
         contributors:
           - 'GitHub'
           - 'dependabot'
+
+signing:
+  active: ALWAYS
+  armored: true
 
 distributions:
   arconia:
