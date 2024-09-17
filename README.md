@@ -5,17 +5,7 @@
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Twitter](https://img.shields.io/static/v1?label=Twitter&message=Follow&color=1DA1F2)](https://twitter.com/kadrasIO)
 
-Arconia CLI is a powerful tool designed to streamline and enhance the developer experience when working
-with Spring Boot applications. 
-
-It offers a comprehensive set of convenient commands to build, test, and run Spring Boot applications
-effortlessly. With Arconia CLI, you can upgrade your applications to the latest Spring Boot version
-with a single command, saving time and ensuring you're always using the most up-to-date features.
-
-Additionally, it simplifies the process of packaging your application as a container image, supporting
-both Cloud Native Buildpacks and Dockerfiles. Whether you're a seasoned Spring Boot developer
-or just getting started, Arconia CLI aims to boost your productivity and make your development
-workflow smoother and more efficient.
+Arconia CLI is a versatile tool designed to enhance the development experience with Spring Boot applications, providing intuitive commands for building, testing, and running projects. It streamlines common tasks, including upgrading Spring Boot applications to the latest version with a single command, and simplifies containerization using both Cloud Native Buildpacks and Dockerfiles.
 
 <img src="arconia-logo.png" alt="The Arconia logo" height="250px" />
 
@@ -26,22 +16,31 @@ workflow smoother and more efficient.
 
 ### Installation
 
-[Download](https://github.com/arconia-io/arconia-cli/releases) the binary for your OS from the latest GitHub release, move it next to your other binaries and make it executable.
+Download the appropriate binary for your operating system from the [latest Arconia CLI release](https://github.com/arconia-io/arconia-cli/releases). Then, follow the instructions below to install it on your system.
 
-On macOS and Linux:
+#### macOS and Linux
+
+1. Move the downloaded binary to a directory in your system PATH:
 
 ```shell
 mv ~/Downloads/arconia-[version]-[os]/bin/ /usr/local/bin/
+```
+
+2. Make the binary executable:
+
+```shell
 chmod +x /usr/local/bin/arconia
 ```
 
-On Windows, run the following commands from PowerShell:
+#### Windows
+
+Run the following commands in PowerShell with administrator privileges:
 
 ```shell
-# Create a new directory for arconia-cli
-New-Item -ItemType Directory -Path "$env:ProgramFiles\arconia-[version]-[os]" -Force
+# Create a directory for Arconia CLI
+New-Item -ItemType Directory -Path "$env:ProgramFiles\arconia-cli" -Force
 
-# Move the arconia.exe to the new directory
+# Move the executable to the new directory
 Move-Item -Path "$env:USERPROFILE\Downloads\arconia-[version]-[os]\bin\arconia.exe" -Destination "$env:ProgramFiles\arconia-cli\arconia.exe"
 
 # Add the new directory to the system PATH
@@ -55,11 +54,13 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 ### Usage
 
-Get the help information for the Arconia CLI.
+To get started with Arconia CLI, you can view the available commands and options by running:
 
 ```shell
 arconia help
 ```
+
+This will display a list of commands and their descriptions, helping you navigate the CLI's functionality.
 
 ## 📙&nbsp; Reference
 
@@ -85,26 +86,91 @@ Migration
 
 ## 📙&nbsp; Provenance
 
-### SLSA
+### PGP
 
-Every Arconia CLI release provides SLSA provenance for all the release artifacts.
+All Arconia CLI release artifacts are signed with PGP. Follow these steps to verify the authenticity of the downloads.
 
-1. Install the slsa-verifier CLI
-2. Download the SLSA provenance attestation file from the release you want to validate.
-For example, `arconia-cli-0.0.1-SNAPSHOT.intoto.jsonl`.
-3. Download the Arconia CLI binary archive you want to validate.
-For example, `arconia-0.0.1-SNAPSHOT-linux-amd64.zip`.
-4. Use the slsa-verifier to verify the SLSA provenance attestation against the binary.
-For example,
+1. Download the Arconia [public key](http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x36DD645BC7818CF5C884DE8F2E64062497575B2D) and save it as `arconia.asc`.
+2. Verify the key fingerprint matches the following:
 
 ```shell
-$ slsa-verifier verify-artifact arconia-0.0.1-SNAPSHOT-linux-amd64.zip \
+$ gpg --show-keys arconia.asc
+pub   ed25519 2024-01-16 [SC] [expires: 2026-01-15]
+      36DD645BC7818CF5C884DE8F2E64062497575B2D
+uid                      Thomas Vitale (MavenCentral) <oss@************.io>
+sub   cv25519 2024-01-16 [E] [expires: 2026-01-15]
+```
+
+3. Import the public key into your GPG keyring:
+
+```shell
+$ gpg --import arconia.asc
+```
+
+4. Download the Arconia CLI binary archive and its corresponding signature file from the desired [release](https://github.com/arconia-io/arconia-cli/releases)
+For example:
+
+* `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`
+* `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip.asc`.
+
+5. Verify the signature against the downloaded binary:
+
+```shell
+$ gpg --verify arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip.asc arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip
+gpg: Signature made Mar 17 Set 23:29:59 2024 CEST
+gpg:                using EDDSA key 2E64062497575B2D
+gpg: Good signature from "Thomas Vitale (MavenCentral) <oss@************.io>" [ultimate]
+```
+
+A successful verification will display "Good signature" in the output, confirming the authenticity and integrity of the downloaded binary.
+
+### SLSA
+
+Every Arconia CLI release includes [SLSA](https://slsa.dev) provenance attestations for all release artifacts. Follow these steps to verify the provenance.
+
+1. Install the [slsa-verifier](https://github.com/slsa-framework/slsa-verifier) tool
+2. Download the SLSA provenance attestation file from the desired [release](https://github.com/arconia-io/arconia-cli/releases).
+Example: `arconia-cli-0.0.1-SNAPSHOT.intoto.jsonl`.
+3. Download the corresponding Arconia CLI binary archive from the same release.
+Example: `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`.
+4. Use the slsa-verifier to verify the SLSA provenance attestation against the binary:
+
+```shell
+$ slsa-verifier verify-artifact arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip \
        --provenance-path arconia-cli-0.0.1-SNAPSHOT.intoto.jsonl \
        --source-uri github.com/arconia-io/arconia-cli
-Verified signature against tlog entry index 131479173 at URL: https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a7a96a19c05e3e336be9a8ce5f56647734ec1b4737ecfd1e5d15519b88f08a706
-Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v2.0.0" at commit eee4635ed75b717f8ceef47f6a2dce3c8e4bfbeb
-Verifying artifact arconia-0.0.1-SNAPSHOT-linux-amd64.zip: PASSED
 ```
+
+A successful verification will output a message similar to:
+
+```
+Verified signature against tlog entry index 131481633 at URL: https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a1631335a14958734e5e0a00b4105b318339d4571b91a1ab8a8b2a90b1704d6d0
+Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v2.0.0" at commit 10d734affc77f0f4d0f1087fe66bd7eeb3a61f8a
+Verifying artifact arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip: PASSED
+
+PASSED: SLSA verification passed
+```
+
+This process ensures the authenticity and integrity of the Arconia CLI release artifacts.
+
+### SBOM
+
+Every Arconia CLI release includes a comprehensive [CycloneDX](https://cyclonedx.org/) Software Bill of Materials (SBOM) for all release artifacts. The SBOM provides a detailed inventory of components, libraries, and dependencies used in the Arconia CLI, enhancing transparency, security, and compliance efforts.
+
+To access and review the SBOM for a specific release:
+
+1. Visit the [Arconia CLI releases page](https://github.com/arconia-io/arconia-cli/releases) on GitHub.
+2. Download the binary archive for your desired release and platform.
+Example: `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`.
+3. Extract the contents of the archive to a local directory.
+4. Locate the file named `sbom.cdx.json` within the extracted directory. This JSON file contains the comprehensive SBOM for the release.
+
+You can use various SBOM analysis tools to examine the `sbom.cdx.json` file and gain valuable insights into the components and dependencies of the Arconia CLI. Some recommended tools include:
+
+- [OWASP Dependency-Track](https://dependencytrack.org/): An intelligent component analysis platform that allows you to identify and reduce risk in your software supply chain.
+- [Trivy](https://github.com/aquasecurity/trivy): A comprehensive and versatile security scanner for containers and other artifacts.
+
+By reviewing the SBOM, you can better understand the composition of the Arconia CLI, identify potential vulnerabilities, and ensure compliance with licensing requirements.
 
 ## 💻&nbsp; Development
 
@@ -112,31 +178,41 @@ Verifying artifact arconia-0.0.1-SNAPSHOT-linux-amd64.zip: PASSED
 
 * Java 22 (GraalVM)
 
-### Build the CLI
+### Building the CLI
 
-Package the Arconia CLI as a native executable:
+To package the Arconia CLI as a native executable, run:
 
 ```shell
 ./gradlew nativeCompile
 ```
 
-The executable is located in `build/native/nativeCompile/arconia`.
-You can run it from there or add it as a new executable to your OS Path.
-For example, on macOS and Linux:
+This command compiles the project and generates a standalone native executable. The resulting file will be located at `build/native/nativeCompile/arconia`.
+
+### Installing the CLI
+
+You can run the CLI directly from its build location or install it system-wide for easier access. To install it globally on macOS or Linux:
 
 ```shell
 sudo cp build/native/nativeCompile/arconia /usr/local/bin/arconia
 ```
 
-### Run the CLI
+This command copies the executable to a directory typically included in the system PATH, making it accessible from anywhere in the terminal.
 
-If you defined the Arconia CLI as an executable in your OS Path, you can run it as follows:
+### Running the CLI
+
+If you've installed the CLI globally, you can run it by simply typing:
 
 ```shell
 arconia help
 ```
 
-Otherwise, you can point to the executable file (`build/native/nativeCompile/arconia`).
+If you haven't installed it globally, you'll need to specify the full path to the executable:
+
+```shell
+./build/native/nativeCompile/arconia help
+```
+
+Replace `help` with any other valid command or option to use different features of the CLI.
 
 ## 🛡️&nbsp; Security
 
@@ -148,4 +224,4 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 
 ## 🙏&nbsp; Acknowledgments
 
-This project relies on [Spring Shell](https://docs.spring.io/spring-shell/reference/index.html) for building CLI applications and draws inspiration from the superior experience offered by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling).
+This project is built upon [Spring Shell](https://docs.spring.io/spring-shell/reference/index.html), a powerful framework for creating CLI applications. We also draw inspiration from the exceptional user experience provided by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling), which has influenced our design.
