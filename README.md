@@ -12,13 +12,31 @@ with Spring Boot applications.
 
 ### Installation
 
-Download the binary for your OS from [the latest Commit Stage workflow execution](https://github.com/arconia-io/arconia-cli/actions/workflows/commit-stage.yml), move it next to your other binaries and make it executable.
+[Download](https://github.com/arconia-io/arconia-cli/releases) the binary for your OS from the latest GitHub release, move it next to your other binaries and make it executable.
 
-For example, on macOS and Linux:
+On macOS and Linux:
 
 ```shell
 mv ~/Downloads/arconia-cli/bin/ /usr/local/bin/
 chmod +x /usr/local/bin/arconia
+```
+
+On Windows, run the following commands from PowerShell:
+
+```shell
+# Create a new directory for arconia-cli
+New-Item -ItemType Directory -Path "$env:ProgramFiles\arconia-cli" -Force
+
+# Move the arconia.exe to the new directory
+Move-Item -Path "$env:USERPROFILE\Downloads\arconia-cli\bin\arconia.exe" -Destination "$env:ProgramFiles\arconia-cli\arconia.exe"
+
+# Add the new directory to the system PATH
+$currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+$newPath = "$currentPath;$env:ProgramFiles\arconia-cli"
+[Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+
+# Refresh the current PowerShell session's PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
 
 ### Usage

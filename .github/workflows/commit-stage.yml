@@ -73,7 +73,12 @@ jobs:
         with:
           pattern: arconia-cli-*
           merge-multiple: true
-          path: build/distributions
+          path: out/jreleaser/assemble/arconia-cli/native-image
+      
+      - name: Verify artifacts
+        run: |
+          echo "Contents of out/jreleaser/assemble/arconia-cli/native-image:"
+          ls -R out/jreleaser/assemble/arconia-cli/native-image
       
       - name: Release
         uses: jreleaser/release-action@v2
