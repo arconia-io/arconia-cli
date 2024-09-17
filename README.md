@@ -84,7 +84,7 @@ Migration
        update: Update project to new Spring Boot version.
 ```
 
-## 📙&nbsp; Provenance
+## 🔗&nbsp; Provenance
 
 ### PGP
 
