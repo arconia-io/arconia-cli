@@ -9,8 +9,8 @@ Arconia CLI is a versatile tool designed to enhance the development experience w
 
 <img src="arconia-logo.png" alt="The Arconia logo" height="250px" />
 
-> [!IMPORTANT]
-> The Arconia CLI is under active development. Use at your own risk!
+> [!NOTE]
+> The Arconia CLI is currently in active development. We're working hard to improve it and appreciate your patience as we refine the tool. Feel free to try it out and share your feedback!
 
 ## 🚀&nbsp; Getting Started
 
