@@ -56,11 +56,11 @@ distributions:
       name: arconia
       windowsExtension: exe
     artifacts:
-      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-macos-aarch64.zip'
+      - path: 'build/distributions/{{distributionName}}-{{projectVersion}}-macos-aarch64.zip'
         platform: 'osx-aarch_64'
-      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-macos-amd64.zip'
+      - path: 'build/distributions/{{distributionName}}-{{projectVersion}}-macos-amd64.zip'
         platform: 'osx-x86_64'
-      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-linux-amd64.zip'
+      - path: 'build/distributions/{{distributionName}}-{{projectVersion}}-linux-amd64.zip'
         platform: 'linux-x86_64'
-      - path: 'build/distributions/{{distributionName}}-{{projectEffectiveVersion}}-windows-amd64.zip'
+      - path: 'build/distributions/{{distributionName}}-{{projectVersion}}-windows-amd64.zip'
         platform: 'windows-x86_64'
