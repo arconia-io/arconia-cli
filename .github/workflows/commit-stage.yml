@@ -62,6 +62,8 @@ jobs:
     needs: [assemble, build]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Check out source code
         uses: actions/checkout@v4
