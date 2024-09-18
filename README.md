@@ -1,6 +1,6 @@
 # Arconia CLI
 
-![Commit Stage Workflow](https://github.com/arconia-io/arconia-cli/actions/workflows/commit-stage.yml/badge.svg)
+![Build](https://github.com/arconia-io/arconia-cli/actions/workflows/commit-stage.yml/badge.svg)
 [![The SLSA Level 3 badge](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev/spec/v1.0/levels)
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Twitter](https://img.shields.io/static/v1?label=Twitter&message=Follow&color=1DA1F2)](https://twitter.com/vitalethomas)
@@ -176,7 +176,7 @@ By reviewing the SBOM, you can better understand the composition of the Arconia 
 
 ### Prerequisites
 
-* Java 22 (GraalVM)
+* Java 23 (GraalVM)
 
 ### Building the CLI
 
