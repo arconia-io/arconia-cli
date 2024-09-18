@@ -5,12 +5,30 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**/*.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - '.sdkmanrc'
+      - '*.adoc'
+      - '*.png'
+      - '*.md'
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/*.md'
+      - '.github/*.yml'
   pull_request:
     branches:
       - main
     paths-ignore:
-      - '**/*.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - '.sdkmanrc'
+      - '*.adoc'
+      - '*.png'
+      - '*.md'
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/*.md'
+      - '.github/*.yml'
 
 jobs:
   build:
