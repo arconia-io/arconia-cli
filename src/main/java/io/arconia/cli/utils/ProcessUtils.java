@@ -8,7 +8,6 @@ public final class ProcessUtils {
 
     private ProcessUtils() {}
 
-    ///
     /// Executes a process with the given arguments in the specified directory.
     ///
     /// @param arguments         The command and its arguments to be executed.
