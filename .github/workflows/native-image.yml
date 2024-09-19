@@ -31,19 +31,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
 
       - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@22cc13fe88ef133134b3798e128fb208df55e1f5 # v1.2.3
         with:
           java-version: '23'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.gh-token }}
       
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
 
       - name: Build with Gradle
         run: ./gradlew nativeCompile
@@ -60,7 +60,7 @@ jobs:
         run: build/native/nativeCompile/arconia.exe help
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           retention-days: 1
           name: arconia-cli-${{ inputs.version }}-${{ matrix.platform }}

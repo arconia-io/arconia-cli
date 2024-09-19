@@ -38,19 +38,19 @@ jobs:
       version: ${{ steps.set_version.outputs.version }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
       
       - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+        uses: graalvm/setup-graalvm@22cc13fe88ef133134b3798e128fb208df55e1f5 # v1.2.3
         with:
           java-version: '23'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
       
       - name: Set VERSION environment variable
         id: set_version
@@ -88,12 +88,12 @@ jobs:
       TAGNAME: ${{ steps.attestation-data.outputs.TAGNAME }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
       
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           pattern: arconia-*
           path: artifacts
@@ -105,7 +105,7 @@ jobs:
           ls -R artifacts
       
       - name: Release
-        uses: jreleaser/release-action@v2
+        uses: jreleaser/release-action@80ffb38fa759704eed4db5c7fcaae3ac1079473e # v2
         with:
           arguments: full-release
         env:
@@ -117,7 +117,7 @@ jobs:
       
       - name: JReleaser output
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           retention-days: 1
           name: jreleaser-release
