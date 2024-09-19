@@ -16,6 +16,8 @@ import io.arconia.cli.utils.SystemUtils;
 
 public class MavenRunner implements BuildToolRunner {
 
+    private static final String OPEN_REWRITE_VERSION = "LATEST";
+
     private final Path projectDir;
 
     public MavenRunner(Path projectDir) {
@@ -130,14 +132,14 @@ public class MavenRunner implements BuildToolRunner {
         command.add("-U");
         
         if (updateOptions.dryRun()) {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "LATEST")));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), OPEN_REWRITE_VERSION)));
         } else {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), "LATEST")));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), OPEN_REWRITE_VERSION)));
         }
 
         command.add("-Drewrite.activeRecipes=" + OpenRewriteUtils.getSpringBootUpdateRecipe(updateOptions));
 
-        command.add("-Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:" + Objects.requireNonNullElse(updateOptions.springRecipesVersion(), "LATEST"));
+        command.add("-Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:" + Objects.requireNonNullElse(updateOptions.springRecipesVersion(), OPEN_REWRITE_VERSION));
         command.add("-Drewrite.exportDatatables=true");
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
