@@ -19,7 +19,6 @@ project:
   license: Apache-2.0
   inceptionYear: "2024"
   stereotype: CLI
-  vendor: Arconia
   tags:
     - spring-boot
     - developer-experience
@@ -60,6 +59,7 @@ distributions:
     type: BINARY
     executable:
       name: arconia
+      windowsExtension: exe
     artifacts:
       - path: 'artifacts/{{distributionName}}-{{projectVersion}}-macos-aarch64.zip'
         platform: 'osx-aarch_64'
