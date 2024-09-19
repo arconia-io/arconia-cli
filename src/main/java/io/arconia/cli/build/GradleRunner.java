@@ -27,35 +27,30 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public void build(BuildOptions buildOptions) {
         var command = constructGradleCommand("build", "nativeBuild", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void test(BuildOptions buildOptions) {
         var command = constructGradleCommand("test", "nativeTest", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
         var command = constructGradleCommand("bootRun", "nativeRun", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void imageBuild(BuildOptions buildOptions) {
         var command = constructGradleCommand("bootBuildImage", "bootBuildImage", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void update(UpdateOptions updateOptions) {
         var command = constructUpdateCommand(updateOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 

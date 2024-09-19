@@ -25,35 +25,30 @@ public class MavenRunner implements BuildToolRunner {
     @Override
     public void build(BuildOptions buildOptions) {
         var command = constructMavenCommand("install", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void test(BuildOptions buildOptions) {
         var command = constructMavenCommand("test", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
         var command = constructMavenCommand("spring-boot:run", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void imageBuild(BuildOptions buildOptions) {
         var command = constructMavenCommand("spring-boot:build-image", buildOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
     @Override
     public void update(UpdateOptions updateOptions) {
         var command = constructUpdateCommand(updateOptions);
-        System.out.println(command.toString());
         ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
     }
 
