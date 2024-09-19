@@ -22,7 +22,7 @@ public final class FileUtils {
 
     /// Find the given executable in the system's PATH.
     ///
-    /// @param executableName   the name of the executable to find
+    /// @param  executableName  the name of the executable to find
     /// @return                 the found executable file
     ///
     public static File getExecutable(String executableName) {
@@ -44,8 +44,8 @@ public final class FileUtils {
 
     /// Copy a file from the classpath to a temporary file.
     ///
-    /// @param resourcePath     the path of the resource in the classpath
-    /// @return Path            the created temporary file
+    /// @param  resourcePath    the path of the resource in the classpath
+    /// @return                 the created temporary file
     /// @throws IOException     if the file is not found or if there's an error during file operations
     ///
     public static Path copyFileToTemp(String resourcePath) throws IOException {
