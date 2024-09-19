@@ -43,12 +43,24 @@ release:
         format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
       extraProperties:
         categorizeScopes: true
+      labelers:
+        - label: 'dependencies'
+          title: 'regex:^(?:deps(?:\(.*\))?!?):\s.*'
+          order: 120
+      categories:
+        - title: '⚙️ Dependencies'
+          key: 'dependencies'
+          order: 70
+          labels:
+            - 'dependencies'
       hide:
         categories:
           - 'merge'
         contributors:
           - 'GitHub'
           - 'dependabot'
+      replacers:
+        - search: 'deps: '
 
 signing:
   active: ALWAYS
