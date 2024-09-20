@@ -8,36 +8,35 @@ public final class ProcessUtils {
 
     private ProcessUtils() {}
 
-    /// Executes a process with the given arguments in the specified directory.
+    /// Executes a command in the specified directory.
     ///
     /// @param arguments         The command and its arguments to be executed.
     /// @param targetDirectory   The directory in which to execute the command.
     ///
-    public static void executeProcess(String[] arguments, File targetDirectory) {
-        System.out.println("Running: %s".formatted(String.join(" ", arguments)));
+    public static void executeProcess(String[] command, File targetDirectory) {
+        System.out.println("Running: %s".formatted(String.join(" ", command)));
 
         try {
             Process process = new ProcessBuilder()
-                .command(arguments)
+                .command(command)
                 .inheritIO()
                 .directory(targetDirectory)
                 .start();
 
             if (!process.waitFor(5, TimeUnit.MINUTES)) {
-                System.out.println("Process timed out: " + String.join(" ", arguments));
                 process.destroy();
-                return;
+                throw new ProcessExecutionException("Process timed out", command);
             }
 
             int exitCode = process.exitValue();
             if (exitCode != 0) {
-                System.out.println("Process failed with exit code %s: %s".formatted(exitCode, String.join(" ", arguments)));
+                throw new ProcessExecutionException("Process failed with exit code %s".formatted(exitCode), command);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("IO error occurred while executing process: %s".formatted(String.join(" ", arguments)), e);
-        } catch (InterruptedException e) {
+        } catch (IOException ex) {
+            throw new ProcessExecutionException("IO error occurred while executing process", command, ex);
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new RuntimeException("Process was interrupted: %s".formatted(String.join(" ", arguments)), e);
+            throw new ProcessExecutionException("Process was interrupted", command, ex);
         }
     }
 
