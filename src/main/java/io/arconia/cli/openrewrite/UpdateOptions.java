@@ -49,11 +49,6 @@ public record UpdateOptions(
             return this;
         }
 
-        public Builder addParam(String param) {
-            this.params.add(param);
-            return this;
-        }
-
         public UpdateOptions build() {
             return new UpdateOptions(dryRun, springBootVersion, rewritePluginVersion, springRecipesVersion, params);
         }

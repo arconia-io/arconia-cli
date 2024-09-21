@@ -8,6 +8,7 @@ import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.openrewrite.UpdateOptions;
 
 import org.springframework.shell.command.CommandContext;
+import org.springframework.shell.command.CommandRegistration.OptionArity;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 
@@ -21,7 +22,7 @@ public class MigrationCommands {
         @Option(defaultValue = "3.3", description = "Spring Boot target version.") String springBootVersion,
         @Option(required = false, description = "OpenRewrite plugin version.") String rewritePluginVersion,
         @Option(required = false, description = "OpenRewrite Spring Recipes version.") String springRecipesVersion,
-        @Option(required = false, description = "Additional build parameters") String[] params
+        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var buildToolRunner = BuildToolRunner.create(terminal);
