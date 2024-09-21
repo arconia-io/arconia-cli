@@ -22,11 +22,15 @@ public class ArconiaCliTerminal {
         this.commandContext = commandContext;
         this.terminal = commandContext.getTerminal();
 
-        debug("Command arguments: %s".formatted(String.join(" ", commandContext.getRawArgs())));
+        debug("Arguments: %s".formatted(String.join(" ", commandContext.getRawArgs())));
+    }
+
+    public boolean isDebug() {
+        return commandContext.getOptionValue("debug") instanceof Boolean debug && debug;
     }
 
     public boolean isVerbose() {
-        return commandContext.getOptionValue("verbose") instanceof Boolean verbose && verbose;
+        return commandContext.getOptionValue("verbose") instanceof Boolean verbose && verbose || isDebug();
     }
 
     public boolean isStacktrace() {
@@ -51,7 +55,7 @@ public class ArconiaCliTerminal {
     }
 
     public void debug(String message) {
-        if (isVerbose()) {
+        if (isDebug()) {
             var debugMessage = buildMessageWithStyle("🔍 %s".formatted(message), AttributedStyle.DEFAULT.faint());
             write(debugMessage);
         }
@@ -69,6 +73,11 @@ public class ArconiaCliTerminal {
 
     public void failure(String message) {
         info("❌ %s".formatted(message));
+    }
+
+    public void newLine() {
+        terminal.writer().println("\n");
+        terminal.flush();
     }
 
     public void handleException(String message, Exception exception) {

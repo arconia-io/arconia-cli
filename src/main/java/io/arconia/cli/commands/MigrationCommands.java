@@ -22,6 +22,9 @@ public class MigrationCommands {
         @Option(defaultValue = "3.3", description = "Spring Boot target version.") String springBootVersion,
         @Option(required = false, description = "OpenRewrite plugin version.") String rewritePluginVersion,
         @Option(required = false, description = "OpenRewrite Spring Recipes version.") String springRecipesVersion,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
+        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
         @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);

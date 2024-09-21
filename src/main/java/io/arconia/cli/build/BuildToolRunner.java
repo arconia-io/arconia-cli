@@ -43,15 +43,13 @@ public interface BuildToolRunner {
     default String getBuildToolMainCommand() {
         File wrapper = getBuildToolWrapper();
         if (wrapper != null && wrapper.isFile()) {
-            getTerminal().debug("Using wrapper to run commands with %s".formatted(getBuildTool()));
-            getTerminal().debug("Wrapper path: %s".formatted(wrapper.getAbsolutePath()));
+            getTerminal().debug("Wrapper: %s".formatted(wrapper.getAbsolutePath()));
             return wrapper.getAbsolutePath();
         }
 
         File executable = getBuildToolExecutable();
         if (executable != null && executable.isFile()) {
-            getTerminal().debug("Using executable to run commands with %s".formatted(getBuildTool()));
-            getTerminal().debug("Executable path: %s".formatted(executable.getAbsolutePath()));
+            getTerminal().debug("Executable: %s".formatted(executable.getAbsolutePath()));
             return executable.getAbsolutePath();
         }
         
@@ -70,7 +68,7 @@ public interface BuildToolRunner {
             throw new ArconiaCliException(terminal, "Cannot detect the build tool used for the project at %s".formatted(projectPath));
         }
 
-        terminal.debug("Project path: %s".formatted(projectPath));
+        terminal.debug("Project: %s".formatted(projectPath));
         terminal.debug("Build tool: %s".formatted(buildTool));
 
         return switch (buildTool) {

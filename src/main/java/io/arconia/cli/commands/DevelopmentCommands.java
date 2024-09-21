@@ -21,6 +21,7 @@ public class DevelopmentCommands {
         @Option(description = "Perform a clean build.") boolean clean,
         @Option(description = "Skip tests.") boolean skipTests,
         @Option(description = "Perform a native build.", longNames = "native") boolean nativeBuild,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
         @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
@@ -42,6 +43,7 @@ public class DevelopmentCommands {
         CommandContext commandContext,
         @Option(description = "Perform a clean build.") boolean clean,
         @Option(description = "Run tests in native mode", longNames = "native") boolean nativeBuild,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
         @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
@@ -60,6 +62,7 @@ public class DevelopmentCommands {
     @Command(command = "run", description = "Run the application.")
     public void run(
         CommandContext commandContext,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
         @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params

@@ -42,23 +42,24 @@ public final class IoUtils {
         Assert.hasText(unixFileName, "unixFileName cannot be null or empty");
         Assert.hasText(windowsFileName, "windowsFileName cannot be null or empty");
 
+        Path currentPath = projectPath.toAbsolutePath().normalize();
+
         File wrapper;
         if (SystemUtils.isWindows()) {
-            wrapper = new File(projectPath.toFile(), windowsFileName);
+            wrapper = currentPath.resolve(windowsFileName).toFile();
         } else {
-            wrapper = new File(projectPath.toFile(), unixFileName);
+            wrapper = currentPath.resolve(unixFileName).toFile();
         }
 
         if (wrapper.isFile()) {
             return wrapper;
         }
 
-        Path projectPathNormalized = projectPath.normalize();
-        if (projectPathNormalized.equals(projectPath.getRoot())) {
+        if (currentPath.equals(projectPath.getRoot())) {
             return null;
         }
 
-        return getBuildToolWrapper(projectPathNormalized, unixFileName, windowsFileName);
+        return getBuildToolWrapper(currentPath.getParent(), unixFileName, windowsFileName);
     }
 
     @Nullable
@@ -77,12 +78,6 @@ public final class IoUtils {
             .orElse(null);
     }
 
-    /// Copy a file from the classpath to a temporary file.
-    ///
-    /// @param  resourcePath    the path of the resource in the classpath
-    /// @return                 the created temporary file
-    /// @throws IOException     if the file is not found or if there's an error during file operations
-    ///
     public static Path copyFileToTemp(String resourcePath) throws IOException {
         ClassPathResource resource = new ClassPathResource(resourcePath);
         
@@ -90,7 +85,7 @@ public final class IoUtils {
             throw new IOException("File not found: " + resourcePath);
         }
 
-        Path tempFile = Files.createTempFile("temp-", "-" + getFileNameFromPath(resourcePath));
+        Path tempFile = Files.createTempFile("temp-", "-" + resourcePath.substring(resourcePath.lastIndexOf('/') + 1));
         tempFile.toFile().deleteOnExit();
         
         try (InputStream inputStream = resource.getInputStream()) {
@@ -98,10 +93,6 @@ public final class IoUtils {
         }
 
         return tempFile;
-    }
-
-    private static String getFileNameFromPath(String path) {
-        return path.substring(path.lastIndexOf('/') + 1);
     }
 
 }

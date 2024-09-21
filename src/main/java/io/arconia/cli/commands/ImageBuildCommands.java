@@ -28,6 +28,7 @@ public class ImageBuildCommands {
 
         @Option(description = "Perform a clean build.") boolean clean,
         @Option(description = "Skip tests.") boolean skipTests,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
         @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
@@ -55,6 +56,7 @@ public class ImageBuildCommands {
         CommandContext commandContext,
         @Option(description = "Name for the image to build.", shortNames = 't') String imageName,
         @Option(required = false, description = "The path to the Dockerfile to use for building the container image.", shortNames = 'f') String dockerfile,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace
     ) {
