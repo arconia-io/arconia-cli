@@ -2,56 +2,68 @@ package io.arconia.cli.build;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.openrewrite.OpenRewriteUtils;
 import io.arconia.cli.openrewrite.UpdateOptions;
-import io.arconia.cli.utils.FileUtils;
-import io.arconia.cli.utils.ProcessUtils;
-import io.arconia.cli.utils.SystemUtils;
+import io.arconia.cli.utils.IoUtils;
 
 public class MavenRunner implements BuildToolRunner {
 
     private static final String OPEN_REWRITE_VERSION = "LATEST";
 
-    private final Path projectDir;
+    private final ArconiaCliTerminal terminal;
+    private final Path projectPath;
 
-    public MavenRunner(Path projectDir) {
-        this.projectDir = projectDir;
+    public MavenRunner(ArconiaCliTerminal terminal, Path projectPath) {
+        Assert.notNull(terminal, "terminal cannot be null");
+        Assert.notNull(projectPath, "projectPath cannot be null");
+        
+        this.terminal = terminal;
+        this.projectPath = projectPath;
     }
 
     @Override
     public void build(BuildOptions buildOptions) {
-        var command = constructMavenCommand("install", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
+        var command = constructMavenCommand("package", buildOptions);
+        call(command);
     }
 
     @Override
     public void test(BuildOptions buildOptions) {
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
         var command = constructMavenCommand("test", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        call(command);
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
         var command = constructMavenCommand("spring-boot:run", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        call(command);
     }
 
     @Override
     public void imageBuild(BuildOptions buildOptions) {
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
         var command = constructMavenCommand("spring-boot:build-image", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        call(command);
     }
 
     @Override
     public void update(UpdateOptions updateOptions) {
+        Assert.notNull(updateOptions, "updateOptions cannot be null");
         var command = constructUpdateCommand(updateOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        call(command);
     }
 
     @Override
@@ -60,23 +72,33 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
-    public File getBuildToolWrapper() {
-        File wrapper;
-        if (SystemUtils.isWindows()) {
-            wrapper = new File(projectDir.toFile(), "mvnw.cmd");
-        } else {
-            wrapper = new File(projectDir.toFile(), "mvnw");
-        }
-        return wrapper;
+    public Path getProjectPath() {
+        return projectPath;
     }
 
     @Override
-    public File getBuildToolExecutable() {
-        return FileUtils.getExecutable("mvn");
+    @Nullable
+    public File getBuildToolWrapper() {
+        return IoUtils.getBuildToolWrapper(projectPath, "mvnw", "mvnw.cmd");
     }
 
-    private ArrayDeque<String> constructMavenCommand(String action, BuildOptions buildOptions) {
-        ArrayDeque<String> command = new ArrayDeque<>();
+    @Override
+    @Nullable
+    public File getBuildToolExecutable() {
+        var mvndExecutable = IoUtils.getExecutable("mvnd");
+        if (mvndExecutable != null && mvndExecutable.isFile()) {
+            return mvndExecutable;
+        }
+        return IoUtils.getExecutable("mvn");
+    }
+
+    @Override
+    public ArconiaCliTerminal getTerminal() {
+        return terminal;
+    }
+
+    private List<String> constructMavenCommand(String action, BuildOptions buildOptions) {
+        List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
@@ -106,7 +128,7 @@ public class MavenRunner implements BuildToolRunner {
         return command;
     }
 
-    private void addBuildImageArguments(ArrayDeque<String> command, BuildImageOptions imageOptions) {
+    private void addBuildImageArguments(List<String> command, BuildImageOptions imageOptions) {
         if (StringUtils.hasText(imageOptions.imageName())) {
             command.add("-Dspring-boot.build-image.imageName=%s".formatted(imageOptions.imageName()));
         }
@@ -124,13 +146,13 @@ public class MavenRunner implements BuildToolRunner {
         }
     }
 
-    private ArrayDeque<String> constructUpdateCommand(UpdateOptions updateOptions) {
-        ArrayDeque<String> command = new ArrayDeque<>();
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+        List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
         command.add("-U");
-        
+
         if (updateOptions.dryRun()) {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(Objects.requireNonNullElse(updateOptions.rewritePluginVersion(), OPEN_REWRITE_VERSION)));
         } else {
@@ -148,5 +170,5 @@ public class MavenRunner implements BuildToolRunner {
 
         return command;
     }
-    
+
 }

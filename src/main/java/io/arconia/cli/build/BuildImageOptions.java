@@ -16,8 +16,8 @@ public record BuildImageOptions(
         private String imageName;
         private String builderImage;
         private String runImage;
-        private boolean cleanCache;
-        private boolean publishImage;
+        private boolean cleanCache = false;
+        private boolean publishImage = false;
 
         private Builder() {}
   

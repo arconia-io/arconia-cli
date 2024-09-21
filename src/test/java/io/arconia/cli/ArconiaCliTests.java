@@ -8,6 +8,7 @@ class ArconiaCliTests {
 
 	@Test
 	void contextLoads() {
+		// Verify Spring context loads correctly
 	}
 
 }

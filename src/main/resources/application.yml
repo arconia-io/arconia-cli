@@ -6,14 +6,26 @@ spring:
     web-application-type: none
   shell:
     command:
+      clear:
+        enabled: false
+      completion:
+        enabled: true
+      help:
+        enabled: true
       history:
+        enabled: false
+      quit:
         enabled: false
       script:
         enabled: false
+      stacktrace:
+        enabled: false
+      version:
+        enabled: true
     option:
        naming:
          case-type: kebab
 
-logging:
+logging: 
   pattern:
     console:

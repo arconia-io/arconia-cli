@@ -3,55 +3,72 @@ package io.arconia.cli.build;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import io.arconia.cli.utils.FileUtils;
-import io.arconia.cli.utils.ProcessUtils;
-import io.arconia.cli.utils.SystemUtils;
+import io.arconia.cli.utils.IoUtils;
+import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.openrewrite.OpenRewriteUtils;
 import io.arconia.cli.openrewrite.UpdateOptions;
 
 public class GradleRunner implements BuildToolRunner {
 
+    private final ArconiaCliTerminal terminal;
     private final BuildTool buildTool;
-    private final Path projectDir;
+    private final Path projectPath;
 
-    public GradleRunner(Path projectDir, BuildTool buildTool) {
-        this.projectDir = projectDir;
+    public GradleRunner(ArconiaCliTerminal terminal, Path projectPath, BuildTool buildTool) {
+        Assert.notNull(terminal, "terminal cannot be null");
+        Assert.notNull(projectPath, "projectPath cannot be null");
+        Assert.notNull(buildTool, "buildTool cannot be null");
+
+        this.terminal = terminal;
+        this.projectPath = projectPath;
         this.buildTool = buildTool;
     }
 
     @Override
     public void build(BuildOptions buildOptions) {
-        var command = constructGradleCommand("build", "nativeBuild", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
+        var action = buildOptions.nativeBuild() ? "nativeBuild" : "build";
+        var command = constructGradleCommand(action, buildOptions);
+        call(command);
     }
 
     @Override
     public void test(BuildOptions buildOptions) {
-        var command = constructGradleCommand("test", "nativeTest", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
+        var action = buildOptions.nativeBuild() ? "nativeTest" : "test";
+        var command = constructGradleCommand(action, buildOptions);
+        call(command);
     }
 
     @Override
     public void run(BuildOptions buildOptions) {
-        var command = constructGradleCommand("bootRun", "nativeRun", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
+        var action = buildOptions.nativeBuild() ? "nativeRun" : "bootRun";
+        var command = constructGradleCommand(action, buildOptions);
+        call(command);
     }
 
     @Override
     public void imageBuild(BuildOptions buildOptions) {
-        var command = constructGradleCommand("bootBuildImage", "bootBuildImage", buildOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        Assert.notNull(buildOptions, "buildOptions cannot be null");
+        var action = "bootBuildImage";
+        var command = constructGradleCommand(action, buildOptions);
+        call(command);
     }
 
     @Override
     public void update(UpdateOptions updateOptions) {
+        Assert.notNull(updateOptions, "updateOptions cannot be null");
         var command = constructUpdateCommand(updateOptions);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        call(command);
     }
 
     @Override
@@ -60,23 +77,29 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public File getBuildToolWrapper() {
-        File wrapper;
-        if (SystemUtils.isWindows()) {
-            wrapper = new File(projectDir.toFile(), "gradlew.bat");
-        } else {
-            wrapper = new File(projectDir.toFile(), "gradlew");
-        }
-        return wrapper;
+    public Path getProjectPath() {
+        return projectPath;
     }
 
     @Override
-    public File getBuildToolExecutable() {
-        return FileUtils.getExecutable("gradle");
+    @Nullable
+    public File getBuildToolWrapper() {
+        return IoUtils.getBuildToolWrapper(projectPath, "gradlew", "gradlew.bat");
     }
 
-    private ArrayDeque<String> constructGradleCommand(String action, String nativeAction, BuildOptions buildOptions) {
-        ArrayDeque<String> command = new ArrayDeque<>();
+    @Override
+    @Nullable
+    public File getBuildToolExecutable() {
+        return IoUtils.getExecutable("gradle");
+    }
+
+    @Override
+    public ArconiaCliTerminal getTerminal() {
+        return terminal;
+    }
+
+    private List<String> constructGradleCommand(String action, BuildOptions buildOptions) {
+        List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
@@ -84,11 +107,9 @@ public class GradleRunner implements BuildToolRunner {
             command.add("clean");
         }
 
-        if (buildOptions.nativeBuild()) {
-            command.add(nativeAction);
-        } else {
-            command.add(action);
-        }
+        command.add(action);
+
+        command.add("--console=rich");
 
         if (buildOptions.skipTests()) {
             command.add("-x");
@@ -106,7 +127,7 @@ public class GradleRunner implements BuildToolRunner {
         return command;
     }
 
-    private void addBuildImageArguments(ArrayDeque<String> command, BuildImageOptions imageOptions) {
+    private void addBuildImageArguments(List<String> command, BuildImageOptions imageOptions) {
         if (StringUtils.hasText(imageOptions.imageName())) {
             command.add("--imageName=%s".formatted(imageOptions.imageName()));
         }
@@ -124,19 +145,19 @@ public class GradleRunner implements BuildToolRunner {
         }
     }
 
-    private ArrayDeque<String> constructUpdateCommand(UpdateOptions updateOptions) {
-        ArrayDeque<String> command = new ArrayDeque<>();
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+        List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
         command.add("--init-script");
 
         try {
-            command.add(FileUtils.copyFileToTemp("openrewrite/init.gradle").toFile().getAbsolutePath());
+            command.add(IoUtils.copyFileToTemp("openrewrite/init.gradle").toFile().getAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        
+
         if (updateOptions.dryRun()) {
             command.add("rewriteDryRun");
         } else {

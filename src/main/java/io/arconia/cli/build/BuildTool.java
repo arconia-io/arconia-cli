@@ -3,6 +3,7 @@ package io.arconia.cli.build;
 import java.nio.file.Path;
 
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 public enum BuildTool {
 
@@ -11,12 +12,14 @@ public enum BuildTool {
     MAVEN;
 
     @Nullable
-    public static BuildTool fromProjectDir(Path projectDir) {
-        if (projectDir.resolve("build.gradle").toFile().exists() || projectDir.resolve("settings.gradle").toFile().exists()) {
+    public static BuildTool detectFromProjectPath(Path projectPath) {
+        Assert.notNull(projectPath, "projectPath cannot be null");
+
+        if (projectPath.resolve("build.gradle").toFile().isFile()) {
             return GRADLE;
-        } else if (projectDir.resolve("build.gradle.kts").toFile().exists()) {
+        } else if (projectPath.resolve("build.gradle.kts").toFile().isFile()) {
             return GRADLE_KOTLIN;
-        } else if (projectDir.resolve("pom.xml").toFile().exists()) {
+        } else if (projectPath.resolve("pom.xml").toFile().isFile()) {
             return MAVEN;
         }
         return null;

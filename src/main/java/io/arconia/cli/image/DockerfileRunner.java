@@ -2,25 +2,40 @@ package io.arconia.cli.image;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import io.arconia.cli.utils.FileUtils;
-import io.arconia.cli.utils.ProcessUtils;
+import io.arconia.cli.core.ArconiaCliException;
+import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.core.ProcessExecutor;
+import io.arconia.cli.utils.IoUtils;
 
 public class DockerfileRunner implements ImageToolRunner {
 
-    private final Path projectDir;
+    private final ArconiaCliTerminal terminal;
+    private final Path projectPath;
 
-    public DockerfileRunner() {
-        this.projectDir = FileUtils.getProjectDir();
+    public DockerfileRunner(ArconiaCliTerminal terminal) {
+        Assert.notNull(terminal, "terminal cannot be null");
+        this.terminal = terminal;
+        this.projectPath = IoUtils.getProjectPath();
     }
-  
-    public void build(String imageName, String dockerfile) { 
+
+    public void call(List<String> command) {
+        Assert.notEmpty(command, "command cannot be null or empty");
+        ProcessExecutor.execute(terminal, command.toArray(new String[0]), projectPath.toFile());
+    }
+
+    public void build(String imageName, @Nullable String dockerfile) {
+        Assert.hasText(imageName, "imageName cannot be null");
         var dockerfilePath = getDockerfilePath(dockerfile);
-        var command = constructImageCommand("build", imageName, dockerfilePath);
-        ProcessUtils.executeProcess(command.toArray(new String[0]), projectDir.toFile());
+        var action = "build";
+        var command = constructImageCommand(action, imageName, dockerfilePath);
+        call(command);
     }
 
     @Override
@@ -30,31 +45,36 @@ public class DockerfileRunner implements ImageToolRunner {
 
     @Override
     public File getImageToolExecutable() {
-        return FileUtils.getExecutable("docker");
+        return IoUtils.getExecutable("docker");
     }
 
     private Path getDockerfilePath(String dockerfile) {
         Path dockerfilePath;
         if (StringUtils.hasText(dockerfile)) {
             dockerfilePath = Path.of(dockerfile).toAbsolutePath();
-            if (!dockerfilePath.toFile().exists()) {
-                throw new RuntimeException("Cannot find a Dockerfile from " + dockerfile);
+            if (dockerfilePath.toFile().isFile()) {
+                terminal.debug("Dockerfile path: %s".formatted(dockerfilePath));
+                return dockerfilePath;
             }
+            throw new ArconiaCliException(terminal, "Cannot find Dockerfile at the specified path: %s".formatted(dockerfile));
         } else {
-            dockerfilePath = projectDir.resolve("src/main/docker/Dockerfile");
-            if (!dockerfilePath.toFile().exists()) {
-                dockerfilePath = projectDir.resolve("Dockerfile");
+            dockerfilePath = projectPath.resolve("src/main/docker/Dockerfile");
+
+            if (!dockerfilePath.toFile().isFile()) {
+                dockerfilePath = projectPath.resolve("Dockerfile");
             }
-            
-            if (!dockerfilePath.toFile().exists()) {
-                throw new RuntimeException("Cannot find a Dockerfile in any of the default locations");
+
+            if (dockerfilePath.toFile().isFile()) {
+                terminal.debug("Dockerfile path: %s".formatted(dockerfilePath));
+                return dockerfilePath;
             }
+
+            throw new ArconiaCliException(terminal, "Cannot find Dockerfile at any of the supported locations");
         }
-        return dockerfilePath;
     }
 
-    private ArrayDeque<String> constructImageCommand(String action, String imageName, Path dockerfilePath) {
-        ArrayDeque<String> command = new ArrayDeque<>();
+    private List<String> constructImageCommand(String action, String imageName, Path dockerfilePath) {
+        List<String> command = new ArrayList<>();
 
         command.add(getImageToolExecutable().getAbsolutePath());
 
@@ -62,11 +82,11 @@ public class DockerfileRunner implements ImageToolRunner {
 
         command.add("--tag");
         command.add(imageName);
-        
+
         command.add("--file");
         command.add(dockerfilePath.toFile().getAbsolutePath());
 
-        command.add(projectDir.toFile().getAbsolutePath());
+        command.add(projectPath.toFile().getAbsolutePath());
 
         command.add("--load");
 
