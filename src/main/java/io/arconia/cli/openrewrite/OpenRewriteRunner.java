@@ -2,7 +2,6 @@ package io.arconia.cli.openrewrite;
 
 import org.springframework.util.Assert;
 
-import io.arconia.cli.build.BuildOptions;
 import io.arconia.cli.build.BuildToolRunner;
 import io.arconia.cli.core.ArconiaCliTerminal;
 
