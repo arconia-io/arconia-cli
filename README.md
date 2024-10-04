@@ -82,7 +82,8 @@ Image
        image build dockerfile: Build a container image using Dockerfile.
 
 Migration
-       update: Update project to new Spring Boot version.
+       update java: Update project to new Java version.
+       update spring-boot: Update project to new Spring Boot version.
 ```
 
 ## 🔗&nbsp; Provenance

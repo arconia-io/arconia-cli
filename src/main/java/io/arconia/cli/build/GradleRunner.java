@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -13,10 +14,11 @@ import org.springframework.util.StringUtils;
 
 import io.arconia.cli.utils.IoUtils;
 import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.openrewrite.OpenRewriteUtils;
 import io.arconia.cli.openrewrite.UpdateOptions;
 
 public class GradleRunner implements BuildToolRunner {
+
+    private static final String OPEN_REWRITE_DEFAULT_VERSION = "latest.release";
 
     private final ArconiaCliTerminal terminal;
     private final BuildTool buildTool;
@@ -65,7 +67,7 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public void update(UpdateOptions updateOptions) {
+    public void rewrite(UpdateOptions updateOptions) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
         var command = constructUpdateCommand(updateOptions);
         call(command);
@@ -164,14 +166,10 @@ public class GradleRunner implements BuildToolRunner {
             command.add("rewriteRun");
         }
 
-        command.add("-DactiveRecipe=" + OpenRewriteUtils.getSpringBootUpdateRecipe(updateOptions));
+        command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
+        command.add("-PrecipeLibrary=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
 
-        if (StringUtils.hasText(updateOptions.rewritePluginVersion())) {
-            command.add("-PpluginVersion=" + updateOptions.rewritePluginVersion());
-        }
-        if (StringUtils.hasText(updateOptions.springRecipesVersion())) {
-            command.add("-PrecipesVersion=" + updateOptions.springRecipesVersion());
-        }
+        command.add("-PpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
             command.addAll(updateOptions.params());

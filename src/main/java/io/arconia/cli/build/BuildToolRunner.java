@@ -28,7 +28,7 @@ public interface BuildToolRunner {
 
     void imageBuild(BuildOptions buildOptions);
 
-    void update(UpdateOptions updateOptions);
+    void rewrite(UpdateOptions updateOptions);
 
     BuildTool getBuildTool();
 

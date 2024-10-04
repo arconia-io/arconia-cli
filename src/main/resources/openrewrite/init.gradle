@@ -1,17 +1,17 @@
 initscript {
-    def pluginVersion = gradle.startParameter.projectProperties['pluginVersion'] ?: 'latest.release'
+    def pluginVersion = gradle.startParameter.projectProperties['pluginVersion']
     repositories {
         maven { url "https://plugins.gradle.org/m2" }
     }
     dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
 }
 
-def recipesVersion = gradle.startParameter.projectProperties['recipesVersion'] ?: 'latest.release'
+def recipeLibrary = gradle.startParameter.projectProperties['recipeLibrary']
 
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
-        rewrite("org.openrewrite.recipe:rewrite-spring:${recipesVersion}")
+        rewrite("${recipeLibrary}")
     }
     rewrite {
         exportDatatables = true

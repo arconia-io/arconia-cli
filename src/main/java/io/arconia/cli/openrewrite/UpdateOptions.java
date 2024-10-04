@@ -5,9 +5,8 @@ import java.util.List;
 
 public record UpdateOptions(
     boolean dryRun,
-    String springBootVersion,
-    String rewritePluginVersion,
-    String springRecipesVersion,
+    String rewriteRecipeName,
+    String rewriteRecipeLibrary,
     List<String> params
 ) {
 
@@ -17,9 +16,8 @@ public record UpdateOptions(
 
     public static class Builder {
         private boolean dryRun = false;
-        private String springBootVersion;
-        private String rewritePluginVersion;
-        private String springRecipesVersion;
+        private String rewriteRecipeName;
+        private String rewriteRecipeLibrary;
         private List<String> params = new ArrayList<>();
 
         private Builder() {}
@@ -29,18 +27,13 @@ public record UpdateOptions(
             return this;
         }
 
-        public Builder springBootVersion(String springBootVersion) {
-            this.springBootVersion = springBootVersion;
+        public Builder rewriteRecipeName(String rewriteRecipeName) {
+            this.rewriteRecipeName = rewriteRecipeName;
             return this;
         }
 
-        public Builder rewritePluginVersion(String rewritePluginVersion) {
-            this.rewritePluginVersion = rewritePluginVersion;
-            return this;
-        }
-
-        public Builder springRecipesVersion(String springRecipesVersion) {
-            this.springRecipesVersion = springRecipesVersion;
+        public Builder rewriteRecipeLibrary(String rewriteRecipeLibrary) {
+            this.rewriteRecipeLibrary = rewriteRecipeLibrary;
             return this;
         }
 
@@ -50,7 +43,7 @@ public record UpdateOptions(
         }
 
         public UpdateOptions build() {
-            return new UpdateOptions(dryRun, springBootVersion, rewritePluginVersion, springRecipesVersion, params);
+            return new UpdateOptions(dryRun, rewriteRecipeName, rewriteRecipeLibrary, params);
         }
     }
     
