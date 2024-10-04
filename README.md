@@ -226,4 +226,6 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 
 ## 🙏&nbsp; Acknowledgments
 
-This project is built upon [Spring Shell](https://docs.spring.io/spring-shell/reference/index.html), a powerful framework for creating CLI applications. We also draw inspiration from the exceptional user experience provided by the [Quarkus CLI](https://quarkus.io/guides/cli-tooling), which has influenced our design.
+* This project is built upon [Spring Shell](https://docs.spring.io/spring-shell/reference/index.html), a powerful framework for creating CLI applications, and compiled to a native executable using [GraalVM](https://www.graalvm.org/).
+* The release and distribution process is managed via [JReleaser](https://jreleaser.org/).
+* Thanks to the [Quarkus CLI](https://quarkus.io/guides/cli-tooling) for leading the way in how to design exceptional developer experiences.
