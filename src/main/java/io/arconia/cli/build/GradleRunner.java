@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -166,10 +165,11 @@ public class GradleRunner implements BuildToolRunner {
             command.add("rewriteRun");
         }
 
-        command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
-        command.add("-PrecipeLibrary=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
-
         command.add("-PpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+
+        command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
+        command.add("-PrecipeLibrary=" + updateOptions.rewriteRecipeLibrary());
+        command.add("-PrecipeVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
             command.addAll(updateOptions.params());

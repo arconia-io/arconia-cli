@@ -7,10 +7,12 @@ initscript {
 }
 
 def recipeLibrary = gradle.startParameter.projectProperties['recipeLibrary']
+def recipeVersion = gradle.startParameter.projectProperties['recipeVersion']
 
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
+        rewrite platform("org.openrewrite.recipe:rewrite-recipe-bom:${recipeVersion}")
         rewrite("${recipeLibrary}")
     }
     rewrite {
