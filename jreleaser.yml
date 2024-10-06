@@ -89,3 +89,11 @@ distributions:
         platform: 'windows-x86_64'
         extraProperties:
           graalVMNativeImage: true
+    brew:
+      active: ALWAYS
+      continueOnError: true
+      formulaName: arconia-cli
+      multiPlatform: true
+      repository:
+        active: RELEASE
+        commitMessage: 'arconia-cli {{tagName}}'
