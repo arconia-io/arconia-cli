@@ -17,9 +17,17 @@ Arconia CLI is a versatile tool designed to enhance the development experience w
 
 ### Installation
 
+#### Homebrew (macOS and Linux)
+
+```shell
+brew install arconia-io/tap/arconia-cli
+```
+
+#### Manual Installation
+
 Download the appropriate binary for your operating system from the [latest Arconia CLI release](https://github.com/arconia-io/arconia-cli/releases). Then, follow the instructions below to install it on your system.
 
-#### macOS and Linux
+<details><summary>macOS and Linux</summary>
 
 1. Move the downloaded binary to a directory in your system PATH:
 
@@ -32,8 +40,9 @@ mv ~/Downloads/arconia-[version]-[os]/bin/ /usr/local/bin/
 ```shell
 chmod +x /usr/local/bin/arconia
 ```
+</details>
 
-#### Windows
+<details><summary>Windows</summary>
 
 Run the following commands in PowerShell with administrator privileges:
 
@@ -52,6 +61,7 @@ $newPath = "$currentPath;$env:ProgramFiles\arconia-cli"
 # Refresh the current PowerShell session's PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
+</details>
 
 ### Usage
 
