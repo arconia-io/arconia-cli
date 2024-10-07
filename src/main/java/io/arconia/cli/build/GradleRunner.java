@@ -165,9 +165,9 @@ public class GradleRunner implements BuildToolRunner {
             command.add("rewriteRun");
         }
 
-        command.add("-PpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
-
         command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
+
+        command.add("-PpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
         command.add("-PrecipeLibrary=" + updateOptions.rewriteRecipeLibrary());
         command.add("-PrecipeVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
 
