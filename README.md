@@ -84,8 +84,8 @@ Built-In Commands
 
 Development
        build: Build the current project.
-       test: Run tests for the current project.
        run: Run the application.
+       test: Run tests for the current project.
 
 Image
        image build buildpacks: Build a container image using Buildpacks.
@@ -93,6 +93,8 @@ Image
 
 Migration
        update java: Update project to new Java version.
+       update gradle: Update project to new Gradle version.
+       update maven: Update project to new Maven version.
        update spring-boot: Update project to new Spring Boot version.
 ```
 
