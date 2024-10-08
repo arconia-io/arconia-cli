@@ -104,3 +104,4 @@ distributions:
       repository:
         active: RELEASE
         commitMessage: 'arconia-cli {{tagName}}'
+        name: scoop-bucket
