@@ -23,6 +23,13 @@ Arconia CLI is a versatile tool designed to enhance the development experience w
 brew install arconia-io/tap/arconia-cli
 ```
 
+#### Scoop (Windows)
+
+```shell
+scoop bucket add arconia https://github.com/arconia-io/scoop-bucket.git
+scoop install arconia-cli
+```
+
 #### Manual Installation
 
 Download the appropriate binary for your operating system from the [latest Arconia CLI release](https://github.com/arconia-io/arconia-cli/releases). Then, follow the instructions below to install it on your system.
