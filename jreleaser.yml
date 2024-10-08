@@ -97,3 +97,10 @@ distributions:
       repository:
         active: RELEASE
         commitMessage: 'arconia-cli {{tagName}}'
+    scoop:
+      active: ALWAYS
+      continueOnError: true
+      packageName: arconia-cli
+      repository:
+        active: RELEASE
+        commitMessage: 'arconia-cli {{tagName}}'
