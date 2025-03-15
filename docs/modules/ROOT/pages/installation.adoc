@@ -1,0 +1,65 @@
+= Installation
+
+The Arconia CLI can be installed using various package managers or directly from the released binaries.
+
+== Package Managers
+
+=== Homebrew
+
+On macOS and Linux, you can install and manage the Arconia CLI using Homebrew.
+
+[source,shell]
+----
+brew install arconia-io/tap/arconia-cli
+----
+
+=== Scoop
+
+On Windows, you can install and manage the Arconia CLI using Scoop.
+
+[source,shell]
+----
+scoop bucket add arconia https://github.com/arconia-io/scoop-bucket.git
+scoop install arconia-cli
+----
+
+== Manual Installation
+
+Download the appropriate binary for your operating system from the https://github.com/arconia-io/arconia-cli/releases[latest Arconia CLI release]. Then, follow the instructions below to install it on your system.
+
+=== macOS and Linux
+
+1. Move the downloaded binary to a directory in your system PATH:
+
+[source,shell]
+----
+mv ~/Downloads/arconia-[version]-[os]/bin/ /usr/local/bin/
+----
+
+2. Make the binary executable:
+
+[source,shell]
+----
+chmod +x /usr/local/bin/arconia
+----
+
+=== Windows
+
+Run the following commands in PowerShell with administrator privileges:
+
+[source,shell]
+----
+# Create a directory for Arconia CLI
+New-Item -ItemType Directory -Path "$env:ProgramFiles\arconia-cli" -Force
+
+# Move the executable to the new directory
+Move-Item -Path "$env:USERPROFILE\Downloads\arconia-[version]-[os]\bin\arconia.exe" -Destination "$env:ProgramFiles\arconia-cli\arconia.exe"
+
+# Add the new directory to the system PATH
+$currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+$newPath = "$currentPath;$env:ProgramFiles\arconia-cli"
+[Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+
+# Refresh the current PowerShell session's PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+----

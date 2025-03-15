@@ -1,0 +1,50 @@
+= Arconia CLI
+
+[.hero]
+Welcome to Arconia CLI! This documentation will help you get started with the tool and explore its features.
+
+== What is Arconia CLI?
+
+Arconia CLI is a versatile tool designed to enhance the development experience with Spring Boot applications, providing intuitive commands for building, testing, and running projects. It streamlines common tasks, including upgrading Spring Boot applications to the latest version with a single command, and simplifies containerization using both Cloud Native Buildpacks and Dockerfiles.
+
+NOTE: The Arconia CLI is currently in active development. We're working hard to improve it and appreciate your patience as we continue to refine the tool. Feel free to try it out and share your feedback!
+
+== Quick Start
+
+Install the Arconia CLI using one of the methods described in xref:installation[Installation].
+
+To get started with Arconia CLI, you can view the available commands and options by running:
+
+[source,shell]
+----
+arconia help
+----
+
+== Reference
+
+[source,shell]
+----
+AVAILABLE COMMANDS
+
+Built-In Commands
+    help: Display help about available commands
+    version: Show version info
+
+Development
+    build: Build the current project.
+    run: Run the application.
+    test: Run tests for the current project.
+
+Image
+    image build buildpacks: Build a container image using Buildpacks.
+    image build dockerfile: Build a container image using Dockerfile.
+
+Migration
+    update java: Update project to new Java version.
+    update gradle: Update project to new Gradle version.
+    update maven: Update project to new Maven version.
+----
+
+== Authors
+
+The Arconia CLI is maintained by https://thomasvitale.com[Thomas Vitale].

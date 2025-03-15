@@ -1,0 +1,47 @@
+= Development
+
+This page describes how to develop the Arconia CLI.
+
+== Prerequisites
+
+* Java 23 (GraalVM)
+
+== Building the CLI
+
+To package the Arconia CLI as a native executable, run:
+
+[source,shell]
+----
+./gradlew nativeCompile
+----
+
+This command compiles the project and generates a standalone native executable. The resulting file will be located at `build/native/nativeCompile/arconia`.
+
+== Installing the CLI
+
+You can run the CLI directly from its build location or install it system-wide for easier access. To install it globally on macOS or Linux:
+
+[source,shell]
+----
+sudo cp build/native/nativeCompile/arconia /usr/local/bin/arconia
+----
+
+This command copies the executable to a directory typically included in the system PATH, making it accessible from anywhere in the terminal.
+
+### Running the CLI
+
+If you've installed the CLI globally, you can run it by simply typing:
+
+[source,shell]
+----
+arconia help
+----
+
+If you haven't installed it globally, you'll need to specify the full path to the executable:
+
+[source,shell]
+----
+./build/native/nativeCompile/arconia help
+----
+
+Replace `help` with any other valid command or option to use different features of the CLI.
