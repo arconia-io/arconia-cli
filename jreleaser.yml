@@ -18,11 +18,6 @@ project:
     - Thomas Vitale
   license: Apache-2.0
   inceptionYear: "2024"
-  stereotype: CLI
-  tags:
-    - spring-boot
-    - developer-experience
-    - java
 
 platform:
   replacements:
