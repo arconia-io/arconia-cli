@@ -141,6 +141,13 @@ jobs:
           echo "HASHES=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
           echo "TAGNAME=$(grep tagName out/jreleaser/output.properties | awk -F'=' '{print $2}')" >> "$GITHUB_OUTPUT"
 
+      - name: Trigger documentation update
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+          repository: arconia-io/arconia-io.github.io
+          event-type: docs-update
+
   provenance:
     needs: [ build, release ]
     name: Generate SLSA Provenance Attestation
