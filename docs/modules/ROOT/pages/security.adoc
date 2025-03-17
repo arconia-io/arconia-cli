@@ -92,7 +92,3 @@ You can use various SBOM analysis tools to examine the `sbom.cdx.json` file and 
 - https://github.com/aquasecurity/trivy[Trivy]: A comprehensive and versatile security scanner for containers and other artifacts.
 
 By reviewing the SBOM, you can better understand the composition of the Arconia CLI, identify potential vulnerabilities, and ensure compliance with licensing requirements.
-
-== Authors
-
-The Arconia CLI is maintained by https://thomasvitale.com[Thomas Vitale].
