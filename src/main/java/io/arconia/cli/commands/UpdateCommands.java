@@ -40,7 +40,7 @@ public class UpdateCommands {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(command = "java", description = "Update project to new Java version.")
+    //@Command(command = "java", description = "Update project to new Java version.")
     public void updateJava(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
@@ -83,7 +83,7 @@ public class UpdateCommands {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(command = "spring-boot", description = "Update project to new Spring Boot version.")
+    //@Command(command = "spring-boot", description = "Update project to new Spring Boot version.")
     public void updateSpringBoot(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
