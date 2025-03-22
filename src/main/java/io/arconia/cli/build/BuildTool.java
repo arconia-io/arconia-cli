@@ -15,9 +15,9 @@ public enum BuildTool {
     public static BuildTool detectFromProjectPath(Path projectPath) {
         Assert.notNull(projectPath, "projectPath cannot be null");
 
-        if (projectPath.resolve("build.gradle").toFile().isFile()) {
+        if (projectPath.resolve("settings.gradle").toFile().isFile()) {
             return GRADLE;
-        } else if (projectPath.resolve("build.gradle.kts").toFile().isFile()) {
+        } else if (projectPath.resolve("settings.gradle.kts").toFile().isFile()) {
             return GRADLE_KOTLIN;
         } else if (projectPath.resolve("pom.xml").toFile().isFile()) {
             return MAVEN;
