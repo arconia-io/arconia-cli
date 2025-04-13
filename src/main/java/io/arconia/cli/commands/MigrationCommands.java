@@ -20,9 +20,9 @@ public class MigrationCommands {
     public void rewrite(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(description = "Name of the OpenRewrite recipe to run.") String recipeName,
-        @Option(required = false, description = "Maven coordinates of the library containing the OpenRewrite recipe.") String recipeLibrary,
-        @Option(required = false, description = "Version of the library containing the OpenRewrite recipe.") String recipeVersion,
+        @Option(description = "Name of the OpenRewrite recipe to run. Example: 'io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0'.") String recipeName,
+        @Option(required = false, description = "Maven coordinates of the library containing the OpenRewrite recipe to run. If not provided, the OpenRewrite OSS core recipe library will be used. Example: 'io.arconia.migrations:rewrite-arconia'.") String recipeLibrary,
+        @Option(required = false, description = "Version of the library containing the OpenRewrite recipe to run. If not provided, the latest available version will be used. Example: '4.2.0'.") String recipeVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
