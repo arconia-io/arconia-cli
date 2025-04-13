@@ -1,4 +1,5 @@
 * xref:index.adoc[Getting Started]
 * xref:installation.adoc[Installation]
 * xref:security.adoc[Security]
-* xref:development.adoc[Development]
+* Contributing
+** xref:contributing/development.adoc[Development]
