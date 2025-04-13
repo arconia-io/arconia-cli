@@ -13,6 +13,8 @@ import org.springframework.util.StringUtils;
 
 import io.arconia.cli.utils.IoUtils;
 import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.openrewrite.RecipeProvider;
+import io.arconia.cli.openrewrite.RewriteOptions;
 import io.arconia.cli.openrewrite.UpdateOptions;
 
 public class GradleRunner implements BuildToolRunner {
@@ -66,9 +68,17 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public void rewrite(UpdateOptions updateOptions) {
+    public void rewrite(RewriteOptions rewriteOptions) {
+        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
+        var command = constructRewriteCommand(rewriteOptions);
+        call(command);
+    }
+
+    @Override
+    public void update(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
-        var command = constructUpdateCommand(updateOptions);
+        Assert.notNull(recipeProvider, "recipeProvider cannot be null");
+        var command = constructUpdateCommand(updateOptions, recipeProvider);
         call(command);
     }
 
@@ -146,7 +156,7 @@ public class GradleRunner implements BuildToolRunner {
         }
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+    private List<String> constructRewriteCommand(RewriteOptions rewriteOptions) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -154,7 +164,50 @@ public class GradleRunner implements BuildToolRunner {
         command.add("--init-script");
 
         try {
-            command.add(IoUtils.copyFileToTemp("openrewrite/init.gradle").toFile().getAbsolutePath());
+            command.add(IoUtils.copyFileToTemp("openrewrite/init-generic.gradle").toFile().getAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (rewriteOptions.dryRun()) {
+            command.add("rewriteDryRun");
+        } else {
+            command.add("rewriteRun");
+        }
+
+        command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+
+        command.add("-DactiveRecipe=" + rewriteOptions.rewriteRecipeName());
+
+        if (StringUtils.hasText(rewriteOptions.rewriteRecipeLibrary())) {
+            var recipeVersion = StringUtils.hasText(rewriteOptions.rewriteRecipeVersion())
+                    ? rewriteOptions.rewriteRecipeVersion()
+                    : OPEN_REWRITE_DEFAULT_VERSION;
+            command.add("-DrecipeLibrary=" + rewriteOptions.rewriteRecipeLibrary());
+            command.add("-DrecipeVersion=" + recipeVersion);
+        }
+
+        if (!CollectionUtils.isEmpty(rewriteOptions.params())) {
+            command.addAll(rewriteOptions.params());
+        }
+
+        return command;
+    }
+
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
+        List<String> command = new ArrayList<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("--init-script");
+
+        String initGradleFilePath = switch(recipeProvider) {
+            case ARCONIA -> "openrewrite/init-arconia.gradle";
+            case OPENREWRITE -> "openrewrite/init-openrewrite.gradle";
+        };
+
+        try {
+            command.add(IoUtils.copyFileToTemp(initGradleFilePath).toFile().getAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -170,7 +223,11 @@ public class GradleRunner implements BuildToolRunner {
         command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
 
         command.add("-DrecipeLibrary=" + updateOptions.rewriteRecipeLibrary());
-        command.add("-DrecipeVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+        
+        switch (recipeProvider) {
+            case ARCONIA -> command.add("-DbomVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+            case OPENREWRITE -> command.add("-DbomVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+        }
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
             command.addAll(updateOptions.params());

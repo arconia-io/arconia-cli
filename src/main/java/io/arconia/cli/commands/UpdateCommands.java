@@ -5,18 +5,19 @@ import java.util.List;
 
 import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.openrewrite.OpenRewriteRunner;
+import io.arconia.cli.openrewrite.RecipeProvider;
 import io.arconia.cli.openrewrite.UpdateOptions;
 import io.arconia.cli.openrewrite.recipes.GradleRecipe;
-import io.arconia.cli.openrewrite.recipes.JavaRecipe;
+import io.arconia.cli.openrewrite.recipes.ArconiaRecipe;
 import io.arconia.cli.openrewrite.recipes.MavenRecipe;
-import io.arconia.cli.openrewrite.recipes.SpringBootRecipe;
+import io.arconia.cli.openrewrite.recipes.SpringAiRecipe;
 
 import org.springframework.shell.command.CommandContext;
 import org.springframework.shell.command.CommandRegistration.OptionArity;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 
-@Command(command = "update", alias = "upgrade", group = "Migration")
+@Command(command = "update", alias = "upgrade", group = "Update")
 public class UpdateCommands {
 
     @Command(command = "gradle", description = "Update project to new Gradle version.")
@@ -37,29 +38,7 @@ public class UpdateCommands {
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
-        openRewriteRunner.update(updateOptions);
-    }
-
-    //@Command(command = "java", description = "Update project to new Java version.")
-    public void updateJava(
-        CommandContext commandContext,
-        @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(defaultValue = "21", description = "Java target version.") String toVersion,
-        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
-        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
-    ) {
-        var terminal = new ArconiaCliTerminal(commandContext);
-        var openRewriteRunner = new OpenRewriteRunner(terminal);
-        var updateOptions = UpdateOptions.builder()
-            .dryRun(dryRun)
-            .rewriteRecipeName(JavaRecipe.getRecipeName(toVersion))
-            .rewriteRecipeLibrary(JavaRecipe.RECIPE_LIBRARY)
-            .params(params != null ? Arrays.asList(params) : List.of())
-            .build();
-
-        openRewriteRunner.update(updateOptions);
+        openRewriteRunner.update(updateOptions, RecipeProvider.OPENREWRITE);
     }
 
     @Command(command = "maven", description = "Update project to new Maven version.")
@@ -80,14 +59,14 @@ public class UpdateCommands {
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
-        openRewriteRunner.update(updateOptions);
+        openRewriteRunner.update(updateOptions, RecipeProvider.OPENREWRITE);
     }
 
-    //@Command(command = "spring-boot", description = "Update project to new Spring Boot version.")
-    public void updateSpringBoot(
+    @Command(command = "framework", description = "Update project to new Arconia Framework version.")
+    public void updateArconia(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(defaultValue = "3.3", description = "Spring Boot target version.") String toVersion,
+        @Option(defaultValue = "0.10", description = "Arconia target version.") String toVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
@@ -97,12 +76,34 @@ public class UpdateCommands {
         var openRewriteRunner = new OpenRewriteRunner(terminal);
         var updateOptions = UpdateOptions.builder()
             .dryRun(dryRun)
-            .rewriteRecipeName(SpringBootRecipe.getRecipeName(toVersion))
-            .rewriteRecipeLibrary(SpringBootRecipe.RECIPE_LIBRARY)
+            .rewriteRecipeName(ArconiaRecipe.computeRecipeLibrary(toVersion))
+            .rewriteRecipeLibrary(ArconiaRecipe.RECIPE_LIBRARY)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
-        openRewriteRunner.update(updateOptions);
+        openRewriteRunner.update(updateOptions, RecipeProvider.ARCONIA);
+    }
+
+    @Command(command = "spring-ai", description = "Update project to new Spring AI version.")
+    public void updateSpringAi(
+        CommandContext commandContext,
+        @Option(description = "Update in dry-run mode.") boolean dryRun,
+        @Option(defaultValue = "1.0", description = "Spring AI target version.") String toVersion,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
+        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
+        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+    ) {
+        var terminal = new ArconiaCliTerminal(commandContext);
+        var openRewriteRunner = new OpenRewriteRunner(terminal);
+        var updateOptions = UpdateOptions.builder()
+            .dryRun(dryRun)
+            .rewriteRecipeName(SpringAiRecipe.computeRecipeLibrary(toVersion))
+            .rewriteRecipeLibrary(SpringAiRecipe.RECIPE_LIBRARY)
+            .params(params != null ? Arrays.asList(params) : List.of())
+            .build();
+
+        openRewriteRunner.update(updateOptions, RecipeProvider.ARCONIA);
     }
 
 }

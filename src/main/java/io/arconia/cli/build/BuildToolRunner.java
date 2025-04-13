@@ -10,6 +10,8 @@ import org.springframework.util.Assert;
 import io.arconia.cli.core.ArconiaCliException;
 import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.core.ProcessExecutor;
+import io.arconia.cli.openrewrite.RecipeProvider;
+import io.arconia.cli.openrewrite.RewriteOptions;
 import io.arconia.cli.openrewrite.UpdateOptions;
 import io.arconia.cli.utils.IoUtils;
 
@@ -28,7 +30,9 @@ public interface BuildToolRunner {
 
     void imageBuild(BuildOptions buildOptions);
 
-    void rewrite(UpdateOptions updateOptions);
+    void rewrite(RewriteOptions rewriteOptions);
+
+    void update(UpdateOptions updateOptions, RecipeProvider recipeProvider);
 
     BuildTool getBuildTool();
 

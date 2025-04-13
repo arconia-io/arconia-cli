@@ -6,13 +6,13 @@ initscript {
     dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
 }
 
+def bomVersion = System.getProperty('bomVersion')
 def recipeLibrary = System.getProperty('recipeLibrary')
-def recipeVersion = System.getProperty('recipeVersion')
 
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
-        rewrite platform("org.openrewrite.recipe:rewrite-recipe-bom:${recipeVersion}")
+        rewrite platform("org.openrewrite.recipe:rewrite-recipe-bom:${bomVersion}")
         rewrite("${recipeLibrary}")
     }
     rewrite {

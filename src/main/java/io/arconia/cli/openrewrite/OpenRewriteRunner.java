@@ -14,9 +14,14 @@ public class OpenRewriteRunner {
         this.buildToolRunner = BuildToolRunner.create(terminal);
     }
 
-    public void update(UpdateOptions updateOptions) {
+    public void update(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
-        buildToolRunner.rewrite(updateOptions);
+        buildToolRunner.update(updateOptions, recipeProvider);
+    }
+
+    public void rewrite(RewriteOptions rewriteOptions) {
+        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
+        buildToolRunner.rewrite(rewriteOptions);
     }
   
 }

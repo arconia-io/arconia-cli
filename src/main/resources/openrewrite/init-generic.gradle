@@ -1,0 +1,29 @@
+initscript {
+    def pluginVersion = System.getProperty('pluginVersion')
+    repositories {
+        maven { url "https://plugins.gradle.org/m2" }
+    }
+    dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
+}
+
+def recipeLibrary = System.getProperty('recipeLibrary')
+def recipeVersion = System.getProperty('recipeVersion')
+
+rootProject {
+    plugins.apply(org.openrewrite.gradle.RewritePlugin)
+    if (recipeLibrary != null && recipeVersion != null) {
+        dependencies {
+            rewrite("${recipeLibrary}:${recipeVersion}")
+        }
+    }
+    rewrite {
+        exportDatatables = true
+    }
+    afterEvaluate {
+        if (repositories.isEmpty()) {
+            repositories {
+                mavenCentral()
+            }
+        }
+    }
+}

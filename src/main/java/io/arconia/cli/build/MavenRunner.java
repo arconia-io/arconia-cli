@@ -11,6 +11,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.openrewrite.RecipeProvider;
+import io.arconia.cli.openrewrite.RewriteOptions;
 import io.arconia.cli.openrewrite.UpdateOptions;
 import io.arconia.cli.utils.IoUtils;
 
@@ -58,9 +60,17 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
-    public void rewrite(UpdateOptions updateOptions) {
+    public void rewrite(RewriteOptions rewriteOptions) {
+        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
+        var command = constructRewriteCommand(rewriteOptions);
+        call(command);
+    }
+
+    @Override
+    public void update(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
-        var command = constructUpdateCommand(updateOptions);
+        Assert.notNull(recipeProvider, "recipeProvider cannot be null");
+        var command = constructUpdateCommand(updateOptions, recipeProvider);
         call(command);
     }
 
@@ -144,7 +154,38 @@ public class MavenRunner implements BuildToolRunner {
         }
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+    private List<String> constructRewriteCommand(RewriteOptions rewriteOptions) {
+        List<String> command = new ArrayList<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("-U");
+
+        if (rewriteOptions.dryRun()) {
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+        } else {
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+        }
+
+        command.add("-Drewrite.activeRecipes=" + rewriteOptions.rewriteRecipeName());
+
+        if (StringUtils.hasText(rewriteOptions.rewriteRecipeLibrary())) {
+            var recipeVersion = StringUtils.hasText(rewriteOptions.rewriteRecipeVersion())
+                    ? rewriteOptions.rewriteRecipeVersion()
+                    : OPEN_REWRITE_DEFAULT_VERSION;
+            command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(rewriteOptions.rewriteRecipeLibrary(), recipeVersion));
+        }
+
+        command.add("-Drewrite.exportDatatables=true");
+
+        if (!CollectionUtils.isEmpty(rewriteOptions.params())) {
+            command.addAll(rewriteOptions.params());
+        }
+
+        return command;
+    }
+
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -159,7 +200,11 @@ public class MavenRunner implements BuildToolRunner {
 
         command.add("-Drewrite.activeRecipes=" + updateOptions.rewriteRecipeName());
 
-        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
+        switch (recipeProvider) {
+            case ARCONIA -> command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
+            case OPENREWRITE -> command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
+        }
+
         command.add("-Drewrite.exportDatatables=true");
 
         if (!CollectionUtils.isEmpty(updateOptions.params())) {

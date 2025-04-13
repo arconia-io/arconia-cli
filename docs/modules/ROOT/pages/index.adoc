@@ -40,8 +40,13 @@ Image
     image build dockerfile: Build a container image using Dockerfile.
 
 Migration
+    rewrite: Run an OpenRewrite recipe.
+
+Update
+    update framework: Update project to new Arconia Framework version.
     update gradle: Update project to new Gradle version.
     update maven: Update project to new Maven version.
+    update spring-ai: Update project to new Spring AI version.
 ----
 
 == Authors

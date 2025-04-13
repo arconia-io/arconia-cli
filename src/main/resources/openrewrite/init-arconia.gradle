@@ -1,0 +1,28 @@
+initscript {
+    def pluginVersion = System.getProperty('pluginVersion')
+    repositories {
+        maven { url "https://plugins.gradle.org/m2" }
+    }
+    dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
+}
+
+def bomVersion = System.getProperty('bomVersion')
+def recipeLibrary = System.getProperty('recipeLibrary')
+
+rootProject {
+    plugins.apply(org.openrewrite.gradle.RewritePlugin)
+    dependencies {
+        rewrite platform("io.arconia.migrations:rewrite-bom:${bomVersion}")
+        rewrite("${recipeLibrary}")
+    }
+    rewrite {
+        exportDatatables = true
+    }
+    afterEvaluate {
+        if (repositories.isEmpty()) {
+            repositories {
+                mavenCentral()
+            }
+        }
+    }
+}
