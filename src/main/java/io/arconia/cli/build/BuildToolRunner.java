@@ -25,7 +25,7 @@ public interface BuildToolRunner {
 
     void test(BuildOptions buildOptions);
 
-    void run(BuildOptions buildOptions);
+    void dev(BuildOptions buildOptions);
 
     void imageBuild(BuildOptions buildOptions);
 

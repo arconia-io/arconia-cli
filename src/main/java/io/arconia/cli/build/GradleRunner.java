@@ -51,7 +51,7 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public void run(BuildOptions buildOptions) {
+    public void dev(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
         var action = buildOptions.nativeBuild() ? "nativeRun" : "bootRun";
         var command = constructGradleCommand(action, buildOptions);

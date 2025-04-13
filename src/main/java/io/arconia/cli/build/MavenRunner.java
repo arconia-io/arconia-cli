@@ -45,7 +45,7 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
-    public void run(BuildOptions buildOptions) {
+    public void dev(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
         var command = constructMavenCommand("spring-boot:run", buildOptions);
         call(command);

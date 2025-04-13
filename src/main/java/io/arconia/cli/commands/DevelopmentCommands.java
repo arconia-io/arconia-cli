@@ -59,8 +59,8 @@ public class DevelopmentCommands {
         buildToolRunner.test(buildOptions);
     }
 
-    @Command(command = "run", description = "Run the application.")
-    public void run(
+    @Command(command = "dev", alias = "run", description = "Run the application in development mode.")
+    public void dev(
         CommandContext commandContext,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
@@ -73,7 +73,7 @@ public class DevelopmentCommands {
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
-        buildToolRunner.run(buildOptions);
+        buildToolRunner.dev(buildOptions);
     }
 
 }

@@ -32,7 +32,7 @@ Built-In Commands
 
 Development
     build: Build the current project.
-    run: Run the application.
+    dev: Run the application in development mode.
     test: Run tests for the current project.
 
 Image
