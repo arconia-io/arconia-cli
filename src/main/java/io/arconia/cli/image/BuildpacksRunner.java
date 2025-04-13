@@ -1,8 +1,7 @@
 package io.arconia.cli.image;
 
 import java.io.File;
-
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 import io.arconia.cli.build.BuildOptions;

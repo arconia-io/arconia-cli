@@ -2,7 +2,7 @@ package io.arconia.cli.build;
 
 import java.nio.file.Path;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 public enum BuildTool {

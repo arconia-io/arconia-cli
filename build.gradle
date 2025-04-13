@@ -18,12 +18,14 @@ repositories {
 }
 
 ext {
+    set('jSpecifyVersion', "1.0.0")
     set('springShellVersion', "3.4.0")
 }
 
 dependencies {
     implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
 
+    implementation "org.jspecify:jspecify:${jSpecifyVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.shell:spring-shell-starter'
 

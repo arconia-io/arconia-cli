@@ -3,7 +3,7 @@ package io.arconia.cli.openrewrite;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record RewriteOptions(
     boolean dryRun,

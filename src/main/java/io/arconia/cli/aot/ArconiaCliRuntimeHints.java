@@ -1,9 +1,9 @@
 package io.arconia.cli.aot;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.lang.Nullable;
 
 public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
 

@@ -1,6 +1,4 @@
-@NonNullApi
-@NonNullFields
+@NullMarked
 package io.arconia.cli.commands;
 
-import org.springframework.lang.NonNullApi;
-import org.springframework.lang.NonNullFields;
+import org.jspecify.annotations.NullMarked;

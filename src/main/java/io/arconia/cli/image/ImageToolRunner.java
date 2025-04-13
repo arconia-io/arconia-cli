@@ -2,7 +2,7 @@ package io.arconia.cli.image;
 
 import java.io.File;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface ImageToolRunner {
 
