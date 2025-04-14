@@ -97,7 +97,7 @@ public class ArconiaCliTerminal {
     }
 
     private void write(String message) {
-        terminal.writer().println(message);
+        terminal.writer().println(new String(message.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         terminal.flush();
     }
 
