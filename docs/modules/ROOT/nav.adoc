@@ -10,10 +10,10 @@
 * Migration
 ** xref:migration/rewrite.adoc[arconia rewrite]
 * Update
-** xref:development/dev.adoc[arconia update framework]
-** xref:development/dev.adoc[arconia update gradle]
-** xref:development/dev.adoc[arconia update maven]
-** xref:development/dev.adoc[arconia update spring-ai]
+** xref:update/framework.adoc[arconia update framework]
+** xref:update/gradle.adoc[arconia update gradle]
+** xref:update/maven.adoc[arconia update maven]
+** xref:update/spring-ai.adoc[arconia update spring-ai]
 * xref:security.adoc[Security]
 * Contributing
 ** xref:contributing/development.adoc[Development]
