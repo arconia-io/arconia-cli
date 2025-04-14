@@ -1,6 +1,6 @@
-= arconia dev
+= `arconia dev`
 
-The `dev` command runs your Spring Boot application in development mode. It delegates to your build tool's (Maven/Gradle) development tasks to start the application with optimized settings for local development provided by the https://arconia.io/docs/arconia/latest/index.html[Arconia Framework].
+The `arconia dev` command runs your Spring Boot application in development mode. It delegates to your build tool's (Maven/Gradle) development tasks to start the application with optimized settings for local development provided by the https://arconia.io/docs/arconia/latest/index.html[Arconia Framework].
 
 == Usage
 

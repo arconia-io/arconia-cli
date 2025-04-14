@@ -1,6 +1,6 @@
-= arconia rewrite
+= `arconia rewrite`
 
-The `rewrite` command runs https://docs.openrewrite.org/[OpenRewrite] recipes to automatically update and refactor your codebase. It integrates with your build tool's (Maven/Gradle) OpenRewrite plugin to execute the recipes.
+The `arconia rewrite` command runs https://docs.openrewrite.org/[OpenRewrite] recipes to automatically update and refactor your codebase. It integrates with your build tool's (Maven/Gradle) OpenRewrite plugin to execute the recipes.
 
 == Usage
 

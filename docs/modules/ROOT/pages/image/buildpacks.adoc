@@ -1,6 +1,6 @@
-= arconia image build buildpacks
+= `arconia image build buildpacks`
 
-The `image build buildpacks` command builds a container image for your Spring Boot application using https://buildpacks.io/[Cloud Native Buildpacks]. It delegates to your build tool's (Maven/Gradle) image build tasks to package your application as a container image and optionally publish it to a container registry, relying on the Spring Boot integration with https://paketo.io[Paketo Buildpacks].
+The `arconia image build buildpacks` command builds a container image for your Spring Boot application using https://buildpacks.io/[Cloud Native Buildpacks]. It delegates to your build tool's (Maven/Gradle) image build tasks to package your application as a container image and optionally publish it to a container registry, relying on the Spring Boot integration with https://paketo.io[Paketo Buildpacks].
 
 == Usage
 

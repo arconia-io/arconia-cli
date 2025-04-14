@@ -1,6 +1,6 @@
-= arconia image build dockerfile
+= `arconia image build dockerfile`
 
-The `image build dockerfile` command builds a container image for your Spring Boot application using a Dockerfile.
+The `arconia image build dockerfile` command builds a container image for your Spring Boot application using a Dockerfile.
 
 == Usage
 

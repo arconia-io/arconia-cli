@@ -1,6 +1,6 @@
-= arconia build
+= `arconia build`
 
-The `build` command builds your Spring Boot application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or native executable.
+The `arconia build` command builds your Spring Boot application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or native executable.
 
 == Usage
 

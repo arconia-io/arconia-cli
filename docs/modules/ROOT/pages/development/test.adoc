@@ -1,6 +1,6 @@
-= arconia test
+= `arconia test`
 
-The `test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both Java and native modes.
+The `arconia test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both Java and native modes.
 
 == Usage
 

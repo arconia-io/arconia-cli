@@ -9,6 +9,11 @@
 ** xref:image/dockerfile.adoc[arconia image build dockerfile]
 * Migration
 ** xref:migration/rewrite.adoc[arconia rewrite]
+* Update
+** xref:development/dev.adoc[arconia update framework]
+** xref:development/dev.adoc[arconia update gradle]
+** xref:development/dev.adoc[arconia update maven]
+** xref:development/dev.adoc[arconia update spring-ai]
 * xref:security.adoc[Security]
 * Contributing
 ** xref:contributing/development.adoc[Development]
