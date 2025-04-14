@@ -25,9 +25,9 @@ public class UpdateCommands {
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -46,9 +46,9 @@ public class UpdateCommands {
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -68,9 +68,9 @@ public class UpdateCommands {
         @Option(description = "Update in dry-run mode.") boolean dryRun,
         @Option(defaultValue = "0.10", description = "Arconia target version.") String toVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -90,9 +90,9 @@ public class UpdateCommands {
         @Option(description = "Update in dry-run mode.") boolean dryRun,
         @Option(defaultValue = "1.0", description = "Spring AI target version.") String toVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
