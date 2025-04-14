@@ -1,0 +1,99 @@
+= arconia test
+
+The `test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both Java and native modes.
+
+== Usage
+
+Basic usage:
+
+[source,shell]
+----
+arconia test
+----
+
+== Options
+
+The following options are available:
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--clean`
+|`false`
+|Perform a clean build before running tests.
+
+|`--native`
+|`false`
+|Run tests in native mode using GraalVM Native Image.
+
+|`--debug` or `-d`
+|`false`
+|Include debug output.
+
+|`--verbose` or `-v`
+|`false`
+|Include more verbose output about the execution.
+
+|`--stacktrace` or `-s`
+|`false`
+|Include more details about errors.
+
+|`--params` or `-p`
+|
+|Additional build parameters passed directly to the build tool.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+== Build Tool Integration
+
+The `test` command automatically detects whether your project uses Maven or Gradle and runs the appropriate test task:
+
+[cols="1,3"]
+|===
+|Build Tool |Command
+
+|Gradle
+a|
+For JVM tests:
+
+* `./gradlew test` (Linux/macOS with wrapper)
+* `gradle test` (Linux/macOS without wrapper)
+* `gradlew.bat test` (Windows with wrapper)
+* `gradle test` (Windows without wrapper)
+
+For native tests:
+
+* `./gradlew nativeTest` (Linux/macOS with wrapper)
+* `gradle nativeTest` (Linux/macOS without wrapper)
+* `gradlew.bat nativeTest` (Windows with wrapper)
+* `gradle nativeTest` (Windows without wrapper)
+
+|Maven
+a|
+For JVM tests:
+
+* `./mvnw test` (Linux/macOS with wrapper)
+* `mvn test` (Linux/macOS without wrapper)
+* `mvnw.cmd test` (Windows with wrapper)
+* `mvn test` (Windows without wrapper)
+* `mvnd test` (Using Maven Daemon)
+
+For native tests:
+
+* `./mvnw test -Pnative` (Linux/macOS with wrapper)
+* `mvn test -Pnative` (Linux/macOS without wrapper)
+* `mvnw.cmd test -Pnative` (Windows with wrapper)
+* `mvn test -Pnative` (Windows without wrapper)
+* `mvnd test -Pnative` (Using Maven Daemon)
+|===
+
+Any additional parameters specified with `--params` are passed through to the respective build tool command.
+
+== See Also
+
+* xref:development/build.adoc[arconia build]
+* xref:development/dev.adoc[arconia dev]
