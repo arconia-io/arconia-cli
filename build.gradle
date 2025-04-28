@@ -19,12 +19,21 @@ repositories {
 }
 
 ext {
+    set('jLineVersion', "3.29.0")
     set('jSpecifyVersion', "1.0.0")
     set('springShellVersion', "3.4.0")
 }
 
 dependencies {
     implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
+
+    implementation "org.jline:jline-builtins:${jLineVersion}"
+    implementation "org.jline:jline-console:${jLineVersion}"
+    implementation "org.jline:jline-native:${jLineVersion}"
+    implementation "org.jline:jline-reader:${jLineVersion}"
+    implementation "org.jline:jline-style:${jLineVersion}"
+    implementation "org.jline:jline-terminal:${jLineVersion}"
+    implementation "org.jline:jline-terminal-jni:${jLineVersion}"
 
     implementation "org.jspecify:jspecify:${jSpecifyVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -43,8 +52,20 @@ graalvmNative {
     binaries {
         main {
             imageName = "arconia"
+            // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+            buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
     }
+}
+
+tasks.withType(JavaExec).configureEach {
+   // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+   jvmArgs += ["--enable-native-access=ALL-UNNAMED"]
+}
+
+tasks.withType(Test).configureEach {
+   // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+   jvmArgs += ["--enable-native-access=ALL-UNNAMED"]
 }
 
 tasks.named('test') {
