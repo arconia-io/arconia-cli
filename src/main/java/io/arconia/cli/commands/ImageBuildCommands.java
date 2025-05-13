@@ -20,9 +20,9 @@ public class ImageBuildCommands {
     @Command(command = "buildpacks", description = "Build a container image using Buildpacks.")
     public void buildpacks(
         CommandContext commandContext,
-        @Option(required = false, description = "Name for the image to build.") String imageName,
-        @Option(required = false, description = "Name of the Builder image to use.") String builderImage,
-        @Option(required = false, description = "Name of the Run image to use.") String runImage,
+        @Option(description = "Name for the image to build.") String imageName,
+        @Option(description = "Name of the Builder image to use.") String builderImage,
+        @Option(description = "Name of the Run image to use.") String runImage,
         @Option(description = "Whether to clean the cache before building.") boolean cleanCache,
         @Option(description = "Whether to publish the generated image to an OCI registry.") boolean publishImage,
 
@@ -31,7 +31,7 @@ public class ImageBuildCommands {
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var buildpacksRunner = new BuildpacksRunner(terminal);
@@ -54,8 +54,8 @@ public class ImageBuildCommands {
     @Command(command = "dockerfile", description = "Build a container image using Dockerfile.")
     public void dockerfile(
         CommandContext commandContext,
-        @Option(description = "Name for the image to build.", shortNames = 't') String imageName,
-        @Option(required = false, description = "The path to the Dockerfile to use for building the container image.", shortNames = 'f') String dockerfile,
+        @Option(required = true, description = "Name for the image to build.", shortNames = 't') String imageName,
+        @Option(description = "The path to the Dockerfile to use for building the container image.", shortNames = 'f') String dockerfile,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace

@@ -27,7 +27,7 @@ public class UpdateCommands {
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -48,7 +48,7 @@ public class UpdateCommands {
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -70,7 +70,7 @@ public class UpdateCommands {
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
@@ -92,7 +92,7 @@ public class UpdateCommands {
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);

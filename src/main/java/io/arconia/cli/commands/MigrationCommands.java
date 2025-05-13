@@ -20,13 +20,13 @@ public class MigrationCommands {
     public void rewrite(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(description = "Name of the OpenRewrite recipe to run. Example: 'io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0'.") String recipeName,
-        @Option(required = false, description = "Maven coordinates of the library containing the OpenRewrite recipe to run. If not provided, the OpenRewrite OSS core recipe library will be used. Example: 'io.arconia.migrations:rewrite-arconia'.") String recipeLibrary,
-        @Option(required = false, description = "Version of the library containing the OpenRewrite recipe to run. If not provided, the latest available version will be used. Example: '4.2.0'.") String recipeVersion,
+        @Option(required = true, description = "Name of the OpenRewrite recipe to run. Example: 'io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0'.") String recipeName,
+        @Option(description = "Maven coordinates of the library containing the OpenRewrite recipe to run. If not provided, the OpenRewrite OSS core recipe library will be used. Example: 'io.arconia.migrations:rewrite-arconia'.") String recipeLibrary,
+        @Option(description = "Version of the library containing the OpenRewrite recipe to run. If not provided, the latest available version will be used. Example: '4.2.0'.") String recipeVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(required = false, description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
     ) {
         var terminal = new ArconiaCliTerminal(commandContext);
         var openRewriteRunner = new OpenRewriteRunner(terminal);
