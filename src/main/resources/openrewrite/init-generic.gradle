@@ -26,4 +26,12 @@ rootProject {
             }
         }
     }
+    configurations {
+        rewrite {
+            attributes {
+                attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+                attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment, TargetJvmEnvironment.STANDARD_JVM))
+            }
+        }
+    }
 }
