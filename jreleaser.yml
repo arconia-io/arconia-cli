@@ -76,6 +76,10 @@ distributions:
         platform: 'osx-x86_64'
         extraProperties:
           graalVMNativeImage: true
+      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-linux-aarch64.zip'
+        platform: 'linux-aarch_64'
+        extraProperties:
+          graalVMNativeImage: true
       - path: 'artifacts/{{distributionName}}-{{projectVersion}}-linux-amd64.zip'
         platform: 'linux-x86_64'
         extraProperties:

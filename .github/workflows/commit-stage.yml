@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
+      - '.flox/**'
       - '.editorconfig'
       - '.gitignore'
       - '.sdkmanrc'
@@ -20,6 +21,7 @@ on:
     branches:
       - main
     paths-ignore:
+      - '.flox/**'
       - '.editorconfig'
       - '.gitignore'
       - '.sdkmanrc'
