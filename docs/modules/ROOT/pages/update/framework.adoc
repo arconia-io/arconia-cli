@@ -24,7 +24,7 @@ The following options are available:
 |Update in dry-run mode. Shows what changes would be made without actually making them.
 
 |`--to-version`
-|`0.11`
+|`0.13`
 |Arconia Framework target version to upgrade to.
 
 |`--debug` or `-d`
