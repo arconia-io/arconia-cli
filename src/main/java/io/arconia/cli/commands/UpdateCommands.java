@@ -11,6 +11,7 @@ import io.arconia.cli.openrewrite.recipes.GradleRecipe;
 import io.arconia.cli.openrewrite.recipes.ArconiaRecipe;
 import io.arconia.cli.openrewrite.recipes.MavenRecipe;
 import io.arconia.cli.openrewrite.recipes.SpringAiRecipe;
+import io.arconia.cli.openrewrite.recipes.SpringBootRecipe;
 
 import org.springframework.shell.command.CommandContext;
 import org.springframework.shell.command.CommandRegistration.OptionArity;
@@ -100,6 +101,28 @@ public class UpdateCommands {
             .dryRun(dryRun)
             .rewriteRecipeName(SpringAiRecipe.computeRecipeLibrary(toVersion))
             .rewriteRecipeLibrary(SpringAiRecipe.RECIPE_LIBRARY)
+            .params(params != null ? Arrays.asList(params) : List.of())
+            .build();
+
+        openRewriteRunner.update(updateOptions, RecipeProvider.ARCONIA);
+    }
+
+    @Command(command = "spring-boot", description = "Update project to new Spring Boot version.")
+    public void updateSpringBoot(
+        CommandContext commandContext,
+        @Option(description = "Update in dry-run mode.") boolean dryRun,
+        @Option(defaultValue = "3.5", description = "Spring Boot target version.") String toVersion,
+        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
+        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
+        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
+        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+    ) {
+        var terminal = new ArconiaCliTerminal(commandContext);
+        var openRewriteRunner = new OpenRewriteRunner(terminal);
+        var updateOptions = UpdateOptions.builder()
+            .dryRun(dryRun)
+            .rewriteRecipeName(SpringBootRecipe.computeRecipeLibrary(toVersion))
+            .rewriteRecipeLibrary(SpringBootRecipe.RECIPE_LIBRARY)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 

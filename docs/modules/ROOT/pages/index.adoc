@@ -47,6 +47,7 @@ Update
     update gradle: Update project to new Gradle version.
     update maven: Update project to new Maven version.
     update spring-ai: Update project to new Spring AI version.
+    update spring-boot: Update project to new Spring Boot version.
 ----
 
 == Authors

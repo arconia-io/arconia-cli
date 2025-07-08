@@ -14,6 +14,7 @@
 ** xref:update/gradle.adoc[arconia update gradle]
 ** xref:update/maven.adoc[arconia update maven]
 ** xref:update/spring-ai.adoc[arconia update spring-ai]
+** xref:update/spring-boot.adoc[arconia update spring-boot]
 * xref:security.adoc[Security]
 * Contributing
 ** xref:contributing/development.adoc[Development]
