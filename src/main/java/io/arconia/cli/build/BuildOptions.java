@@ -6,6 +6,7 @@ import java.util.List;
 public record BuildOptions(
     boolean clean,
     boolean skipTests,
+    Mode mode,
     Trait trait,
     BuildImageOptions buildImageOptions,
     List<String> params
@@ -17,6 +18,12 @@ public record BuildOptions(
         TEST_CLASSPATH
     }
 
+    public enum Mode {
+        DEV,
+        TEST,
+        PROD
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -24,6 +31,7 @@ public record BuildOptions(
     public static class Builder {
         private boolean clean = false;
         private boolean skipTests = false;
+        private Mode mode = Mode.PROD;
         private Trait trait = Trait.NONE;
         private BuildImageOptions buildImageOptions;
         private List<String> params = new ArrayList<>();
@@ -37,6 +45,11 @@ public record BuildOptions(
 
         public Builder skipTests(boolean skipTests) {
             this.skipTests = skipTests;
+            return this;
+        }
+
+        public Builder mode(Mode mode) {
+            this.mode = mode;
             return this;
         }
 
@@ -56,7 +69,7 @@ public record BuildOptions(
         }
     
         public BuildOptions build() {
-            return new BuildOptions(clean, skipTests, trait, buildImageOptions, params);
+            return new BuildOptions(clean, skipTests, mode, trait, buildImageOptions, params);
         }
 
     }

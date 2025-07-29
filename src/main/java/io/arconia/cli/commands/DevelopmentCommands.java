@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.arconia.cli.build.BuildOptions;
+import io.arconia.cli.build.BuildOptions.Mode;
 import io.arconia.cli.build.BuildOptions.Trait;
 import io.arconia.cli.build.BuildToolRunner;
 import io.arconia.cli.core.ArconiaCliTerminal;
@@ -53,6 +54,7 @@ public class DevelopmentCommands {
         var buildToolRunner = BuildToolRunner.create(terminal);
         var buildOptions = BuildOptions.builder()
             .clean(clean)
+            .mode(Mode.TEST)
             .trait(nativeBuild ? Trait.NATIVE_BUILD : Trait.NONE)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
@@ -72,6 +74,7 @@ public class DevelopmentCommands {
         var terminal = new ArconiaCliTerminal(commandContext);
         var buildToolRunner = BuildToolRunner.create(terminal);
         var buildOptions = BuildOptions.builder()
+            .mode(Mode.DEV)
             .trait(test ? Trait.TEST_CLASSPATH : Trait.NONE)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
