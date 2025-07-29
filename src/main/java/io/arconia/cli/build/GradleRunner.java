@@ -37,7 +37,10 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public void build(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = buildOptions.nativeBuild() ? "nativeBuild" : "build";
+        var action = switch(buildOptions.trait()) {
+            case NATIVE_BUILD -> "nativeBuild";
+            default -> "build";
+        };
         var command = constructGradleCommand(action, buildOptions);
         call(command);
     }
@@ -45,7 +48,10 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public void test(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = buildOptions.nativeBuild() ? "nativeTest" : "test";
+        var action = switch(buildOptions.trait()) {
+            case NATIVE_BUILD -> "nativeTest";
+            default -> "test";
+        };
         var command = constructGradleCommand(action, buildOptions);
         call(command);
     }
@@ -53,7 +59,11 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public void dev(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = buildOptions.nativeBuild() ? "nativeRun" : "bootRun";
+        var action = switch(buildOptions.trait()) {
+            case NATIVE_BUILD -> "nativeRun";
+            case TEST_CLASSPATH -> "bootTestRun";
+            default -> "bootRun";
+        };
         var command = constructGradleCommand(action, buildOptions);
         call(command);
     }

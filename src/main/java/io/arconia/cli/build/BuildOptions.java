@@ -5,11 +5,17 @@ import java.util.List;
 
 public record BuildOptions(
     boolean clean,
-    boolean nativeBuild,
     boolean skipTests,
+    Trait trait,
     BuildImageOptions buildImageOptions,
     List<String> params
 ) {
+
+    public enum Trait {
+        NONE,
+        NATIVE_BUILD,
+        TEST_CLASSPATH
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -17,8 +23,8 @@ public record BuildOptions(
 
     public static class Builder {
         private boolean clean = false;
-        private boolean nativeBuild = false;
         private boolean skipTests = false;
+        private Trait trait = Trait.NONE;
         private BuildImageOptions buildImageOptions;
         private List<String> params = new ArrayList<>();
         
@@ -29,13 +35,13 @@ public record BuildOptions(
             return this;
         }
 
-        public Builder nativeBuild(boolean nativeBuild) {
-            this.nativeBuild = nativeBuild;
+        public Builder skipTests(boolean skipTests) {
+            this.skipTests = skipTests;
             return this;
         }
 
-        public Builder skipTests(boolean skipTests) {
-            this.skipTests = skipTests;
+        public Builder trait(Trait trait) {
+            this.trait = trait;
             return this;
         }
 
@@ -50,7 +56,7 @@ public record BuildOptions(
         }
     
         public BuildOptions build() {
-            return new BuildOptions(clean, nativeBuild, skipTests, buildImageOptions, params);
+            return new BuildOptions(clean, skipTests, trait, buildImageOptions, params);
         }
 
     }

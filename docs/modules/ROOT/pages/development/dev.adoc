@@ -19,6 +19,10 @@ The following options are available:
 |===
 |Option |Default |Description
 
+|`--test` or `-t`
+|`false`
+|Run the application from the test classpath.
+
 |`--debug` or `-d`
 |`false`
 |Include debug output.
@@ -68,6 +72,8 @@ a|One of:
 
 Any additional parameters specified with `--params` are passed through to the respective build tool command.
 
+If you want to run the application from the test classpath, you can use the `--test` option. This will run the application using the test classpath instead of the main classpath, which is useful when using the low-level Testcontainers support in Spring Boot at development time. In that case, the command will be `gradle bootTestRun` for Gradle and `mvn spring-boot:test-run` for Maven.
+
 == Workflow
 
 To get get the best out of this workflow, you can rely on Arconia for getting an enhanced developer experience on top of Spring Boot, including Arconia Dev Services and integration with the Spring Boot DevTools. For example:
@@ -82,7 +88,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "io.arconia:arconia-bom:0.10.0"
+		mavenBom "io.arconia:arconia-bom:0.14.0"
 	}
 }
 ----

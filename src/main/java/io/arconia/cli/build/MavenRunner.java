@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import io.arconia.cli.build.BuildOptions.Trait;
 import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.openrewrite.RecipeProvider;
 import io.arconia.cli.openrewrite.RewriteOptions;
@@ -47,7 +48,11 @@ public class MavenRunner implements BuildToolRunner {
     @Override
     public void dev(BuildOptions buildOptions) {
         Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var command = constructMavenCommand("spring-boot:run", buildOptions);
+        var action = switch(buildOptions.trait()) {
+            case TEST_CLASSPATH -> "spring-boot:test-run";
+            default -> "spring-boot:run";
+        };
+        var command = constructMavenCommand(action, buildOptions);
         call(command);
     }
 
@@ -115,11 +120,11 @@ public class MavenRunner implements BuildToolRunner {
 
         command.add(action);
 
-        if (buildOptions.nativeBuild()) {
+        if (Trait.NATIVE_BUILD.equals(buildOptions.trait())) {
             command.add("-Pnative");
         }
 
-        if (buildOptions.skipTests()) {
+        if (buildOptions.skipTests() || action.equals("spring-boot:build-image")) {
             command.add("-DskipTests");
             command.add("-Dmaven.test.skip=true");
         }

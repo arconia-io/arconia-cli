@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.arconia.cli.build.BuildOptions;
+import io.arconia.cli.build.BuildOptions.Trait;
 import io.arconia.cli.build.BuildToolRunner;
 import io.arconia.cli.core.ArconiaCliTerminal;
 
@@ -31,7 +32,7 @@ public class DevelopmentCommands {
         var buildOptions = BuildOptions.builder()
             .clean(clean)
             .skipTests(skipTests)
-            .nativeBuild(nativeBuild)
+            .trait(nativeBuild ? Trait.NATIVE_BUILD : Trait.NONE)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
@@ -52,7 +53,7 @@ public class DevelopmentCommands {
         var buildToolRunner = BuildToolRunner.create(terminal);
         var buildOptions = BuildOptions.builder()
             .clean(clean)
-            .nativeBuild(nativeBuild)
+            .trait(nativeBuild ? Trait.NATIVE_BUILD : Trait.NONE)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
@@ -62,6 +63,7 @@ public class DevelopmentCommands {
     @Command(command = "dev", alias = "run", description = "Run the application in development mode.")
     public void dev(
         CommandContext commandContext,
+        @Option(description = "Run from the test classpath.", shortNames = 't') boolean test,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
@@ -70,6 +72,7 @@ public class DevelopmentCommands {
         var terminal = new ArconiaCliTerminal(commandContext);
         var buildToolRunner = BuildToolRunner.create(terminal);
         var buildOptions = BuildOptions.builder()
+            .trait(test ? Trait.TEST_CLASSPATH : Trait.NONE)
             .params(params != null ? Arrays.asList(params) : List.of())
             .build();
 
