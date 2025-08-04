@@ -19,25 +19,16 @@ repositories {
 }
 
 ext {
-    set('jLineVersion', "3.29.0")
     set('jSpecifyVersion', "1.0.0")
-    set('springShellVersion', "3.4.0")
+    set('springShellVersion', "3.4.1")
 }
 
 dependencies {
     implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
 
-    implementation "org.jline:jline-builtins:${jLineVersion}"
-    implementation "org.jline:jline-console:${jLineVersion}"
-    implementation "org.jline:jline-native:${jLineVersion}"
-    implementation "org.jline:jline-reader:${jLineVersion}"
-    implementation "org.jline:jline-style:${jLineVersion}"
-    implementation "org.jline:jline-terminal:${jLineVersion}"
-    implementation "org.jline:jline-terminal-jni:${jLineVersion}"
-
     implementation "org.jspecify:jspecify:${jSpecifyVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.shell:spring-shell-starter'
+    implementation 'org.springframework.shell:spring-shell-starter-jni'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.shell:spring-shell-starter-test'
