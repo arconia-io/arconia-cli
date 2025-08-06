@@ -8,6 +8,11 @@ vscode-java-flake.flake = "github:thomasvitale/vscode-java-flake"
 [vars]
 FLOX_DISABLE_METRICS="true"
 
+[profile]
+common = '''
+  export JAVA_HOME=$FLOX_ENV
+'''
+
 [options]
 systems = [
   "aarch64-darwin",
