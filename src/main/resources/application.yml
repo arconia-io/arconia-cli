@@ -25,7 +25,3 @@ spring:
     option:
        naming:
          case-type: kebab
-
-logging: 
-  pattern:
-    console:

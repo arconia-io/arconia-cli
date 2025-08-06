@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- For CLI applications, completely disable logging output -->
+    <!-- No appenders defined = no output anywhere -->
+    
+    <!-- Set root logger to OFF -->
+    <root level="OFF" />
+</configuration>
