@@ -67,7 +67,7 @@ public class UpdateCommands {
     public void updateArconia(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(defaultValue = "0.15", description = "Arconia target version.") String toVersion,
+        @Option(defaultValue = "0.16", description = "Arconia target version.") String toVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
