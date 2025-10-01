@@ -35,6 +35,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        // Override managed dependency in Spring Boot to fix CVE-2025-48924
+        substitute module('org.apache.commons:commons-lang3') using module('org.apache.commons:commons-lang3:3.18.0')
+    }
+}
+
 springBoot {
     buildInfo()
 }
