@@ -4,7 +4,7 @@ This page describes how to develop the Arconia CLI.
 
 == Prerequisites
 
-* Java 24 (GraalVM)
+* Java 25 (GraalVM)
 
 == Building the CLI
 
