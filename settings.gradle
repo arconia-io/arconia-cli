@@ -3,3 +3,14 @@ plugins {
 }
 
 rootProject.name = 'arconia-cli'
+
+gradle.settingsEvaluated {
+    gradle.allprojects { project ->
+        project.configurations.configureEach {
+            resolutionStrategy.dependencySubstitution {
+                // Override managed dependency in Spring Boot and CycloneDX to fix CVE-2025-48924
+                substitute module('org.apache.commons:commons-lang3') using module('org.apache.commons:commons-lang3:3.18.0')
+            }
+        }
+    }
+}
