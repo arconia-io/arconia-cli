@@ -1,10 +1,12 @@
+import org.cyclonedx.Version
+
 plugins {
     id 'java'
     id 'distribution'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.graalvm.buildtools.native' version '0.10.6'
-    id 'org.cyclonedx.bom' version '2.4.1'
+    id 'org.cyclonedx.bom' version '3.0.0'
 }
 
 java {
@@ -63,11 +65,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.named('cyclonedxBom') {
+cyclonedxDirectBom {
     includeConfigs = ["runtimeClasspath"]
-    outputFormat = "json"
     projectType = "application"
-    schemaVersion = "1.6"
+    schemaVersion = Version.VERSION_16
 }
 
 distributions {
@@ -77,8 +78,8 @@ distributions {
                 into 'bin'
                 include 'arconia', 'arconia.exe'
             }
-            from("$buildDir/reports") {
-                include 'application.cdx.json'
+            from("$buildDir/reports/cyclonedx") {
+                include 'bom.json'
                 rename { 'sbom.cdx.json' }
             }
             from(rootDir) {
@@ -89,6 +90,7 @@ distributions {
 }
 
 tasks.named('distZip') {
+    dependsOn('cyclonedxBom')
     def archiveName = gradle.startParameter.projectProperties['archiveName'] ?: "arconia-${project.version}.zip"
     onlyIf {
         gradle.startParameter.taskNames.contains("distZip")
