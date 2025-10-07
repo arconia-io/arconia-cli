@@ -1,5 +1,4 @@
 name: arconia-cli
 title: Arconia CLI
-prerelease: true
 nav:
   - modules/ROOT/nav.adoc
