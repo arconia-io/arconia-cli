@@ -77,6 +77,20 @@ distributions {
             from("$buildDir/native/nativeCompile") {
                 into 'bin'
                 include 'arconia', 'arconia.exe'
+                filePermissions {
+                    user {
+                        read = true
+                        execute = true
+                    }
+                    group {
+                        read = true
+                        execute = true
+                    }
+                    other {
+                        read = true
+                        execute = true
+                    }
+                }
             }
             from("$buildDir/reports/cyclonedx") {
                 include 'bom.json'
