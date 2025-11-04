@@ -3,6 +3,7 @@ package io.arconia.cli.openrewrite.recipes;
 import org.springframework.util.Assert;
 
 public enum SpringAiRecipe {
+    SPRING_AI_1_1("1.1", "io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_1"),
     SPRING_AI_1_0("1.0", "io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0");
 
     public static final String RECIPE_LIBRARY = "io.arconia.migrations:rewrite-spring";
