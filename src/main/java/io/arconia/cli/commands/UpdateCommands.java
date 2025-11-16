@@ -89,7 +89,7 @@ public class UpdateCommands {
     public void updateSpringAi(
         CommandContext commandContext,
         @Option(description = "Update in dry-run mode.") boolean dryRun,
-        @Option(defaultValue = "1.0", description = "Spring AI target version.") String toVersion,
+        @Option(defaultValue = "1.1", description = "Spring AI target version.") String toVersion,
         @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
         @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
         @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
