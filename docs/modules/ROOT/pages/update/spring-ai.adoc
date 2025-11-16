@@ -24,7 +24,7 @@ The following options are available:
 |Update in dry-run mode. Shows what changes would be made without actually making them.
 
 |`--to-version`
-|`1.0`
+|`1.1`
 |Spring AI target version to upgrade to.
 
 |`--debug` or `-d`
