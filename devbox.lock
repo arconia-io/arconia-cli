@@ -2,12 +2,12 @@
   "lockfile_version": "1",
   "packages": {
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
-      "last_modified": "2025-11-03T07:53:02Z",
-      "resolved": "github:NixOS/nixpkgs/7241bcbb4f099a66aafca120d37c65e8dda32717?lastModified=1762156382"
+      "last_modified": "2025-11-15T07:28:48Z",
+      "resolved": "github:NixOS/nixpkgs/1d4c88323ac36805d09657d13a5273aea1b34f0c?lastModified=1763191728"
     },
     "graalvmPackages.graalvm-ce@25": {
-      "last_modified": "2025-10-22T20:59:19Z",
-      "resolved": "github:NixOS/nixpkgs/01b6809f7f9d1183a2b3e081f0a1e6f8f415cb09#graalvmPackages.graalvm-ce",
+      "last_modified": "2025-11-12T10:38:40Z",
+      "resolved": "github:NixOS/nixpkgs/91c9a64ce2a84e648d0cf9671274bb9c2fb9ba60#graalvmPackages.graalvm-ce",
       "source": "devbox-search",
       "version": "25.0.0",
       "systems": {
@@ -15,41 +15,41 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/1qr4pa8sqsskh7nx5wav5vcn0mk4g5jm-graalvm-ce-25.0.0",
+              "path": "/nix/store/6f28zzav10gqvfwlknh9hqcqdvp5dkzw-graalvm-ce-25.0.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/1qr4pa8sqsskh7nx5wav5vcn0mk4g5jm-graalvm-ce-25.0.0"
+          "store_path": "/nix/store/6f28zzav10gqvfwlknh9hqcqdvp5dkzw-graalvm-ce-25.0.0"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/gsw2lvnwbjms2b8inrhmlcxi1clcggab-graalvm-ce-25.0.0",
+              "path": "/nix/store/j9jnnrwbav1rwraa44nyjz54pmdcq0z4-graalvm-ce-25.0.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/gsw2lvnwbjms2b8inrhmlcxi1clcggab-graalvm-ce-25.0.0"
+          "store_path": "/nix/store/j9jnnrwbav1rwraa44nyjz54pmdcq0z4-graalvm-ce-25.0.0"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/splb0wpi8hn32lmfp5ckb1skrc7j3ff9-graalvm-ce-25.0.0",
+              "path": "/nix/store/brwfpckx929v0nzgv739ihmkgbyq7n6f-graalvm-ce-25.0.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/splb0wpi8hn32lmfp5ckb1skrc7j3ff9-graalvm-ce-25.0.0"
+          "store_path": "/nix/store/brwfpckx929v0nzgv739ihmkgbyq7n6f-graalvm-ce-25.0.0"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/qn2nvfpzcn1fhjpsysg4nr22g09c05qj-graalvm-ce-25.0.0",
+              "path": "/nix/store/c4sdq5yw6145dl22fzpxmqdc8mvmfbq6-graalvm-ce-25.0.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/qn2nvfpzcn1fhjpsysg4nr22g09c05qj-graalvm-ce-25.0.0"
+          "store_path": "/nix/store/c4sdq5yw6145dl22fzpxmqdc8mvmfbq6-graalvm-ce-25.0.0"
         }
       }
     },
