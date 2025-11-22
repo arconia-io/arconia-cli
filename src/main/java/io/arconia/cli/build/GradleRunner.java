@@ -238,6 +238,8 @@ public class GradleRunner implements BuildToolRunner {
             case OPENREWRITE -> command.add("-DbomVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
         }
 
+        command.add("--no-parallel");
+
         if (!CollectionUtils.isEmpty(updateOptions.params())) {
             command.addAll(updateOptions.params());
         }

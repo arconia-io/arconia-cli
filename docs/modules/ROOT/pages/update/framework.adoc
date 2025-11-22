@@ -8,7 +8,7 @@ Basic usage:
 
 [source,shell]
 ----
-arconia update framework
+arconia update framework --to-version=0.19
 ----
 
 == Options
@@ -24,7 +24,7 @@ The following options are available:
 |Update in dry-run mode. Shows what changes would be made without actually making them.
 
 |`--to-version`
-|`0.18`
+|`0.19`
 |Arconia Framework target version to upgrade to.
 
 |`--debug` or `-d`
