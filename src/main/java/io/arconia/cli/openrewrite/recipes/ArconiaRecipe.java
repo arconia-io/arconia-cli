@@ -3,6 +3,7 @@ package io.arconia.cli.openrewrite.recipes;
 import org.springframework.util.Assert;
 
 public enum ArconiaRecipe {
+    ARCONIA_0_21("0.21", "io.arconia.rewrite.UpgradeArconia_0_21"),
     ARCONIA_0_20("0.20", "io.arconia.rewrite.UpgradeArconia_0_20"),
     ARCONIA_0_19("0.19", "io.arconia.rewrite.UpgradeArconia_0_19"),
     ARCONIA_0_18("0.18", "io.arconia.rewrite.UpgradeArconia_0_18"),
