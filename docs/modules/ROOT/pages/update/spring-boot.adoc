@@ -8,7 +8,7 @@ Basic usage:
 
 [source,shell]
 ----
-arconia update spring-boot --to-version=4.0
+arconia update spring-boot --to-version 4.0
 ----
 
 == Options
