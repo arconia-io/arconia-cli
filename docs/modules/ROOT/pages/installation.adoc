@@ -1,6 +1,10 @@
 = Installation
 
-The Arconia CLI can be installed using various package managers or directly from the released binaries.
+The Arconia CLI can be installed using various package managers or directly from the released binaries. Support for these operating systems and architectures is provided:
+
+* Linux (x86_64 and ARM64)
+* macOS (ARM64)
+* Windows (x86_64).
 
 == Package Managers
 
