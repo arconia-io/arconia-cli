@@ -1,6 +1,8 @@
 = `arconia test`
 
-The `arconia test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both Java and native modes.
+The `arconia test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both JVM and native modes.
+
+When using the https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] with https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services], any declared external services are automatically provisioned as containers during the test run. No test configuration classes or `@Import` annotations needed.
 
 == Usage
 
@@ -9,6 +11,28 @@ Basic usage:
 [source,shell]
 ----
 arconia test
+----
+
+Clean build before running tests:
+
+[source,shell]
+----
+arconia test --clean
+----
+
+Run tests in native mode:
+
+[source,shell]
+----
+arconia test --native
+----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia test -- --stacktrace
+arconia test -- -DmyProperty=value
 ----
 
 == Options
@@ -27,22 +51,16 @@ The following options are available:
 |`false`
 |Run tests in native mode using GraalVM Native Image.
 
-|`--debug` or `-d`
-|`false`
-|Include debug output.
-
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
 |Display help information for the command.
 |===
+
+NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM] with the Native Image component installed. Native tests compile the application to a native binary before executing, which takes significantly longer than JVM tests.
 
 == Build Tool Integration
 
@@ -87,9 +105,35 @@ For native tests:
 * `mvnd test -Pnative` (Using Maven Daemon)
 |===
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
+
+TIP: To run a specific test class or filter tests, use `--` to pass the appropriate build tool argument. For example, with Gradle: `arconia test -- --tests "*BookServiceTests"`. With Maven: `arconia test -- -Dtest=BookServiceTests`.
+
+== Integration Testing with Arconia Dev Services
+
+If your project uses https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services], the declared external services are automatically started before your integration tests run and stopped after they complete. No boilerplate configuration is required:
+
+[source,java]
+----
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class BookServiceTests {
+
+    @Autowired
+    BookService bookService;
+
+    @Test
+    void getBooks() {
+        // The PostgreSQL Dev Service is already running, configured, and ready to use
+        assertThat(bookService.findAll()).isEmpty();
+    }
+
+}
+----
+
+This works because Arconia Dev Services detect the test context and provision the required services automatically, the same way they work in development mode with `arconia dev`.
 
 == See Also
 
 * xref:development/build.adoc[arconia build]
 * xref:development/dev.adoc[arconia dev]
+* https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services]

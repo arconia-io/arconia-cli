@@ -1,6 +1,6 @@
 = `arconia build`
 
-The `arconia build` command builds your Spring Boot application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or native executable.
+The `arconia build` command builds your Spring Boot application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or a GraalVM native executable.
 
 == Usage
 
@@ -9,6 +9,42 @@ Basic usage:
 [source,shell]
 ----
 arconia build
+----
+
+Clean build (removes previous build output before building):
+
+[source,shell]
+----
+arconia build --clean
+----
+
+Build without running tests:
+
+[source,shell]
+----
+arconia build --skip-tests
+----
+
+Build a GraalVM native executable:
+
+[source,shell]
+----
+arconia build --native
+----
+
+Clean build of a native executable, skipping tests:
+
+[source,shell]
+----
+arconia build --clean --native --skip-tests
+----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia build -- --stacktrace
+arconia build -- -DmyProperty=value
 ----
 
 == Options
@@ -21,7 +57,7 @@ The following options are available:
 
 |`--clean`
 |`false`
-|Perform a clean build.
+|Perform a clean build, removing previous build outputs before building.
 
 |`--skip-tests`
 |`false`
@@ -29,24 +65,23 @@ The following options are available:
 
 |`--native`
 |`false`
-|Perform a native build using GraalVM Native Image.
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+|Perform a native build using GraalVM Native Image, producing a standalone native executable.
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
 |Display help information for the command.
 |===
+
+NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM] with the Native Image component installed. Native builds take a little bit longer than JVM builds but produce a standalone binary with fast startup time and low memory footprint.
+
+== Build Output
+
+* **JVM build**: produces a fat JAR in `build/libs/` (Gradle) or `target/` (Maven).
+* **Native build**: produces a standalone native executable in `build/native/nativeCompile/` (Gradle) or `target/` (Maven).
 
 == Build Tool Integration
 
@@ -91,7 +126,7 @@ For native builds:
 * `mvnd package -Pnative` (Using Maven Daemon)
 |===
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 

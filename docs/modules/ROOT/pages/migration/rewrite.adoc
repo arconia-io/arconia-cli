@@ -2,16 +2,31 @@
 
 The `arconia rewrite` command runs https://docs.openrewrite.org/[OpenRewrite] recipes to automatically update and refactor your codebase. It integrates with your build tool's (Maven/Gradle) OpenRewrite plugin to execute the recipes.
 
+== Relationship to `arconia update`
+
+The xref:update/spring-boot.adoc[`arconia update`] commands are curated shortcuts for the most common upgrades (Spring Boot, Spring AI, Arconia Framework, Gradle wrapper, Maven wrapper). Each one runs a specific, well-tested OpenRewrite recipe with sensible defaults.
+
+The `arconia rewrite` command gives you full control: you can run *any* OpenRewrite recipe, including recipes from the https://docs.openrewrite.org/recipes[OpenRewrite OSS catalog], from the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project, or from any other library.
+
 == Usage
 
-Basic usage with a specific recipe from the OpenRewrite OSS core library:
+Run a recipe from the OpenRewrite OSS core library:
 
 [source,shell]
 ----
 arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports
 ----
 
-With a custom recipe library:
+Preview changes without applying them:
+
+[source,shell]
+----
+arconia rewrite \
+    --recipe-name org.openrewrite.java.RemoveUnusedImports \
+    --dry-run
+----
+
+Run a recipe from a specific library:
 
 [source,shell]
 ----
@@ -20,14 +35,25 @@ arconia rewrite \
     --recipe-library io.arconia.migrations:rewrite-spring
 ----
 
-Try changes first with dry-run:
+Run a recipe pinned to a specific library version:
 
 [source,shell]
 ----
 arconia rewrite \
-    --recipe-name org.openrewrite.java.RemoveUnusedImports
-    --dry-run
+    --recipe-name io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0 \
+    --recipe-library io.arconia.migrations:rewrite-spring \
+    --recipe-version 1.2.0
 ----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports -- --stacktrace
+arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports -- -DmyProperty=value
+----
+
+WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
 
 == Options
 
@@ -39,31 +65,23 @@ The following options are available:
 
 |`--dry-run`
 |`false`
-|Update in dry-run mode. Shows what changes would be made without actually making them.
+|Preview the changes that would be made without modifying any files. Recommended before applying any recipe.
 
 |`--recipe-name` (required)
 |
-|Name of the OpenRewrite recipe to run. For example: 'io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0'.
+|Fully-qualified name of the OpenRewrite recipe to run. For example: `io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0`.
 
 |`--recipe-library`
 |
-|Maven coordinates of the library containing the OpenRewrite recipe to run. If not provided, the OpenRewrite OSS core recipe library will be used. For example: 'io.arconia.migrations:rewrite-arconia'.
+|Maven coordinates (`groupId:artifactId`) of the library containing the recipe. If not provided, the OpenRewrite OSS core library is used. For example: `io.arconia.migrations:rewrite-spring`.
 
 |`--recipe-version`
 |
-|Version of the library containing the OpenRewrite recipe to run. If not provided, the latest available version will be used. For example: '4.2.0'.
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+|Version of the recipe library to use. If not provided, the latest available version is resolved automatically. For example: `1.2.0`.
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
@@ -74,18 +92,20 @@ The following options are available:
 
 The command automatically detects whether your project uses Maven or Gradle and runs the appropriate OpenRewrite task relying on the OpenRewrite Maven and Gradle plugins without modifying the build itself.
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == Recipe Discovery
 
-To discover available recipes, visit the https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog].
-You can use the `--dry-run` option to preview changes before applying them.
+To discover available recipes, visit the https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog]. Use the `--dry-run` option to preview changes before applying them.
 
-WARNING: The OpenRewrite Recipe Catalog includes recipes published with different licenses. Some of them are open-source, released with Apache 2.0 license. Others are not open-source, released with Moderne Source Available License or Moderne Proprietary License. Make sure you're compliant with the license of the recipe you would like to run. You can find more information https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module[here].
+WARNING: The OpenRewrite Recipe Catalog includes recipes with different licenses. Some are open-source (Apache 2.0); others use the Moderne Source Available License or Moderne Proprietary License. Review the license of any recipe before running it. See https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module[OpenRewrite module versions] for details.
 
-You can find more recipes in the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project. All Arconia recipes are open-source, released with Apache 2.0 license.
+You can find additional recipes in the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project. All Arconia recipes are open-source, released under the Apache 2.0 license.
 
 == See Also
 
+* xref:update/spring-boot.adoc[arconia update spring-boot]
+* xref:update/spring-ai.adoc[arconia update spring-ai]
+* xref:update/framework.adoc[arconia update framework]
 * https://github.com/arconia-io/arconia-migrations[Arconia Migrations]
 * https://docs.openrewrite.org/[OpenRewrite Documentation]

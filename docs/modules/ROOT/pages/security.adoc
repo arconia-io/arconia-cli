@@ -6,16 +6,16 @@ The Arconia CLI releases are signed, their provenance is attested via SLSA (Buil
 
 All Arconia CLI release artifacts are signed with PGP. Follow these steps to verify the authenticity of the downloads.
 
-1. Download the Arconia CLI http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x36DD645BC7818CF5C884DE8F2E64062497575B2D[public key] and save it as `arconia.asc`.
+1. Download the Arconia CLI http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x7DF66939ADCE2CF84244C4A5E8CD1A1C72CAFA26[public key] and save it as `arconia.asc`.
 2. Verify the key fingerprint matches the following:
 
 [source,shell]
 ----
 $ gpg --show-keys arconia.asc
-pub   ed25519 2024-01-16 [SC] [expires: 2026-01-15]
-      36DD645BC7818CF5C884DE8F2E64062497575B2D
+pub   ed25519 2026-01-10 [SC] [expires: 2028-01-10]
+      7DF66939ADCE2CF84244C4A5E8CD1A1C72CAFA26
 uid                      Thomas Vitale (MavenCentral) <oss@************.io>
-sub   cv25519 2024-01-16 [E] [expires: 2026-01-15]
+sub   cv25519 2026-01-10 [E] [expires: 2028-01-10]
 ----
 
 3. Import the public key into your GPG keyring:
@@ -28,16 +28,16 @@ $ gpg --import arconia.asc
 4. Download the Arconia CLI binary archive and its corresponding signature file from the desired https://github.com/arconia-io/arconia-cli/releases[release].
 For example:
 
-* `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`
-* `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip.asc`.
+* `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip`
+* `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip.asc`.
 
 5. Verify the signature against the downloaded binary:
 
 [source,shell]
 ----
-$ gpg --verify arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip.asc arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip
-gpg: Signature made Mar 17 Set 23:29:59 2024 CEST
-gpg:                using EDDSA key 2E64062497575B2D
+$ gpg --verify arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip.asc arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip
+gpg: Signature made Fri Feb 20 00:40:11 2026 CET
+gpg:                using EDDSA key E8CD1A1C72CAFA26
 gpg: Good signature from "Thomas Vitale (MavenCentral) <oss@************.io>" [ultimate]
 ----
 
@@ -49,15 +49,15 @@ Every Arconia CLI release includes https://slsa.dev[SLSA] provenance attestation
 
 1. Install the https://github.com/slsa-framework/slsa-verifier[slsa-verifier] tool
 2. Download the SLSA provenance attestation file from the desired https://github.com/arconia-io/arconia-cli/releases[release].
-Example: `arconia-cli-0.0.1-SNAPSHOT.intoto.jsonl`.
+Example: `arconia-cli-0.9.8-SNAPSHOT.intoto.jsonl`.
 3. Download the corresponding Arconia CLI binary archive from the same release.
-Example: `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`.
+Example: `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip`.
 4. Use the slsa-verifier to verify the SLSA provenance attestation against the binary:
 
 [source,shell]
 ----
-$ slsa-verifier verify-artifact arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip \
-       --provenance-path arconia-cli-0.0.1-SNAPSHOT.intoto.jsonl \
+$ slsa-verifier verify-artifact arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip \
+       --provenance-path arconia-cli-0.9.8-SNAPSHOT.intoto.jsonl \
        --source-uri github.com/arconia-io/arconia-cli
 ----
 
@@ -65,9 +65,9 @@ A successful verification will output a message similar to:
 
 [source,shell]
 ----
-Verified signature against tlog entry index 131481633 at URL: https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a1631335a14958734e5e0a00b4105b318339d4571b91a1ab8a8b2a90b1704d6d0
-Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v2.0.0" at commit 10d734affc77f0f4d0f1087fe66bd7eeb3a61f8a
-Verifying artifact arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip: PASSED
+Verified signature against tlog entry index 971655809 at URL: https://rekor.sigstore.dev/api/v1/log/entries/108e9186e8c5677a7142a6a01d5b7c643a29670e0997ffa69885b31eea405d483b3284cd643b5e85
+Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v2.0.0" at commit 60ba307923212448e37903fdcfd6371503efa1ba
+Verifying artifact arconia-cli-0.9.8-macos-aarch64.zip: PASSED
 
 PASSED: SLSA verification passed
 ----
@@ -82,7 +82,7 @@ To access and review the SBOM for a specific release:
 
 1. Visit the https://github.com/arconia-io/arconia-cli/releases[Arconia CLI releases page] on GitHub.
 2. Download the binary archive for your desired release and platform.
-Example: `arconia-cli-0.0.1-SNAPSHOT-linux-amd64.zip`.
+Example: `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip`.
 3. Extract the contents of the archive to a local directory.
 4. Locate the file named `sbom.cdx.json` within the extracted directory. This JSON file contains the comprehensive SBOM for the release.
 

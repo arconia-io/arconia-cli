@@ -5,50 +5,69 @@ Welcome to Arconia CLI! This documentation will help you get started with the to
 
 == What is Arconia CLI?
 
-Arconia CLI is a versatile tool designed to enhance the development experience with Spring Boot applications, providing intuitive commands for building, testing, and running projects. It streamlines common tasks, including upgrading Spring Boot applications to the latest version with a single command, and simplifies containerization using both Cloud Native Buildpacks and Dockerfiles.
+Arconia CLI is the companion command-line tool for the https://spring.io/projects/spring-boot[Spring Boot] and https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] projects. It provides intuitive commands that streamline the entire development lifecycle: running applications in development mode with automatic service provisioning, building and testing, packaging as container images, and upgrading to newer versions of Spring Boot, Spring AI, and the Arconia Framework.
 
 NOTE: The Arconia CLI is currently in active development. We're working hard to improve it and appreciate your patience as we continue to refine the tool. Feel free to try it out and share your feedback!
 
 == Quick Start
 
-Install the Arconia CLI using one of the methods described in xref:installation[Installation].
+Install the Arconia CLI using one of the methods described in xref:installation.adoc[Installation].
 
-To get started with Arconia CLI, you can view the available commands and options by running:
+To get started, view the available commands and options by running:
 
 [source,shell]
 ----
 arconia help
 ----
 
-== Reference
+You'll see a summary of the main commands and options available in the CLI.
 
 [source,shell]
 ----
-AVAILABLE COMMANDS
+Usage: arconia [-hV] [COMMAND]
+Options:
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
 
-Built-In Commands
-    help: Display help about available commands
-    version: Show version info
-
-Development
-    build: Build the current project.
-    dev, run: Run the application in development mode.
-    test: Run tests for the current project.
-
-Image
-    image build buildpacks: Build a container image using Buildpacks.
-    image build dockerfile: Build a container image using Dockerfile.
-
-Migration
-    rewrite: Run an OpenRewrite recipe to migrate or refactor your project.
-
-Update
-    update, upgrade framework: Update project to new Arconia Framework version.
-    update, upgrade gradle: Update project to new Gradle version.
-    update, upgrade maven: Update project to new Maven version.
-    update, upgrade spring-ai: Update project to new Spring AI version.
-    update, upgrade spring-boot: Update project to new Spring Boot version.
+Commands:
+  dev, run         Run the application in development mode.
+  build            Build the current project.
+  test             Run tests for the current project.
+  image            Build and manage container images.
+  update, upgrade  Update project dependencies and build tool versions.
+  rewrite          Run an OpenRewrite recipe to migrate or refactor your project.
+  help             Display help information about the specified command.
+  version          Display version information about the Arconia CLI.
 ----
+
+== Commands
+
+=== Development
+
+These commands wrap your build tool (Maven or Gradle) to provide a consistent, tool-agnostic developer experience:
+
+* **xref:development/dev.adoc[arconia dev]** — Runs your application in development mode, activating the Arconia Framework's `dev` Spring profile and automatically starting any declared https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services] (databases, message brokers, AI inference servers, etc.) as containers. No boilerplate code required.
+* **xref:development/build.adoc[arconia build]** — Compiles, tests, and packages your application as a JAR or a GraalVM native executable.
+* **xref:development/test.adoc[arconia test]** — Runs your test suite, with Arconia Dev Services automatically provisioned for integration tests.
+
+=== Container Images
+
+* **xref:image/buildpacks.adoc[arconia image build buildpacks]** — Builds a container image using Cloud Native Buildpacks and Paketo, without needing a Dockerfile.
+* **xref:image/dockerfile.adoc[arconia image build dockerfile]** — Builds a container image using a Dockerfile.
+
+=== Updates
+
+These commands use https://docs.openrewrite.org/[OpenRewrite] recipes to automatically migrate your project with a single command:
+
+* **xref:update/spring-boot.adoc[arconia update spring-boot]** — Upgrades to a newer Spring Boot version.
+* **xref:update/spring-ai.adoc[arconia update spring-ai]** — Upgrades to a newer Spring AI version.
+* **xref:update/framework.adoc[arconia update framework]** — Upgrades to a newer Arconia Framework version.
+* **xref:update/gradle.adoc[arconia update gradle]** — Upgrades the Gradle wrapper.
+* **xref:update/maven.adoc[arconia update maven]** — Upgrades the Maven wrapper.
+
+=== Migration
+
+* **xref:migration/rewrite.adoc[arconia rewrite]** — Runs any OpenRewrite recipe for custom migration or refactoring tasks beyond the built-in `update` commands.
 
 == Authors
 

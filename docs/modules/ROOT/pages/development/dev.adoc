@@ -1,8 +1,16 @@
 = `arconia dev`
 
-The `arconia dev` command runs your Spring Boot application in development mode. It delegates to your build tool's (Maven/Gradle) development tasks to start the application with optimized settings for local development provided by the https://arconia.io/docs/arconia/latest/index.html[Arconia Framework].
+The `arconia dev` command runs your Spring Boot application in development mode. It delegates to your build tool's (Maven/Gradle) development tasks and is designed to work seamlessly with the https://docs.arconia.io/arconia/latest/index.html[Arconia Framework].
 
 Alias: `arconia run`
+
+== How It Works
+
+When you run `arconia dev`, the Arconia Framework detects that the application is running in development mode and activates the `dev` Spring profile. This enables several key developer experience features:
+
+* **https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services]** are automatically started. Any external services your application depends on (databases, message brokers, AI inference servers, etc.) are automatically provisioned as containers using Testcontainers. There is no boilerplate code to write: simply add a `testAndDevelopmentOnly` dependency and the service is ready to use.
+* **Spring Boot auto-configuration** detects the running containers and configures the connection details automatically (e.g., `DataSource`, `ConnectionFactory`). No manual `application.properties` changes needed.
+* **Spring Boot DevTools** (if present on the classpath) enables live restart on code changes, and Arconia keeps the provisioned containers running across restarts so you don't pay the startup cost of re-creating them on every change.
 
 == Usage
 
@@ -11,6 +19,28 @@ Basic usage:
 [source,shell]
 ----
 arconia dev
+----
+
+Using the alias:
+
+[source,shell]
+----
+arconia run
+----
+
+Run from the test classpath (for Spring Boot's native Testcontainers approach):
+
+[source,shell]
+----
+arconia dev --test
+----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia dev -- --stacktrace
+arconia dev -- -DmyProperty=value
 ----
 
 == Options
@@ -23,19 +53,11 @@ The following options are available:
 
 |`--test` or `-t`
 |`false`
-|Run the application from the test classpath.
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+|Run the application from the test classpath. Equivalent to `bootTestRun` (Gradle) or `spring-boot:test-run` (Maven). Useful when using Spring Boot's native Testcontainers support without Arconia Dev Services.
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
@@ -68,30 +90,60 @@ a|One of:
 * `mvnd spring-boot:run` (Using Maven Daemon)
 |===
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
-If you want to run the application from the test classpath, you can use the `--test` option. This will run the application using the test classpath instead of the main classpath, which is useful when using the low-level Testcontainers support in Spring Boot at development time. In that case, the command will be `gradle bootTestRun` for Gradle and `mvn spring-boot:test-run` for Maven.
+When the `--test` option is used, the command changes to `bootTestRun` for Gradle and `spring-boot:test-run` for Maven, running the application from the test classpath.
 
-== Workflow
+== Workflow with Arconia Dev Services
 
-To get get the best out of this workflow, you can rely on Arconia for getting an enhanced developer experience on top of Spring Boot, including Arconia Dev Services and integration with the Spring Boot DevTools. For example:
+Arconia Dev Services make it trivial to provision external services for local development. As an example, here is how to add a PostgreSQL database to a Spring Boot application using Gradle:
 
 [source,groovy]
 ----
 dependencies {
-  implementation "io.arconia:arconia-spring-boot-starter"
-  developmentOnly "org.springframework.boot:spring-boot-devtools"
-  testAndDevelopmentOnly "io.arconia:arconia-dev-services-postgresql"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Arconia Dev Services: only active during development and testing
+    testAndDevelopmentOnly 'io.arconia:arconia-dev-services-postgresql'
+
+    // Optional: enables live restart and keeps containers alive across restarts
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "io.arconia:arconia-bom:0.14.0"
-	}
+    imports {
+        mavenBom 'io.arconia:arconia-bom:0.23.1'
+    }
 }
 ----
+
+Then simply run your application:
+
+[source,shell]
+----
+arconia dev
+----
+
+On startup, Arconia will automatically:
+
+1. Detect the application is running in development mode and activate the `dev` profile.
+2. Start a PostgreSQL container using Testcontainers.
+3. Configure the `DataSource` to connect to it. No `spring.datasource.*` properties needed.
+4. Keep the container running across code changes if Spring Boot DevTools is on the classpath.
+
+NOTE: Arconia Dev Services are available for a wide range of services, including data stores (PostgreSQL, MongoDB, Redis, MySQL, and more), message brokers (Kafka, RabbitMQ, Pulsar), observability platforms (Grafana LGTM, OpenTelemetry Collector), and AI inference servers (Ollama). See the https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services documentation] for the full list.
+
+TIP: If you're using Spring AI with a vector database, Arconia can automatically use the appropriate container image. For example, when `arconia-dev-services-postgresql` is present alongside Spring AI PGVector, it automatically uses the `pgvector/pgvector` image.
+
+== The `--test` Flag
+
+The `--test` flag runs the application from the test classpath. It's equivalent to `./gradlew bootTestRun` or `./mvnw spring-boot:test-run`. This is the approach needed when relying on Spring Boot's native Testcontainers development-time services, which live in the test classpath and require a separate `TestApplication` class and container configuration beans.
+
+If you are using **Arconia Dev Services**, you do *not* need `--test`. Dev Services work from the main classpath and activate automatically when `arconia dev` is used, with no boilerplate code required.
 
 == See Also
 
 * xref:development/build.adoc[arconia build]
 * xref:development/test.adoc[arconia test]
+* https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services]

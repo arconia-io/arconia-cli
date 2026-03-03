@@ -14,20 +14,23 @@ import picocli.CommandLine.Model.CommandSpec;
     name = "arconia",
     commandListHeading = "%nCommands:%n",
     headerHeading = "%n",
+    footer = "",
     mixinStandardHelpOptions = true,
     optionListHeading = "Options:%n",
     parameterListHeading = "%n",
     scope = ScopeType.INHERIT,
+    showEndOfOptionsDelimiterInUsageHelp = true,
     sortOptions = false,
     versionProvider = VersionProvider.class,
     subcommands = {
-        HelpCommand.class,
         DevCommand.class,
         BuildCommand.class,
         TestCommand.class,
         ImageCommands.class,
         UpdateCommands.class,
-        RewriteCommand.class
+        RewriteCommand.class,
+        HelpCommand.class,
+        VersionCommand.class
     }
 )
 public class ArconiaCommand implements Runnable {

@@ -1,6 +1,12 @@
 = `arconia image build buildpacks`
 
-The `arconia image build buildpacks` command builds a container image for your Spring Boot application using https://buildpacks.io/[Cloud Native Buildpacks]. It delegates to your build tool's (Maven/Gradle) image build tasks to package your application as a container image and optionally publish it to a container registry, relying on the Spring Boot integration with https://paketo.io[Paketo Buildpacks].
+The `arconia image build buildpacks` command builds a container image for your Spring Boot application using https://buildpacks.io/[Cloud Native Buildpacks]. It delegates to your build tool's (Maven/Gradle) image build tasks to package your application as a container image, relying on the Spring Boot integration with https://paketo.io[Paketo Buildpacks].
+
+This approach does not require a Dockerfile: the buildpack automatically detects the application type, installs the appropriate runtime, and assembles the image following best practices for security and size.
+
+== Prerequisites
+
+* An OCI container runtime (Docker, Podman, or compatible) must be running on your machine.
 
 == Usage
 
@@ -11,11 +17,33 @@ Basic usage:
 arconia image build buildpacks
 ----
 
-With custom image name:
+With a custom image name:
 
 [source,shell]
 ----
-arconia image build buildpacks --image-name ghcr.io/thomasvitale/my-app:4.2.0
+arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0
+----
+
+Publish the image to a registry after building:
+
+[source,shell]
+----
+arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0 --publish-image
+----
+
+Build without running tests and clean cache:
+
+[source,shell]
+----
+arconia image build buildpacks --skip-tests --clean-cache
+----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia image build buildpacks -- --stacktrace
+arconia image build buildpacks -- -DmyProperty=value
 ----
 
 == Options
@@ -28,48 +56,42 @@ The following options are available:
 
 |`--image-name`
 |
-|Name for the image to build.
+|Name (and optionally tag) for the image to build. For example: `ghcr.io/my-org/my-app:1.0.0`.
 
 |`--builder-image`
 |
-|Name of the Builder image to use.
+|Name of the Paketo builder image to use. Defaults to the builder configured in your Spring Boot build plugin. Override this to use a different builder, for example a custom corporate builder.
 
 |`--run-image`
 |
-|Name of the Run image to use.
+|Name of the Paketo run image to use. Override this to change the base image of the produced container, for example to use a distroless or hardened run image.
 
 |`--clean-cache`
 |`false`
-|Whether to clean the cache before building.
+|Whether to clean the local buildpack cache before building. Useful when troubleshooting caching issues.
 
 |`--publish-image`
 |`false`
-|Whether to publish the generated image to an OCI registry.
+|Whether to publish the generated image to an OCI registry after building. Make sure you are authenticated with the target registry (e.g., `podman login ghcr.io`) before using this option.
 
 |`--clean`
 |`false`
-|Perform a clean build.
+|Perform a clean build of the application before building the image.
 
 |`--skip-tests`
 |`false`
-|Skip tests during the build.
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+|Skip tests during the application build.
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
 |Display help information for the command.
 |===
+
+TIP: To push the image to a registry using `--publish-image`, authenticate first (e.g., `podman login ghcr.io`). Registry credentials can also be configured in your Spring Boot build plugin for CI/CD environments.
 
 == Build Tool Integration
 
@@ -97,9 +119,11 @@ a|
 * `mvnd spring-boot:build-image` (Using Maven Daemon)
 |===
 
-Additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 
 * xref:image/dockerfile.adoc[arconia image build dockerfile]
 * xref:development/build.adoc[arconia build]
+* https://paketo.io[Paketo Buildpacks]
+* https://docs.spring.io/spring-boot/reference/packaging/container-images/cloud-native-buildpacks.html[Spring Boot Cloud Native Buildpacks documentation]

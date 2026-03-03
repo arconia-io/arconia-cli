@@ -1,15 +1,34 @@
 = `arconia update spring-ai`
 
-The `arconia update spring-ai` command upgrades your project to a newer version of Spring AI. It uses the Spring AI recipes from the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project.
+The `arconia update spring-ai` command upgrades your project to a newer version of https://spring.io/projects/spring-ai[Spring AI]. It uses upgrade recipes from the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project, which automatically apply the necessary changes: dependency version bumps, API renames, and configuration property updates required by the new version.
 
 == Usage
 
-Basic usage:
+Preview what changes will be made without applying them:
+
+[source,shell]
+----
+arconia update spring-ai --to-version=1.1 --dry-run
+----
+
+Apply the update:
 
 [source,shell]
 ----
 arconia update spring-ai --to-version=1.1
 ----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia update spring-ai --to-version=1.1 -- --stacktrace
+arconia update spring-ai --to-version=1.1 -- -DmyProperty=value
+----
+
+WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
+
+TIP: Consider using `--dry-run` first to inspect what the migration recipe will change before applying it.
 
 == Options
 
@@ -21,23 +40,15 @@ The following options are available:
 
 |`--dry-run`
 |`false`
-|Update in dry-run mode. Shows what changes would be made without actually making them.
+|Preview the changes that would be made without modifying any files. Recommended before applying the update.
 
 |`--to-version`
 |`1.1`
 |Spring AI target version to upgrade to.
 
-|`--debug` or `-d`
-|`false`
-|Include debug output.
-
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
@@ -48,9 +59,11 @@ The following options are available:
 
 The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite.adoc[`arconia rewrite`] command.
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 
+* xref:update/spring-boot.adoc[arconia update spring-boot]
 * xref:migration/rewrite.adoc[arconia rewrite]
-* https://github.com/arconia-io/arconia-migrations/tree/main[Arconia Migrations]
+* https://github.com/arconia-io/arconia-migrations[Arconia Migrations]
+* https://spring.io/projects/spring-ai[Spring AI]

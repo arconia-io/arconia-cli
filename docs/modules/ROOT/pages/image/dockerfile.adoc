@@ -1,21 +1,25 @@
 = `arconia image build dockerfile`
 
-The `arconia image build dockerfile` command builds a container image for your Spring Boot application using a Dockerfile.
+The `arconia image build dockerfile` command builds a container image for your Spring Boot application using a https://docs.docker.com/reference/dockerfile/[Dockerfile]. Unlike the xref:image/buildpacks.adoc[buildpacks] approach, this command gives you full control over the image build process through a custom Dockerfile.
+
+== Prerequisites
+
+* A container runtime (Docker, Podman, or compatible) must be running on your machine.
 
 == Usage
 
-Basic usage:
+Basic usage (Dockerfile must be located at `src/main/docker/Dockerfile` or `Dockerfile` in the project root):
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/thomasvitale/my-app:4.2.0
+arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0
 ----
 
-With custom Dockerfile path:
+With a custom Dockerfile path:
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/thomasvitale/my-app:4.2.0 --dockerfile config/Dockerfile
+arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --dockerfile config/Dockerfile
 ----
 
 == Options
@@ -28,33 +32,51 @@ The following options are available:
 
 |`--image-name` or `-t`
 |
-|Name for the image to build.
+|*(Required)* Name (and optionally tag) for the image to build. For example: `ghcr.io/my-org/my-app:1.0.0`.
 
 |`--dockerfile` or `-f`
 |
-a|The path to the Dockerfile to use for building the container image. If not specified, the command will look for a Dockerfile in the following locations:
+a|The path to the Dockerfile to use for building the container image. If not specified, the command looks for a Dockerfile in these locations (in order):
 
-* `src/main/docker/Dockerfile`
-* `Dockerfile` (in project root)
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+1. `src/main/docker/Dockerfile`
+2. `Dockerfile` (project root)
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
 |Display help information for the command.
 |===
 
+== Example Dockerfile
+
+The following is a minimal multi-stage Dockerfile suitable for a Spring Boot application. It uses Spring Boot's layered JAR support to separate dependencies (which change rarely) from application code (which changes often), resulting in better OCI image layer caching and faster incremental builds:
+
+[source,dockerfile]
+----
+FROM docker.io/library/eclipse-temurin:25-noble AS builder
+WORKDIR /builder
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} application.jar
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
+
+FROM docker.io/library/eclipse-temurin:25-jre-noble
+RUN useradd spring
+USER spring
+WORKDIR /application
+COPY --from=builder /builder/extracted/dependencies/ ./
+COPY --from=builder /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder /builder/extracted/application/ ./
+ENTRYPOINT ["java", "-jar", "application.jar"]
+----
+
+TIP: The multi-stage build pattern above keeps the final image small by only including the JRE and the extracted application layers, not the full build toolchain.
+
 == See Also
 
 * xref:image/buildpacks.adoc[arconia image build buildpacks]
-* https://docs.docker.com/engine/reference/commandline/build/[Docker build reference]
+* https://docs.docker.com/reference/dockerfile/[Dockerfile reference]
+* https://docs.spring.io/spring-boot/reference/packaging/container-images/dockerfiles.html[Spring Boot Dockerfiles documentation]

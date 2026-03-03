@@ -2,14 +2,33 @@
 
 The `arconia update gradle` command upgrades your project's Gradle wrapper to a newer version. It uses the https://docs.openrewrite.org/recipes/gradle/updategradlewrapper[UpdateGradleWrapper] recipe from the OpenRewrite OSS library.
 
+The recipe updates `gradle/wrapper/gradle-wrapper.properties` with the new Gradle version and refreshes the associated wrapper JAR and scripts.
+
 == Usage
 
-Basic usage:
+Preview what changes will be made without applying them:
+
+[source,shell]
+----
+arconia update gradle --dry-run
+----
+
+Apply the update:
 
 [source,shell]
 ----
 arconia update gradle
 ----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia update gradle -- --stacktrace
+arconia update gradle -- -DmyProperty=value
+----
+
+WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
 
 == Options
 
@@ -21,19 +40,11 @@ The following options are available:
 
 |`--dry-run`
 |`false`
-|Update in dry-run mode. Shows what changes would be made without actually making them.
-
-|`--debug` or `-d`
-|`false`
-|Include debug output.
+|Preview the changes that would be made without modifying any files. Recommended before applying the update.
 
 |`--verbose` or `-v`
 |`false`
-|Include more verbose output about the execution.
-
-|`--stacktrace` or `-s`
-|`false`
-|Include more details about errors.
+|Include verbose output.
 
 |`--help` or `-h`
 |
@@ -44,7 +55,7 @@ The following options are available:
 
 The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite.adoc[`arconia rewrite`] command.
 
-Any additional parameters appended to the command are passed through to the respective build tool command.
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 

@@ -8,8 +8,7 @@ public class ParametersOption {
 
     @Parameters(index = "0..*",
                 description = "Additional parameters passed directly to the underlying tool.",
-                paramLabel = "<param>",
-                hidden = true)
+                paramLabel = "<param>")
     List<String> params;
 
     public List<String> getParams() {

@@ -66,7 +66,7 @@ public class DockerfileRunner implements ImageToolRunner {
         if (StringUtils.hasText(dockerfile)) {
             dockerfilePath = Path.of(dockerfile).toAbsolutePath();
             if (dockerfilePath.toFile().isFile()) {
-                terminal.debug(common.isDebug(), "Dockerfile: %s".formatted(dockerfilePath));
+                terminal.verbose(common.isVerbose(), "Dockerfile: %s".formatted(dockerfilePath));
                 return dockerfilePath;
             }
             throw new ArconiaCliException("Cannot find Dockerfile at the specified path: %s".formatted(dockerfile));
@@ -78,7 +78,7 @@ public class DockerfileRunner implements ImageToolRunner {
             }
 
             if (dockerfilePath.toFile().isFile()) {
-                terminal.debug(common.isDebug(), "Dockerfile: %s".formatted(dockerfilePath));
+                terminal.verbose(common.isVerbose(), "Dockerfile: %s".formatted(dockerfilePath));
                 return dockerfilePath;
             }
 

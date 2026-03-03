@@ -46,13 +46,13 @@ public interface BuildToolRunner {
     default String getBuildToolMainCommand() {
         File wrapper = getBuildToolWrapper();
         if (wrapper != null && wrapper.isFile()) {
-            getTerminal().debug(getTroubleshootOptions().isDebug(), "Wrapper: %s".formatted(wrapper.getAbsolutePath()));
+            getTerminal().verbose(getTroubleshootOptions().isVerbose(), "Wrapper: %s".formatted(wrapper.getAbsolutePath()));
             return wrapper.getAbsolutePath();
         }
 
         File executable = getBuildToolExecutable();
         if (executable != null && executable.isFile()) {
-            getTerminal().debug(getTroubleshootOptions().isDebug(), "Executable: %s".formatted(executable.getAbsolutePath()));
+            getTerminal().verbose(getTroubleshootOptions().isVerbose(), "Executable: %s".formatted(executable.getAbsolutePath()));
             return executable.getAbsolutePath();
         }
 
@@ -74,8 +74,8 @@ public interface BuildToolRunner {
             throw new ArconiaCliException("Cannot detect the build tool used for the project at %s".formatted(projectPath));
         }
 
-        terminal.debug(troubleshootOptions.isDebug(), "Project: %s".formatted(projectPath));
-        terminal.debug(troubleshootOptions.isDebug(), "Build tool: %s".formatted(buildTool));
+        terminal.verbose(troubleshootOptions.isVerbose(), "Project: %s".formatted(projectPath));
+        terminal.verbose(troubleshootOptions.isVerbose(), "Build tool: %s".formatted(buildTool));
 
         return switch (buildTool) {
             case GRADLE, GRADLE_KOTLIN -> new GradleRunner(terminal, troubleshootOptions, projectPath, buildTool);
