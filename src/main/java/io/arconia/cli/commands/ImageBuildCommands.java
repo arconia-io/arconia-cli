@@ -1,40 +1,52 @@
 package io.arconia.cli.commands;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.shell.command.CommandContext;
-import org.springframework.shell.command.CommandRegistration.OptionArity;
-import org.springframework.shell.command.annotation.Command;
-import org.springframework.shell.command.annotation.Option;
+import org.springframework.stereotype.Component;
 
 import io.arconia.cli.build.BuildImageOptions;
 import io.arconia.cli.build.BuildOptions;
 import io.arconia.cli.core.ArconiaCliTerminal;
 import io.arconia.cli.image.BuildpacksRunner;
 import io.arconia.cli.image.DockerfileRunner;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
+import picocli.CommandLine.Model.CommandSpec;
 
-@Command(command = "image build", group = "Image")
-public class ImageBuildCommands {
+@Component
+@Command(
+    name = "build",
+    description = "Build a container image."
+)
+public class ImageBuildCommands implements Runnable {
 
-    @Command(command = "buildpacks", description = "Build a container image using Buildpacks.")
+    @Spec
+    CommandSpec spec;
+
+    private final ArconiaCliTerminal terminal;
+
+    public ImageBuildCommands(ArconiaCliTerminal terminal) {
+        this.terminal = terminal;
+    }
+
+    @Override
+    public void run() {
+        spec.commandLine().usage(spec.commandLine().getOut());
+    }
+
+    @Command(name = "buildpacks", description = "Build a container image using Buildpacks.")
     public void buildpacks(
-        CommandContext commandContext,
-        @Option(description = "Name for the image to build.") String imageName,
-        @Option(description = "Name of the Builder image to use.") String builderImage,
-        @Option(description = "Name of the Run image to use.") String runImage,
-        @Option(description = "Whether to clean the cache before building.") boolean cleanCache,
-        @Option(description = "Whether to publish the generated image to an OCI registry.") boolean publishImage,
-
-        @Option(description = "Perform a clean build.") boolean clean,
-        @Option(description = "Skip tests.") boolean skipTests,
-        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
-        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace,
-        @Option(description = "Additional build parameters passed directly to the build tool.", shortNames = 'p', arity = OptionArity.ZERO_OR_MORE) String[] params
+        @Option(names = "--image-name", description = "Name for the image to build.") String imageName,
+        @Option(names = "--builder-image", description = "Name of the Builder image to use.") String builderImage,
+        @Option(names = "--run-image", description = "Name of the Run image to use.") String runImage,
+        @Option(names = "--clean-cache", description = "Whether to clean the cache before building.") boolean cleanCache,
+        @Option(names = "--publish-image", description = "Whether to publish the generated image to an OCI registry.") boolean publishImage,
+        @Option(names = "--clean", description = "Perform a clean build.") boolean clean,
+        @Option(names = "--skip-tests", description = "Skip tests.") boolean skipTests,
+        @Mixin TroubleshootOptions troubleshootOptions,
+        @Mixin ParametersOption parametersOption
     ) {
-        var terminal = new ArconiaCliTerminal(commandContext);
-        var buildpacksRunner = new BuildpacksRunner(terminal);
+        var buildpacksRunner = new BuildpacksRunner(terminal, troubleshootOptions);
         var buildOptions = BuildOptions.builder()
             .buildImageOptions(BuildImageOptions.builder()
                 .imageName(imageName)
@@ -45,25 +57,20 @@ public class ImageBuildCommands {
                 .build())
             .clean(clean)
             .skipTests(skipTests)
-            .params(params != null ? Arrays.asList(params) : List.of())
+            .params(parametersOption.getParams())
             .build();
 
         buildpacksRunner.build(buildOptions);
     }
 
-    @Command(command = "dockerfile", description = "Build a container image using Dockerfile.")
+    @Command(name = "dockerfile", description = "Build a container image using Dockerfile.")
     public void dockerfile(
-        CommandContext commandContext,
-        @Option(required = true, description = "Name for the image to build.", shortNames = 't') String imageName,
-        @Option(description = "The path to the Dockerfile to use for building the container image.", shortNames = 'f') String dockerfile,
-        @Option(description = "Include debug output.", shortNames = 'd') boolean debug,
-        @Option(description = "Include more verbose output about the execution.", shortNames = 'v') boolean verbose,
-        @Option(description = "Include more details about errors.", shortNames = 's') boolean stacktrace
+        @Option(names = {"-t", "--image-name"}, required = true, description = "Name for the image to build.") String imageName,
+        @Option(names = {"-f", "--dockerfile"}, description = "The path to the Dockerfile to use for building the container image.") String dockerfile,
+        @Mixin TroubleshootOptions troubleshootOptions
     ) {
-        var terminal = new ArconiaCliTerminal(commandContext);
-        var dockerfileRunner = new DockerfileRunner(terminal);
-
+        var dockerfileRunner = new DockerfileRunner(terminal, troubleshootOptions);
         dockerfileRunner.build(imageName, dockerfile);
     }
-    
+
 }

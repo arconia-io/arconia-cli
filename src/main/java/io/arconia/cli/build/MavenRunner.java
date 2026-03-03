@@ -10,8 +10,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import io.arconia.cli.build.BuildOptions.Trait;
+import io.arconia.cli.commands.TroubleshootOptions;
 import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.openrewrite.RecipeProvider;
 import io.arconia.cli.openrewrite.RewriteOptions;
 import io.arconia.cli.openrewrite.UpdateOptions;
 import io.arconia.cli.utils.IoUtils;
@@ -21,13 +21,16 @@ public class MavenRunner implements BuildToolRunner {
     private static final String OPEN_REWRITE_DEFAULT_VERSION = "LATEST";
 
     private final ArconiaCliTerminal terminal;
+    private final TroubleshootOptions troubleshootOptions;
     private final Path projectPath;
 
-    public MavenRunner(ArconiaCliTerminal terminal, Path projectPath) {
+    public MavenRunner(ArconiaCliTerminal terminal, TroubleshootOptions troubleshootOptions, Path projectPath) {
         Assert.notNull(terminal, "terminal cannot be null");
+        Assert.notNull(troubleshootOptions, "troubleshootOptions cannot be null");
         Assert.notNull(projectPath, "projectPath cannot be null");
-        
+
         this.terminal = terminal;
+        this.troubleshootOptions = troubleshootOptions;
         this.projectPath = projectPath;
     }
 
@@ -71,10 +74,9 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
-    public void update(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
+    public void update(UpdateOptions updateOptions) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
-        Assert.notNull(recipeProvider, "recipeProvider cannot be null");
-        var command = constructUpdateCommand(updateOptions, recipeProvider);
+        var command = constructUpdateCommand(updateOptions);
         call(command);
     }
 
@@ -107,6 +109,11 @@ public class MavenRunner implements BuildToolRunner {
     @Override
     public ArconiaCliTerminal getTerminal() {
         return terminal;
+    }
+
+    @Override
+    public TroubleshootOptions getTroubleshootOptions() {
+        return troubleshootOptions;
     }
 
     private List<String> constructMavenCommand(String action, BuildOptions buildOptions) {
@@ -189,7 +196,7 @@ public class MavenRunner implements BuildToolRunner {
         return command;
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -204,10 +211,7 @@ public class MavenRunner implements BuildToolRunner {
 
         command.add("-Drewrite.activeRecipes=" + updateOptions.rewriteRecipeName());
 
-        switch (recipeProvider) {
-            case ARCONIA -> command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
-            case OPENREWRITE -> command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
-        }
+        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
 
         command.add("-Drewrite.exportDatatables=true");
 

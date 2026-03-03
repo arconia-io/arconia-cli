@@ -2,6 +2,8 @@
 
 The `arconia dev` command runs your Spring Boot application in development mode. It delegates to your build tool's (Maven/Gradle) development tasks to start the application with optimized settings for local development provided by the https://arconia.io/docs/arconia/latest/index.html[Arconia Framework].
 
+Alias: `arconia run`
+
 == Usage
 
 Basic usage:
@@ -35,10 +37,6 @@ The following options are available:
 |`false`
 |Include more details about errors.
 
-|`--params` or `-p`
-|
-|Additional build parameters passed directly to the build tool.
-
 |`--help` or `-h`
 |
 |Display help information for the command.
@@ -70,7 +68,7 @@ a|One of:
 * `mvnd spring-boot:run` (Using Maven Daemon)
 |===
 
-Any additional parameters specified with `--params` are passed through to the respective build tool command.
+Any additional parameters appended to the command are passed through to the respective build tool command.
 
 If you want to run the application from the test classpath, you can use the `--test` option. This will run the application using the test classpath instead of the main classpath, which is useful when using the low-level Testcontainers support in Spring Boot at development time. In that case, the command will be `gradle bootTestRun` for Gradle and `mvn spring-boot:test-run` for Maven.
 

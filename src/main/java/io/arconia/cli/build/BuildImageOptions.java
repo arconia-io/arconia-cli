@@ -13,6 +13,7 @@ public record BuildImageOptions(
     }
 
     public static class Builder {
+        
         private String imageName;
         private String builderImage;
         private String runImage;
@@ -49,6 +50,7 @@ public record BuildImageOptions(
         public BuildImageOptions build() {
             return new BuildImageOptions(imageName, builderImage, runImage, cleanCache, publishImage);
         }
+
     }
 
 }

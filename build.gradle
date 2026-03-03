@@ -3,10 +3,10 @@ import org.cyclonedx.Version
 plugins {
     id 'java'
     id 'distribution'
-    id 'org.springframework.boot' version '3.5.11'
+    id 'org.springframework.boot' version '4.0.3'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.graalvm.buildtools.native' version '0.10.6'
-    id 'org.cyclonedx.bom' version '3.1.0'
+    id 'org.graalvm.buildtools.native' version '0.11.4'
+    id 'org.cyclonedx.bom' version '3.2.0'
 }
 
 java {
@@ -21,43 +21,52 @@ repositories {
 }
 
 ext {
-    set('jSpecifyVersion', "1.0.0")
-    set('springShellVersion', "3.4.1")
+    set('arconiaVersion', "0.23.1")
+    set('picocliVersion', "4.7.7")
+    set('jlineVersion', "3.30.7")
 }
 
 dependencies {
-    implementation platform("org.springframework.shell:spring-shell-dependencies:${springShellVersion}")
+    implementation "org.springframework.boot:spring-boot-starter"
 
-    implementation "org.jspecify:jspecify:${jSpecifyVersion}"
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.shell:spring-shell-starter-jni'
+    implementation "info.picocli:picocli:${picocliVersion}"
+    annotationProcessor "info.picocli:picocli-codegen:${picocliVersion}"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.shell:spring-shell-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation "org.jline:jline-terminal-ffm:${jlineVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "io.arconia:arconia-spring-boot-starter:${arconiaVersion}"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 springBoot {
     buildInfo()
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
 graalvmNative {
+    metadataRepository {
+        version = "0.3.34"
+    }
     binaries {
         main {
             imageName = "arconia"
-            // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+            // See: https://jline.org/versions/4.0/docs/modules/terminal-providers#ffm-provider
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
     }
 }
 
 tasks.withType(JavaExec).configureEach {
-   // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+   // See: https://jline.org/versions/4.0/docs/modules/terminal-providers#ffm-provider
    jvmArgs += ["--enable-native-access=ALL-UNNAMED"]
 }
 
 tasks.withType(Test).configureEach {
-   // See: https://docs.spring.io/spring-shell/reference/building.html#_ffm
+   // See: https://jline.org/versions/4.0/docs/modules/terminal-providers#ffm-provider
    jvmArgs += ["--enable-native-access=ALL-UNNAMED"]
 }
 
@@ -93,7 +102,7 @@ distributions {
                 }
             }
             from("$buildDir/reports/cyclonedx") {
-                include 'bom.json'
+                include 'application.cdx.json'
                 rename { 'sbom.cdx.json' }
             }
             from(rootDir) {

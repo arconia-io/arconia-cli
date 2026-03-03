@@ -32,7 +32,7 @@ Built-In Commands
 
 Development
     build: Build the current project.
-    dev: Run the application in development mode.
+    dev, run: Run the application in development mode.
     test: Run tests for the current project.
 
 Image
@@ -40,14 +40,14 @@ Image
     image build dockerfile: Build a container image using Dockerfile.
 
 Migration
-    rewrite: Run an OpenRewrite recipe.
+    rewrite: Run an OpenRewrite recipe to migrate or refactor your project.
 
 Update
-    update framework: Update project to new Arconia Framework version.
-    update gradle: Update project to new Gradle version.
-    update maven: Update project to new Maven version.
-    update spring-ai: Update project to new Spring AI version.
-    update spring-boot: Update project to new Spring Boot version.
+    update, upgrade framework: Update project to new Arconia Framework version.
+    update, upgrade gradle: Update project to new Gradle version.
+    update, upgrade maven: Update project to new Maven version.
+    update, upgrade spring-ai: Update project to new Spring AI version.
+    update, upgrade spring-boot: Update project to new Spring Boot version.
 ----
 
 == Authors

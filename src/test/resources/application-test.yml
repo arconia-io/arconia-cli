@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: arconia-cli
+
+logging:
+  console:
+    enabled: true

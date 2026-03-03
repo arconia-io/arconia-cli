@@ -10,9 +10,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import io.arconia.cli.commands.TroubleshootOptions;
 import io.arconia.cli.utils.IoUtils;
 import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.openrewrite.RecipeProvider;
 import io.arconia.cli.openrewrite.RewriteOptions;
 import io.arconia.cli.openrewrite.UpdateOptions;
 
@@ -21,15 +21,18 @@ public class GradleRunner implements BuildToolRunner {
     private static final String OPEN_REWRITE_DEFAULT_VERSION = "latest.release";
 
     private final ArconiaCliTerminal terminal;
+    private final TroubleshootOptions troubleshootOptions;
     private final BuildTool buildTool;
     private final Path projectPath;
 
-    public GradleRunner(ArconiaCliTerminal terminal, Path projectPath, BuildTool buildTool) {
+    public GradleRunner(ArconiaCliTerminal terminal, TroubleshootOptions troubleshootOptions, Path projectPath, BuildTool buildTool) {
         Assert.notNull(terminal, "terminal cannot be null");
+        Assert.notNull(troubleshootOptions, "troubleshootOptions cannot be null");
         Assert.notNull(projectPath, "projectPath cannot be null");
         Assert.notNull(buildTool, "buildTool cannot be null");
 
         this.terminal = terminal;
+        this.troubleshootOptions = troubleshootOptions;
         this.projectPath = projectPath;
         this.buildTool = buildTool;
     }
@@ -84,10 +87,9 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public void update(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
+    public void update(UpdateOptions updateOptions) {
         Assert.notNull(updateOptions, "updateOptions cannot be null");
-        Assert.notNull(recipeProvider, "recipeProvider cannot be null");
-        var command = constructUpdateCommand(updateOptions, recipeProvider);
+        var command = constructUpdateCommand(updateOptions);
         call(command);
     }
 
@@ -116,6 +118,11 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public ArconiaCliTerminal getTerminal() {
         return terminal;
+    }
+
+    @Override
+    public TroubleshootOptions getTroubleshootOptions() {
+        return troubleshootOptions;
     }
 
     private List<String> constructGradleCommand(String action, BuildOptions buildOptions) {
@@ -173,7 +180,7 @@ public class GradleRunner implements BuildToolRunner {
         command.add("--init-script");
 
         try {
-            command.add(IoUtils.copyFileToTemp("openrewrite/init-generic.gradle").toFile().getAbsolutePath());
+            command.add(IoUtils.copyFileToTemp("openrewrite/init-rewrite.gradle").toFile().getAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -203,20 +210,15 @@ public class GradleRunner implements BuildToolRunner {
         return command;
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions, RecipeProvider recipeProvider) {
+    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
         command.add("--init-script");
 
-        String initGradleFilePath = switch(recipeProvider) {
-            case ARCONIA -> "openrewrite/init-arconia.gradle";
-            case OPENREWRITE -> "openrewrite/init-openrewrite.gradle";
-        };
-
         try {
-            command.add(IoUtils.copyFileToTemp(initGradleFilePath).toFile().getAbsolutePath());
+            command.add(IoUtils.copyFileToTemp("openrewrite/init-rewrite.gradle").toFile().getAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -232,11 +234,6 @@ public class GradleRunner implements BuildToolRunner {
         command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
 
         command.add("-DrecipeLibrary=" + updateOptions.rewriteRecipeLibrary());
-        
-        switch (recipeProvider) {
-            case ARCONIA -> command.add("-DbomVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
-            case OPENREWRITE -> command.add("-DbomVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
-        }
 
         command.add("--no-parallel");
 

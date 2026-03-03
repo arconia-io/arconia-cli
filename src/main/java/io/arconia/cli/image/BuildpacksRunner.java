@@ -6,15 +6,17 @@ import org.springframework.util.Assert;
 
 import io.arconia.cli.build.BuildOptions;
 import io.arconia.cli.build.BuildToolRunner;
+import io.arconia.cli.commands.TroubleshootOptions;
 import io.arconia.cli.core.ArconiaCliTerminal;
 
 public class BuildpacksRunner implements ImageToolRunner {
 
     private final BuildToolRunner buildToolRunner;
 
-    public BuildpacksRunner(ArconiaCliTerminal terminal) {
+    public BuildpacksRunner(ArconiaCliTerminal terminal, TroubleshootOptions common) {
         Assert.notNull(terminal, "terminal cannot be null");
-        this.buildToolRunner = BuildToolRunner.create(terminal);
+        Assert.notNull(common, "common cannot be null");
+        this.buildToolRunner = BuildToolRunner.create(terminal, common);
     }
 
     public void build(BuildOptions buildOptions) {
@@ -32,5 +34,5 @@ public class BuildpacksRunner implements ImageToolRunner {
     public File getImageToolExecutable() {
         return buildToolRunner.getBuildToolExecutable();
     }
-  
+
 }

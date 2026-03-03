@@ -5,18 +5,21 @@ import java.io.IOException;
 
 import org.springframework.util.Assert;
 
+import io.arconia.cli.commands.TroubleshootOptions;
+
 public final class ProcessExecutor {
 
     private ProcessExecutor() {
         // Prevent instantiation
     }
 
-    public static int execute(ArconiaCliTerminal terminal, String[] command, File targetDirectory) {
+    public static int execute(ArconiaCliTerminal terminal, TroubleshootOptions common, String[] command, File targetDirectory) {
         Assert.notNull(terminal, "terminal cannot be null");
+        Assert.notNull(common, "common cannot be null");
         Assert.notEmpty(command, "command cannot be null or empty");
         Assert.notNull(targetDirectory, "targetDirectory cannot be null");
-        
-        terminal.verbose(
+
+        terminal.verbose(common.isVerbose(),
             "🚀 Executing: %s".formatted(String.join(" ", command)),
             "📁 Project: %s".formatted(targetDirectory));
 
@@ -29,16 +32,16 @@ public final class ProcessExecutor {
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                terminal.verbose("\n🍃 Mission accomplished!");
+                terminal.verbose(common.isVerbose(), "\n🍃 Mission accomplished!");
             } else {
-                terminal.verbose("\n🍂 Ouch! Something went wrong!");
+                terminal.verbose(common.isVerbose(), "\n🍂 Ouch! Something went wrong!");
             }
             return exitCode;
         } catch (IOException ex) {
-            throw new ArconiaCliException(terminal, ex.getMessage(), ex);
+            throw new ArconiaCliException(ex.getMessage(), ex);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new ArconiaCliException(terminal, ex.getMessage(), ex);
+            throw new ArconiaCliException(ex.getMessage(), ex);
         }
     }
 

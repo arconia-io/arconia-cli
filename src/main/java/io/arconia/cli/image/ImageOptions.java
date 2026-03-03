@@ -12,6 +12,7 @@ public record ImageOptions(
     }
 
     public static class Builder {
+        
         private String registry;
         private String group;
         private String name;
@@ -42,6 +43,7 @@ public record ImageOptions(
         public ImageOptions build() {
             return new ImageOptions(registry, group, name, tag);
         }
+
     }
 
 }

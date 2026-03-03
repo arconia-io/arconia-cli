@@ -29,6 +29,7 @@ public record BuildOptions(
     }
 
     public static class Builder {
+        
         private boolean clean = false;
         private boolean skipTests = false;
         private Mode mode = Mode.PROD;

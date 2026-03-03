@@ -1,69 +1,75 @@
 package io.arconia.cli.core;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.jline.terminal.Terminal;
-import org.jline.utils.AttributedString;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
-import org.springframework.shell.command.CommandContext;
-import org.springframework.util.Assert;
+import jakarta.annotation.PreDestroy;
 
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.springframework.stereotype.Component;
+
+import picocli.CommandLine.Help.Ansi;
+
+@Component
 public class ArconiaCliTerminal {
 
-    private final CommandContext commandContext;
     private final Terminal terminal;
 
-    public ArconiaCliTerminal(CommandContext commandContext) {
-        Assert.notNull(commandContext, "commandContext cannot be null");
-        Assert.notNull(commandContext.getTerminal(), "commandContext.getTerminal() cannot be null");
-
-        this.commandContext = commandContext;
-        this.terminal = commandContext.getTerminal();
-
-        debug("Arguments: %s".formatted(String.join(" ", commandContext.getRawArgs())));
+    public ArconiaCliTerminal() throws IOException {
+        this.terminal = TerminalBuilder.builder()
+                .system(true)
+                .provider("ffm")
+                .dumb(true)
+                .build();
     }
 
-    public boolean isDebug() {
-        return commandContext.getOptionValue("debug") instanceof Boolean debug && debug;
+    /** 
+     * Returns the JLine terminal's {@link PrintWriter} (auto-flush).
+     **/
+    public PrintWriter writer() {
+        return terminal.writer();
     }
 
-    public boolean isVerbose() {
-        return commandContext.getOptionValue("verbose") instanceof Boolean verbose && verbose || isDebug();
+    /** 
+     * Returns the current terminal column width as reported by JLine.
+     **/
+    public int width() {
+        return terminal.getWidth();
     }
 
-    public boolean isStacktrace() {
-        return commandContext.getOptionValue("stacktrace") instanceof Boolean stacktrace && stacktrace;
-    }
+    // -------------------------------------------------------------------------
+    // Output helpers (used by runner / command classes)
+    // -------------------------------------------------------------------------
 
     public void info(String... messages) {
         for (var message : messages) {
             terminal.writer().println(message);
         }
-        terminal.flush();
+        terminal.writer().flush();
     }
 
     public void warn(String message) {
-        var warnMessage = buildMessageWithStyle("🔥 %s".formatted(message), AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
-        write(warnMessage);
+        terminal.writer().println(Ansi.AUTO.string("@|yellow 🔥 %s|@".formatted(message)));
+        terminal.writer().flush();
     }
 
     public void error(String message) {
-        var errorMessage = buildMessageWithStyle("❗ %s".formatted(message), AttributedStyle.DEFAULT.foreground(AttributedStyle.RED));
-        write(errorMessage);
+        terminal.writer().println(Ansi.AUTO.string("@|red ❗ %s|@".formatted(message)));
+        terminal.writer().flush();
     }
 
-    public void debug(String message) {
-        if (isDebug()) {
-            var debugMessage = buildMessageWithStyle("🔍 %s".formatted(message), AttributedStyle.DEFAULT.faint());
-            write(debugMessage);
+    public void debug(boolean debugEnabled, String message) {
+        if (debugEnabled) {
+            terminal.writer().println(Ansi.AUTO.string("@|faint 🔍 %s|@".formatted(message)));
+            terminal.writer().flush();
         }
     }
 
-    public void verbose(String... message) {
-        if (isVerbose()) {
-            info(message);
+    public void verbose(boolean verboseEnabled, String... messages) {
+        if (verboseEnabled) {
+            info(messages);
         }
     }
 
@@ -76,29 +82,26 @@ public class ArconiaCliTerminal {
     }
 
     public void newLine() {
-        terminal.writer().println("\n");
-        terminal.flush();
+        terminal.writer().println();
+        terminal.writer().flush();
     }
 
-    public void handleException(String message, Exception exception) {
-        if (isStacktrace()) {
-            var stringWriter = new StringWriter();
-            exception.printStackTrace(new PrintWriter(stringWriter, true));
-            error(stringWriter.toString());
+    public void handleException(boolean stacktraceEnabled, String message, Exception exception) {
+        if (stacktraceEnabled) {
+            var sw = new StringWriter();
+            exception.printStackTrace(new PrintWriter(sw, true));
+            error(sw.toString());
         }
-
         error(message);
     }
 
-    private String buildMessageWithStyle(String message, AttributedStyle style) {
-        var messageBuilder = new AttributedStringBuilder();
-        messageBuilder.append(new AttributedString(message, style));
-        return messageBuilder.toAttributedString().toAnsi();
-    }
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
 
-    private void write(String message) {
-        terminal.writer().println(new String(message));
-        terminal.flush();
+    @PreDestroy
+    public void close() throws IOException {
+        terminal.close();
     }
 
 }

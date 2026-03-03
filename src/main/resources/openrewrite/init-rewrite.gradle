@@ -11,9 +11,15 @@ def recipeVersion = System.getProperty('recipeVersion')
 
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
-    if (recipeLibrary != null && recipeVersion != null) {
-        dependencies {
-            rewrite("${recipeLibrary}:${recipeVersion}")
+    dependencies {
+        rewrite platform("org.openrewrite.recipe:rewrite-recipe-bom:latest.release")
+        rewrite platform("io.arconia.migrations:rewrite-bom:latest.release")
+        if (recipeLibrary != null) {
+            if (recipeVersion != null) {
+                rewrite("${recipeLibrary}:${recipeVersion}")
+            } else {
+                rewrite("${recipeLibrary}")
+            }
         }
     }
     rewrite {

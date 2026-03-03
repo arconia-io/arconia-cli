@@ -43,10 +43,6 @@ The following options are available:
 |`false`
 |Include more details about errors.
 
-|`--params` or `-p`
-|
-|Additional build parameters passed directly to the build tool.
-
 |`--help` or `-h`
 |
 |Display help information for the command.
@@ -95,7 +91,7 @@ For native builds:
 * `mvnd package -Pnative` (Using Maven Daemon)
 |===
 
-Any additional parameters specified with `--params` are passed through to the respective build tool command.
+Any additional parameters appended to the command are passed through to the respective build tool command.
 
 == See Also
 

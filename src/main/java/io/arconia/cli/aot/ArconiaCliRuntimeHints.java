@@ -5,13 +5,15 @@ import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * {@link RuntimeHintsRegistrar} that registers classpath resources required by
+ * the Arconia CLI at runtime in a GraalVM native image.
+ */
 public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
 
     @Override
     public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
-        hints.resources().registerResource(new ClassPathResource("openrewrite/init-arconia.gradle"));
-        hints.resources().registerResource(new ClassPathResource("openrewrite/init-generic.gradle"));
-        hints.resources().registerResource(new ClassPathResource("openrewrite/init-openrewrite.gradle"));
+        hints.resources().registerResource(new ClassPathResource("openrewrite/init-rewrite.gradle"));
     }
 
 }
