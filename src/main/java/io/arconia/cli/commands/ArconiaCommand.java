@@ -17,7 +17,6 @@ import picocli.CommandLine.Model.CommandSpec;
     footer = "",
     mixinStandardHelpOptions = true,
     optionListHeading = "Options:%n",
-    parameterListHeading = "%n",
     scope = ScopeType.INHERIT,
     showEndOfOptionsDelimiterInUsageHelp = true,
     sortOptions = false,
