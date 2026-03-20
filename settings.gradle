@@ -9,7 +9,7 @@ gradle.settingsEvaluated {
         project.configurations.configureEach {
             resolutionStrategy.dependencySubstitution {
                 // Override managed dependency in CycloneDX to fix GHSA-72hv-8253-57qq
-                substitute module('com.fasterxml.jackson.core:jackson-core') using module('com.fasterxml.jackson.core:jackson-core:2.21.1')
+                substitute module('com.fasterxml.jackson.core:jackson-core') using module('com.fasterxml.jackson.core:jackson-core:2.21.2')
             }
         }
     }
