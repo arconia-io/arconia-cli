@@ -1,34 +1,41 @@
 package io.arconia.cli.config;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.arconia.cli.commands.ArconiaCommand;
-import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.core.ArconiaExceptionHandler;
+import io.arconia.cli.core.CliExceptionHandler;
 import picocli.CommandLine;
 
 @Configuration(proxyBeanMethods = false)
 public final class PicocliConfiguration {
 
     @Bean
+    Terminal terminal() throws IOException {
+        return TerminalBuilder.builder()
+                    .system(true)
+                    .provider("ffm")
+                    .dumb(true)
+                    .build();
+    }
+
+    @Bean
     CommandLine commandLine(
+            Terminal terminal,
             ArconiaCommand topCommand,
-            PicocliSpringFactory factory,
-            ArconiaExceptionHandler exceptionHandler,
-            ArconiaCliTerminal terminal
+            PicocliSpringFactory factory
     ) {
         CommandLine cmd = new CommandLine(topCommand, factory);
-        cmd.setExecutionExceptionHandler(exceptionHandler);
-        cmd.setOut(new PrintWriter(terminal.writer(), true));
-        cmd.setErr(new PrintWriter(terminal.writer(), true));
+        cmd.setExecutionExceptionHandler(new CliExceptionHandler());
+        cmd.setOut(terminal.writer());
+        cmd.setErr(terminal.writer());
         cmd.setUsageHelpAutoWidth(true);
 
-        // In headless / test environments JLine returns 0; skip the explicit
-        // width in that case and let usageHelpAutoWidth handle it.
-        int terminalWidth = terminal.width();
+        int terminalWidth = terminal.getWidth();
         if (terminalWidth > 0) {
             cmd.setUsageHelpWidth(terminalWidth);
         }

@@ -53,8 +53,7 @@ class IoUtilsTests {
     @Test
     void getWorkingDirectoryMatchesUserDirSystemProperty() {
         Path result = IoUtils.getWorkingDirectory();
-        assertThat(result.toString()).isEqualTo(
-                Path.of(System.getProperty("user.dir")).toAbsolutePath().toString());
+        assertThat(result.toString()).isEqualTo(Path.of(System.getProperty("user.dir")).toAbsolutePath().toString());
     }
 
     // --- getBuildToolWrapper ---

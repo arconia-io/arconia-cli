@@ -8,44 +8,44 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import io.arconia.cli.build.BuildOptions;
+import io.arconia.cli.build.BuildArguments;
 import io.arconia.cli.build.BuildToolRunner;
-import io.arconia.cli.commands.TroubleshootOptions;
-import io.arconia.cli.core.ArconiaCliException;
-import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.core.CliException;
 import io.arconia.cli.core.ProcessExecutor;
 import io.arconia.cli.utils.IoUtils;
 
+/**
+ * {@link ImageToolRunner} implementation for building and managing container images using Dockerfiles.
+ */
 public class DockerfileRunner implements ImageToolRunner {
 
-    private final ArconiaCliTerminal terminal;
-    private final TroubleshootOptions common;
+    private final OutputOptions outputOptions;
     private final BuildToolRunner buildToolRunner;
     private final Path projectPath;
 
-    public DockerfileRunner(ArconiaCliTerminal terminal, TroubleshootOptions common) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(common, "common cannot be null");
-        this.terminal = terminal;
-        this.common = common;
-        this.buildToolRunner = BuildToolRunner.create(terminal, common);
+    public DockerfileRunner(OutputOptions outputOptions, List<String> additionalParameters) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
+        this.outputOptions = outputOptions;
+        this.buildToolRunner = BuildToolRunner.create(outputOptions, additionalParameters);
         this.projectPath = IoUtils.getProjectPath();
     }
 
     public void call(List<String> command) {
         Assert.notEmpty(command, "command cannot be null or empty");
-        ProcessExecutor.execute(terminal, common, command.toArray(new String[0]), projectPath.toFile());
+        ProcessExecutor.execute(outputOptions, command.toArray(new String[0]), projectPath.toFile());
     }
 
     public void build(String imageName, @Nullable String dockerfile) {
         Assert.hasText(imageName, "imageName cannot be null");
 
-        terminal.verbose(common.isVerbose(), "☕ Building application");
-        buildToolRunner.build(BuildOptions.builder().skipTests(true).build());
+        outputOptions.verbose("Building application");
+        buildToolRunner.build(BuildArguments.builder().skipTests(true).build());
 
-        terminal.newLine();
+        outputOptions.newLine();
 
-        terminal.verbose(common.isVerbose(), "🐳 Building container image");
+        outputOptions.verbose("Building container image");
         var dockerfilePath = getDockerfilePath(dockerfile);
         var command = constructImageCommand("build", imageName, dockerfilePath);
         call(command);
@@ -66,10 +66,10 @@ public class DockerfileRunner implements ImageToolRunner {
         if (StringUtils.hasText(dockerfile)) {
             dockerfilePath = Path.of(dockerfile).toAbsolutePath();
             if (dockerfilePath.toFile().isFile()) {
-                terminal.verbose(common.isVerbose(), "Dockerfile: %s".formatted(dockerfilePath));
+                outputOptions.verbose("Dockerfile: %s".formatted(dockerfilePath));
                 return dockerfilePath;
             }
-            throw new ArconiaCliException("Cannot find Dockerfile at the specified path: %s".formatted(dockerfile));
+            throw new CliException("Cannot find Dockerfile at the specified path: %s".formatted(dockerfile));
         } else {
             dockerfilePath = projectPath.resolve("src/main/docker/Dockerfile");
 
@@ -78,11 +78,11 @@ public class DockerfileRunner implements ImageToolRunner {
             }
 
             if (dockerfilePath.toFile().isFile()) {
-                terminal.verbose(common.isVerbose(), "Dockerfile: %s".formatted(dockerfilePath));
+                outputOptions.verbose("Dockerfile: %s".formatted(dockerfilePath));
                 return dockerfilePath;
             }
 
-            throw new ArconiaCliException("Cannot find Dockerfile at any of the supported locations");
+            throw new CliException("Cannot find Dockerfile at any of the supported locations");
         }
     }
 

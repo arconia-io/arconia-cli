@@ -1,29 +1,30 @@
 package io.arconia.cli.openrewrite;
 
+import java.util.List;
+
 import org.springframework.util.Assert;
 
 import io.arconia.cli.build.BuildToolRunner;
-import io.arconia.cli.commands.TroubleshootOptions;
-import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.commands.options.OutputOptions;
 
 public class OpenRewriteRunner {
 
     private final BuildToolRunner buildToolRunner;
 
-    public OpenRewriteRunner(ArconiaCliTerminal terminal, TroubleshootOptions common) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(common, "common cannot be null");
-        this.buildToolRunner = BuildToolRunner.create(terminal, common);
+    public OpenRewriteRunner(OutputOptions outputOptions, List<String> additionalParameters) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
+        this.buildToolRunner = BuildToolRunner.create(outputOptions, additionalParameters);
     }
 
-    public void update(UpdateOptions updateOptions) {
-        Assert.notNull(updateOptions, "updateOptions cannot be null");
-        buildToolRunner.update(updateOptions);
+    public void update(UpdateArguments updateArguments) {
+        Assert.notNull(updateArguments, "updateArguments cannot be null");
+        buildToolRunner.update(updateArguments);
     }
 
-    public void rewrite(RewriteOptions rewriteOptions) {
-        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
-        buildToolRunner.rewrite(rewriteOptions);
+    public void rewrite(RewriteArguments rewriteArguments) {
+        Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
+        buildToolRunner.rewrite(rewriteArguments);
     }
 
 }

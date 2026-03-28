@@ -2,7 +2,13 @@ package io.arconia.cli.commands;
 
 import org.springframework.stereotype.Component;
 
-import io.arconia.cli.config.VersionProvider;
+import io.arconia.cli.commands.development.BuildCommand;
+import io.arconia.cli.commands.development.DevCommand;
+import io.arconia.cli.commands.development.TestCommand;
+import io.arconia.cli.commands.image.ImageCommands;
+import io.arconia.cli.commands.refactoring.RewriteCommand;
+import io.arconia.cli.commands.refactoring.UpdateCommands;
+import io.arconia.cli.core.CliVersionProvider;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.ScopeType;
@@ -20,7 +26,7 @@ import picocli.CommandLine.Model.CommandSpec;
     scope = ScopeType.INHERIT,
     showEndOfOptionsDelimiterInUsageHelp = true,
     sortOptions = false,
-    versionProvider = VersionProvider.class,
+    versionProvider = CliVersionProvider.class,
     subcommands = {
         DevCommand.class,
         BuildCommand.class,

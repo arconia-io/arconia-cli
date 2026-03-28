@@ -5,43 +5,40 @@ import java.io.IOException;
 
 import org.springframework.util.Assert;
 
-import io.arconia.cli.commands.TroubleshootOptions;
+import io.arconia.cli.commands.options.OutputOptions;
 
+/**
+ * Executes external processes on behalf of the CLI.
+ */
 public final class ProcessExecutor {
 
-    private ProcessExecutor() {
-        // Prevent instantiation
-    }
+    private ProcessExecutor() {}
 
-    public static int execute(ArconiaCliTerminal terminal, TroubleshootOptions common, String[] command, File targetDirectory) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(common, "common cannot be null");
+    /**
+     * Executes the given command in the specified directory, inheriting the parent process I/O streams.
+     */
+    public static int execute(OutputOptions outputOptions, String[] command, File targetDirectory) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
         Assert.notEmpty(command, "command cannot be null or empty");
         Assert.notNull(targetDirectory, "targetDirectory cannot be null");
+        Assert.isTrue(targetDirectory.isDirectory(), "targetDirectory must be an existing directory");
 
-        terminal.verbose(common.isVerbose(),
-            "🚀 Executing: %s".formatted(String.join(" ", command)),
-            "📁 Project: %s".formatted(targetDirectory));
+        outputOptions.verbose(
+            "Executing: %s".formatted(String.join(" ", command)),
+            "Project: %s".formatted(targetDirectory));
 
         try {
-            Process process = new ProcessBuilder()
+            return new ProcessBuilder()
                 .command(command)
                 .inheritIO()
                 .directory(targetDirectory)
-                .start();
-
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                terminal.verbose(common.isVerbose(), "\n🍃 Mission accomplished!");
-            } else {
-                terminal.verbose(common.isVerbose(), "\n🍂 Ouch! Something went wrong!");
-            }
-            return exitCode;
+                .start()
+                .waitFor();
         } catch (IOException ex) {
-            throw new ArconiaCliException(ex.getMessage(), ex);
+            throw new CliException(ex.getMessage(), ex);
         } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            throw new ArconiaCliException(ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+            throw new CliException("Process was interrupted", ex);
         }
     }
 

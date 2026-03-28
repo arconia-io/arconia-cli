@@ -6,8 +6,7 @@ import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * {@link RuntimeHintsRegistrar} that registers classpath resources required by
- * the Arconia CLI at runtime in a GraalVM native image.
+ * {@link RuntimeHintsRegistrar} for locating the classpath resources required by the Arconia CLI.
  */
 public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
 

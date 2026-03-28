@@ -3,35 +3,39 @@ package io.arconia.cli.build;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.commands.TroubleshootOptions;
-import io.arconia.cli.core.ArconiaCliException;
-import io.arconia.cli.core.ArconiaCliTerminal;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.core.CliException;
 import io.arconia.cli.core.ProcessExecutor;
-import io.arconia.cli.openrewrite.RewriteOptions;
-import io.arconia.cli.openrewrite.UpdateOptions;
+import io.arconia.cli.openrewrite.RewriteArguments;
+import io.arconia.cli.openrewrite.UpdateArguments;
 import io.arconia.cli.utils.IoUtils;
 
+/**
+ * Interface for running build tools (e.g., Gradle, Maven) with common operations
+ * for application development, refactoring, and publishing.
+ */
 public interface BuildToolRunner {
 
     default void call(List<String> command) {
         Assert.notEmpty(command, "command cannot be null or empty");
-        ProcessExecutor.execute(getTerminal(), getTroubleshootOptions(), command.toArray(new String[0]), getProjectPath().toFile());
+        ProcessExecutor.execute(getOutputOptions(), command.toArray(new String[0]), getProjectPath().toFile());
     }
 
-    void build(BuildOptions buildOptions);
+    void build(BuildArguments buildArguments);
 
-    void test(BuildOptions buildOptions);
+    void test(BuildArguments buildArguments);
 
-    void dev(BuildOptions buildOptions);
+    void dev(BuildArguments buildArguments);
 
-    void imageBuild(BuildOptions buildOptions);
+    void imageBuild(BuildArguments buildArguments);
 
-    void rewrite(RewriteOptions rewriteOptions);
+    void rewrite(RewriteArguments rewriteArguments);
 
-    void update(UpdateOptions updateOptions);
+    void update(UpdateArguments updateArguments);
 
     BuildTool getBuildTool();
 
@@ -46,40 +50,38 @@ public interface BuildToolRunner {
     default String getBuildToolMainCommand() {
         File wrapper = getBuildToolWrapper();
         if (wrapper != null && wrapper.isFile()) {
-            getTerminal().verbose(getTroubleshootOptions().isVerbose(), "Wrapper: %s".formatted(wrapper.getAbsolutePath()));
+            getOutputOptions().verbose("Wrapper: %s".formatted(wrapper.getAbsolutePath()));
             return wrapper.getAbsolutePath();
         }
 
         File executable = getBuildToolExecutable();
         if (executable != null && executable.isFile()) {
-            getTerminal().verbose(getTroubleshootOptions().isVerbose(), "Executable: %s".formatted(executable.getAbsolutePath()));
+            getOutputOptions().verbose("Executable: %s".formatted(executable.getAbsolutePath()));
             return executable.getAbsolutePath();
         }
 
-        throw new ArconiaCliException("Cannot find any wrapper or executable to run the detected build tool: %s".formatted(getBuildTool()));
+        throw new CliException("Cannot find any wrapper or executable to run the detected build tool: %s".formatted(getBuildTool()));
     }
 
-    ArconiaCliTerminal getTerminal();
+    OutputOptions getOutputOptions();
 
-    TroubleshootOptions getTroubleshootOptions();
-
-    static BuildToolRunner create(ArconiaCliTerminal terminal, TroubleshootOptions troubleshootOptions) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(troubleshootOptions, "troubleshootOptions cannot be null");
+    static BuildToolRunner create(OutputOptions outputOptions, List<String> additionalParameters) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
 
         var projectPath = IoUtils.getProjectPath();
         var buildTool = BuildTool.detectFromProjectPath(projectPath);
 
         if (buildTool == null) {
-            throw new ArconiaCliException("Cannot detect the build tool used for the project at %s".formatted(projectPath));
+            throw new CliException("Cannot detect the build tool used for the project at %s".formatted(projectPath));
         }
 
-        terminal.verbose(troubleshootOptions.isVerbose(), "Project: %s".formatted(projectPath));
-        terminal.verbose(troubleshootOptions.isVerbose(), "Build tool: %s".formatted(buildTool));
+        outputOptions.verbose("Project: %s".formatted(projectPath));
+        outputOptions.verbose("Build tool: %s".formatted(buildTool));
 
         return switch (buildTool) {
-            case GRADLE, GRADLE_KOTLIN -> new GradleRunner(terminal, troubleshootOptions, projectPath, buildTool);
-            case MAVEN -> new MavenRunner(terminal, troubleshootOptions, projectPath);
+            case GRADLE, GRADLE_KOTLIN -> new GradleRunner(outputOptions, additionalParameters, projectPath, buildTool);
+            case MAVEN -> new MavenRunner(outputOptions, additionalParameters, projectPath);
         };
     }
 

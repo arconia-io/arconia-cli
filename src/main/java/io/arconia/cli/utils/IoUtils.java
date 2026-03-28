@@ -16,9 +16,7 @@ import org.springframework.util.StringUtils;
 
 public final class IoUtils {
 
-    private IoUtils() {
-        // Prevent instantiation
-    }
+    private IoUtils() {}
 
     public static Path getProjectPath() {
         return getProjectPath(null);

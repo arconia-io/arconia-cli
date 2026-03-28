@@ -4,80 +4,73 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import io.arconia.cli.build.BuildOptions.Trait;
-import io.arconia.cli.commands.TroubleshootOptions;
-import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.openrewrite.RewriteOptions;
-import io.arconia.cli.openrewrite.UpdateOptions;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.openrewrite.RewriteArguments;
+import io.arconia.cli.openrewrite.UpdateArguments;
 import io.arconia.cli.utils.IoUtils;
 
+/**
+ * {@link BuildToolRunner} implementation for Maven projects.
+ */
 public class MavenRunner implements BuildToolRunner {
 
-    private static final String OPEN_REWRITE_DEFAULT_VERSION = "LATEST";
+    static final String OPEN_REWRITE_DEFAULT_VERSION = "LATEST";
 
-    private final ArconiaCliTerminal terminal;
-    private final TroubleshootOptions troubleshootOptions;
+    private final OutputOptions outputOptions;
+    private final List<String> additionalParameters;
     private final Path projectPath;
 
-    public MavenRunner(ArconiaCliTerminal terminal, TroubleshootOptions troubleshootOptions, Path projectPath) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(troubleshootOptions, "troubleshootOptions cannot be null");
+    public MavenRunner(OutputOptions outputOptions, List<String> additionalParameters, Path projectPath) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
         Assert.notNull(projectPath, "projectPath cannot be null");
 
-        this.terminal = terminal;
-        this.troubleshootOptions = troubleshootOptions;
+        this.outputOptions = outputOptions;
+        this.additionalParameters = additionalParameters;
         this.projectPath = projectPath;
     }
 
     @Override
-    public void build(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var command = constructMavenCommand("package", buildOptions);
-        call(command);
+    public void build(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        call(constructMavenCommand("package", buildArguments, BootstrapMode.PROD));
     }
 
     @Override
-    public void test(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var command = constructMavenCommand("test", buildOptions);
-        call(command);
+    public void test(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        call(constructMavenCommand("test", buildArguments, BootstrapMode.TEST));
     }
 
     @Override
-    public void dev(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = switch(buildOptions.trait()) {
-            case TEST_CLASSPATH -> "spring-boot:test-run";
-            default -> "spring-boot:run";
-        };
-        var command = constructMavenCommand(action, buildOptions);
-        call(command);
+    public void dev(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        var action = buildArguments.testClasspath() ? "spring-boot:test-run" : "spring-boot:run";
+        call(constructMavenCommand(action, buildArguments, BootstrapMode.DEV));
     }
 
     @Override
-    public void imageBuild(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var command = constructMavenCommand("spring-boot:build-image", buildOptions);
-        call(command);
+    public void imageBuild(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        call(constructMavenCommand("spring-boot:build-image", buildArguments, BootstrapMode.PROD));
     }
 
     @Override
-    public void rewrite(RewriteOptions rewriteOptions) {
-        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
-        var command = constructRewriteCommand(rewriteOptions);
-        call(command);
+    public void rewrite(RewriteArguments rewriteArguments) {
+        Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
+        call(constructRewriteCommand(rewriteArguments));
     }
 
     @Override
-    public void update(UpdateOptions updateOptions) {
-        Assert.notNull(updateOptions, "updateOptions cannot be null");
-        var command = constructUpdateCommand(updateOptions);
-        call(command);
+    public void update(UpdateArguments updateArguments) {
+        Assert.notNull(updateArguments, "updateArguments cannot be null");
+        call(constructUpdateCommand(updateArguments));
     }
 
     @Override
@@ -88,6 +81,11 @@ public class MavenRunner implements BuildToolRunner {
     @Override
     public Path getProjectPath() {
         return projectPath;
+    }
+
+    @Override
+    public OutputOptions getOutputOptions() {
+        return outputOptions;
     }
 
     @Override
@@ -106,117 +104,113 @@ public class MavenRunner implements BuildToolRunner {
         return IoUtils.getExecutable("mvn");
     }
 
-    @Override
-    public ArconiaCliTerminal getTerminal() {
-        return terminal;
-    }
+    // Package-private for testability
 
-    @Override
-    public TroubleshootOptions getTroubleshootOptions() {
-        return troubleshootOptions;
-    }
-
-    private List<String> constructMavenCommand(String action, BuildOptions buildOptions) {
+    List<String> constructMavenCommand(String action, BuildArguments buildArguments, BootstrapMode bootstrapMode) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
-        if (buildOptions.clean()) {
+        if (buildArguments.clean()) {
             command.add("clean");
         }
 
         command.add(action);
 
-        if (Trait.NATIVE_BUILD.equals(buildOptions.trait())) {
+        if (buildArguments.nativeBuild()) {
             command.add("-Pnative");
         }
 
-        if (buildOptions.skipTests() || action.equals("spring-boot:build-image")) {
+        if (buildArguments.skipTests() || action.equals("spring-boot:build-image")) {
             command.add("-DskipTests");
             command.add("-Dmaven.test.skip=true");
         }
 
-        if (buildOptions.buildImageOptions() != null) {
-            addBuildImageArguments(command, buildOptions.buildImageOptions());
+        if (buildArguments.offline()) {
+            command.add("--offline");
         }
 
-        if (!CollectionUtils.isEmpty(buildOptions.params())) {
-            command.addAll(buildOptions.params());
+        if (buildArguments.buildImageArguments() != null) {
+            addBuildImageArguments(command, buildArguments.buildImageArguments());
+        }
+
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;
     }
 
-    private void addBuildImageArguments(List<String> command, BuildImageOptions imageOptions) {
-        if (StringUtils.hasText(imageOptions.imageName())) {
-            command.add("-Dspring-boot.build-image.imageName=%s".formatted(imageOptions.imageName()));
+    private void addBuildImageArguments(List<String> command, BuildImageArguments imageArguments) {
+        if (StringUtils.hasText(imageArguments.imageName())) {
+            command.add("-Dspring-boot.build-image.imageName=%s".formatted(imageArguments.imageName()));
         }
-        if (StringUtils.hasText(imageOptions.builderImage())) {
-            command.add("-Dspring-boot.build-image.builder=%s".formatted(imageOptions.builderImage()));
+        if (StringUtils.hasText(imageArguments.builderImage())) {
+            command.add("-Dspring-boot.build-image.builder=%s".formatted(imageArguments.builderImage()));
         }
-        if (StringUtils.hasText(imageOptions.runImage())) {
-            command.add("-Dspring-boot.build-image.runImage=%s".formatted(imageOptions.runImage()));
+        if (StringUtils.hasText(imageArguments.runImage())) {
+            command.add("-Dspring-boot.build-image.runImage=%s".formatted(imageArguments.runImage()));
         }
-        if (imageOptions.cleanCache()) {
+        if (imageArguments.cleanCache()) {
             command.add("-Dspring-boot.build-image.cleanCache=true");
         }
-        if (imageOptions.publishImage()) {
+        if (imageArguments.publishImage()) {
             command.add("-Dspring-boot.build-image.publish=true");
         }
     }
 
-    private List<String> constructRewriteCommand(RewriteOptions rewriteOptions) {
+    List<String> constructRewriteCommand(RewriteArguments rewriteArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
         command.add("-U");
 
-        if (rewriteOptions.dryRun()) {
+        if (rewriteArguments.dryRun()) {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         } else {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         }
 
-        command.add("-Drewrite.activeRecipes=" + rewriteOptions.rewriteRecipeName());
+        command.add("-Drewrite.activeRecipes=" + rewriteArguments.rewriteRecipeName());
 
-        if (StringUtils.hasText(rewriteOptions.rewriteRecipeLibrary())) {
-            var recipeVersion = StringUtils.hasText(rewriteOptions.rewriteRecipeVersion())
-                    ? rewriteOptions.rewriteRecipeVersion()
+        if (StringUtils.hasText(rewriteArguments.rewriteRecipeLibrary())) {
+            var recipeVersion = StringUtils.hasText(rewriteArguments.rewriteRecipeVersion())
+                    ? rewriteArguments.rewriteRecipeVersion()
                     : OPEN_REWRITE_DEFAULT_VERSION;
-            command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(rewriteOptions.rewriteRecipeLibrary(), recipeVersion));
+            command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(rewriteArguments.rewriteRecipeLibrary(), recipeVersion));
         }
 
         command.add("-Drewrite.exportDatatables=true");
 
-        if (!CollectionUtils.isEmpty(rewriteOptions.params())) {
-            command.addAll(rewriteOptions.params());
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+    List<String> constructUpdateCommand(UpdateArguments updateArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
         command.add("-U");
 
-        if (updateOptions.dryRun()) {
+        if (updateArguments.dryRun()) {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         } else {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         }
 
-        command.add("-Drewrite.activeRecipes=" + updateOptions.rewriteRecipeName());
+        command.add("-Drewrite.activeRecipes=" + updateArguments.rewriteRecipeName());
 
-        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateOptions.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
+        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateArguments.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
 
         command.add("-Drewrite.exportDatatables=true");
 
-        if (!CollectionUtils.isEmpty(updateOptions.params())) {
-            command.addAll(updateOptions.params());
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;

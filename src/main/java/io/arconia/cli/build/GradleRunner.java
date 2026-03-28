@@ -5,92 +5,79 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import io.arconia.cli.commands.TroubleshootOptions;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.core.CliException;
+import io.arconia.cli.openrewrite.RewriteArguments;
+import io.arconia.cli.openrewrite.UpdateArguments;
 import io.arconia.cli.utils.IoUtils;
-import io.arconia.cli.core.ArconiaCliTerminal;
-import io.arconia.cli.openrewrite.RewriteOptions;
-import io.arconia.cli.openrewrite.UpdateOptions;
 
+/**
+ * {@link BuildToolRunner} implementation for Gradle projects.
+ */
 public class GradleRunner implements BuildToolRunner {
 
-    private static final String OPEN_REWRITE_DEFAULT_VERSION = "latest.release";
+    static final String OPEN_REWRITE_DEFAULT_VERSION = "latest.release";
 
-    private final ArconiaCliTerminal terminal;
-    private final TroubleshootOptions troubleshootOptions;
-    private final BuildTool buildTool;
+    private final OutputOptions outputOptions;
+    private final List<String> additionalParameters;
     private final Path projectPath;
+    private final BuildTool buildTool;
 
-    public GradleRunner(ArconiaCliTerminal terminal, TroubleshootOptions troubleshootOptions, Path projectPath, BuildTool buildTool) {
-        Assert.notNull(terminal, "terminal cannot be null");
-        Assert.notNull(troubleshootOptions, "troubleshootOptions cannot be null");
+    public GradleRunner(OutputOptions outputOptions, List<String> additionalParameters, Path projectPath, BuildTool buildTool) {
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
         Assert.notNull(projectPath, "projectPath cannot be null");
         Assert.notNull(buildTool, "buildTool cannot be null");
 
-        this.terminal = terminal;
-        this.troubleshootOptions = troubleshootOptions;
+        this.outputOptions = outputOptions;
+        this.additionalParameters = additionalParameters;
         this.projectPath = projectPath;
         this.buildTool = buildTool;
     }
 
     @Override
-    public void build(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = switch(buildOptions.trait()) {
-            case NATIVE_BUILD -> "nativeCompile";
-            default -> "build";
-        };
-        var command = constructGradleCommand(action, buildOptions);
-        call(command);
+    public void build(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        var action = buildArguments.nativeBuild() ? "nativeBuild" : "build";
+        call(constructGradleCommand(action, buildArguments, BootstrapMode.PROD));
     }
 
     @Override
-    public void test(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = switch(buildOptions.trait()) {
-            case NATIVE_BUILD -> "nativeTest";
-            default -> "test";
-        };
-        var command = constructGradleCommand(action, buildOptions);
-        call(command);
+    public void test(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        var action = buildArguments.nativeBuild() ? "nativeTest" : "test";
+        call(constructGradleCommand(action, buildArguments, BootstrapMode.TEST));
     }
 
     @Override
-    public void dev(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = switch(buildOptions.trait()) {
-            case NATIVE_BUILD -> "nativeRun";
-            case TEST_CLASSPATH -> "bootTestRun";
-            default -> "bootRun";
-        };
-        var command = constructGradleCommand(action, buildOptions);
-        call(command);
+    public void dev(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        var action = buildArguments.testClasspath() ? "bootTestRun" : "bootRun";
+        call(constructGradleCommand(action, buildArguments, BootstrapMode.DEV));
     }
 
     @Override
-    public void imageBuild(BuildOptions buildOptions) {
-        Assert.notNull(buildOptions, "buildOptions cannot be null");
-        var action = "bootBuildImage";
-        var command = constructGradleCommand(action, buildOptions);
-        call(command);
+    public void imageBuild(BuildArguments buildArguments) {
+        Assert.notNull(buildArguments, "buildArguments cannot be null");
+        call(constructGradleCommand("bootBuildImage", buildArguments, BootstrapMode.PROD));
     }
 
     @Override
-    public void rewrite(RewriteOptions rewriteOptions) {
-        Assert.notNull(rewriteOptions, "rewriteOptions cannot be null");
-        var command = constructRewriteCommand(rewriteOptions);
-        call(command);
+    public void rewrite(RewriteArguments rewriteArguments) {
+        Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
+        call(constructRewriteCommand(rewriteArguments));
     }
 
     @Override
-    public void update(UpdateOptions updateOptions) {
-        Assert.notNull(updateOptions, "updateOptions cannot be null");
-        var command = constructUpdateCommand(updateOptions);
-        call(command);
+    public void update(UpdateArguments updateArguments) {
+        Assert.notNull(updateArguments, "updateArguments cannot be null");
+        call(constructUpdateCommand(updateArguments));
     }
 
     @Override
@@ -101,6 +88,11 @@ public class GradleRunner implements BuildToolRunner {
     @Override
     public Path getProjectPath() {
         return projectPath;
+    }
+
+    @Override
+    public OutputOptions getOutputOptions() {
+        return outputOptions;
     }
 
     @Override
@@ -115,22 +107,14 @@ public class GradleRunner implements BuildToolRunner {
         return IoUtils.getExecutable("gradle");
     }
 
-    @Override
-    public ArconiaCliTerminal getTerminal() {
-        return terminal;
-    }
+    // Package-private for testability
 
-    @Override
-    public TroubleshootOptions getTroubleshootOptions() {
-        return troubleshootOptions;
-    }
-
-    private List<String> constructGradleCommand(String action, BuildOptions buildOptions) {
+    List<String> constructGradleCommand(String action, BuildArguments buildArguments, BootstrapMode bootstrapMode) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
 
-        if (buildOptions.clean()) {
+        if (buildArguments.clean()) {
             command.add("clean");
         }
 
@@ -138,41 +122,45 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("--console=rich");
 
-        if (buildOptions.skipTests()) {
+        if (buildArguments.skipTests()) {
             command.add("-x");
             command.add("test");
         }
 
-        if (buildOptions.buildImageOptions() != null) {
-            addBuildImageArguments(command, buildOptions.buildImageOptions());
+        if (buildArguments.offline()) {
+            command.add("--offline");
         }
 
-        if (!CollectionUtils.isEmpty(buildOptions.params())) {
-            command.addAll(buildOptions.params());
+        if (buildArguments.buildImageArguments() != null) {
+            addBuildImageArguments(command, buildArguments.buildImageArguments());
+        }
+
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;
     }
 
-    private void addBuildImageArguments(List<String> command, BuildImageOptions imageOptions) {
-        if (StringUtils.hasText(imageOptions.imageName())) {
-            command.add("--imageName=%s".formatted(imageOptions.imageName()));
+    private void addBuildImageArguments(List<String> command, BuildImageArguments imageArguments) {
+        if (StringUtils.hasText(imageArguments.imageName())) {
+            command.add("--imageName=%s".formatted(imageArguments.imageName()));
         }
-        if (StringUtils.hasText(imageOptions.builderImage())) {
-            command.add("--builder=%s".formatted(imageOptions.builderImage()));
+        if (StringUtils.hasText(imageArguments.builderImage())) {
+            command.add("--builder=%s".formatted(imageArguments.builderImage()));
         }
-        if (StringUtils.hasText(imageOptions.runImage())) {
-            command.add("--runImage=%s".formatted(imageOptions.runImage()));
+        if (StringUtils.hasText(imageArguments.runImage())) {
+            command.add("--runImage=%s".formatted(imageArguments.runImage()));
         }
-        if (imageOptions.cleanCache()) {
+        if (imageArguments.cleanCache()) {
             command.add("--cleanCache");
         }
-        if (imageOptions.publishImage()) {
+        if (imageArguments.publishImage()) {
             command.add("--publishImage");
         }
     }
 
-    private List<String> constructRewriteCommand(RewriteOptions rewriteOptions) {
+    List<String> constructRewriteCommand(RewriteArguments rewriteArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -181,11 +169,11 @@ public class GradleRunner implements BuildToolRunner {
 
         try {
             command.add(IoUtils.copyFileToTemp("openrewrite/init-rewrite.gradle").toFile().getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ex) {
+            throw new CliException("Failed to copy OpenRewrite init script", ex);
         }
 
-        if (rewriteOptions.dryRun()) {
+        if (rewriteArguments.dryRun()) {
             command.add("rewriteDryRun");
         } else {
             command.add("rewriteRun");
@@ -193,24 +181,24 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
 
-        command.add("-DactiveRecipe=" + rewriteOptions.rewriteRecipeName());
+        command.add("-DactiveRecipe=" + rewriteArguments.rewriteRecipeName());
 
-        if (StringUtils.hasText(rewriteOptions.rewriteRecipeLibrary())) {
-            var recipeVersion = StringUtils.hasText(rewriteOptions.rewriteRecipeVersion())
-                    ? rewriteOptions.rewriteRecipeVersion()
+        if (StringUtils.hasText(rewriteArguments.rewriteRecipeLibrary())) {
+            var recipeVersion = StringUtils.hasText(rewriteArguments.rewriteRecipeVersion())
+                    ? rewriteArguments.rewriteRecipeVersion()
                     : OPEN_REWRITE_DEFAULT_VERSION;
-            command.add("-DrecipeLibrary=" + rewriteOptions.rewriteRecipeLibrary());
+            command.add("-DrecipeLibrary=" + rewriteArguments.rewriteRecipeLibrary());
             command.add("-DrecipeVersion=" + recipeVersion);
         }
 
-        if (!CollectionUtils.isEmpty(rewriteOptions.params())) {
-            command.addAll(rewriteOptions.params());
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;
     }
 
-    private List<String> constructUpdateCommand(UpdateOptions updateOptions) {
+    List<String> constructUpdateCommand(UpdateArguments updateArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -219,11 +207,11 @@ public class GradleRunner implements BuildToolRunner {
 
         try {
             command.add(IoUtils.copyFileToTemp("openrewrite/init-rewrite.gradle").toFile().getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ex) {
+            throw new CliException("Failed to copy OpenRewrite init script", ex);
         }
 
-        if (updateOptions.dryRun()) {
+        if (updateArguments.dryRun()) {
             command.add("rewriteDryRun");
         } else {
             command.add("rewriteRun");
@@ -231,14 +219,14 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
 
-        command.add("-DactiveRecipe=" + updateOptions.rewriteRecipeName());
+        command.add("-DactiveRecipe=" + updateArguments.rewriteRecipeName());
 
-        command.add("-DrecipeLibrary=" + updateOptions.rewriteRecipeLibrary());
+        command.add("-DrecipeLibrary=" + updateArguments.rewriteRecipeLibrary());
 
         command.add("--no-parallel");
 
-        if (!CollectionUtils.isEmpty(updateOptions.params())) {
-            command.addAll(updateOptions.params());
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
         }
 
         return command;
