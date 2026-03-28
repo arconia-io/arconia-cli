@@ -48,9 +48,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 graalvmNative {
-    metadataRepository {
-        version = "0.3.34"
-    }
     binaries {
         main {
             imageName = "arconia"
