@@ -14,7 +14,7 @@ import picocli.CommandLine.Option;
 @Component
 @Command(
     name = "rewrite",
-    description = "Run an OpenRewrite recipe to migrate or refactor your project."
+    description = "Run OpenRewrite recipes to migrate or refactor your project."
 )
 public class RewriteCommand implements Runnable {
 

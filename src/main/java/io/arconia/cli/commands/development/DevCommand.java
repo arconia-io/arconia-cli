@@ -13,7 +13,7 @@ import picocli.CommandLine.Option;
 @Component
 @Command(
     name = "dev",
-    description = "Run the application in development mode."
+    description = "Run the application in dev mode."
 )
 public class DevCommand implements Runnable {
 

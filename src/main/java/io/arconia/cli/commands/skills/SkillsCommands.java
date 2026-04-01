@@ -40,7 +40,7 @@ import io.arconia.cli.utils.OciUtils;
 @Component
 @Command(
     name = "skills",
-    description = "Manage agent skills.",
+    description = "Install and manage agent skills.",
     subcommands = {
         SkillsCatalogCommands.class
     }
