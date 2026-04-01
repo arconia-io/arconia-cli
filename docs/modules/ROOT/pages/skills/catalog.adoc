@@ -1,0 +1,91 @@
+= `arconia skills catalog`
+
+NOTE: The `arconia skills catalog` commands are experimental and may change in future releases. They showcase the capabilities of the suggested [Agent Skills OCI Artifacts Specification](https://github.com/ThomasVitale/agents-skills-oci-artifacts-spec).
+
+The `arconia skills catalog` command manages catalogs of agent skills. Catalogs are OCI indexes that list available skills and their locations.
+
+== Commands
+
+=== `add`
+
+Register a catalog and fetch its contents into the local cache.
+
+[source,shell]
+----
+arconia skills catalog add --name my-catalog --ref ghcr.io/org/repo/catalog:1.0.0
+----
+
+**Options**
+
+* `--name`: (Required) The alias to assign to the catalog.
+* `--ref`: (Required) The OCI artifact reference for the catalog index.
+
+=== `list`
+
+List available skills in a catalog. You can query a catalog by direct OCI reference, by its registered alias, or list all registered catalogs.
+
+[source,shell]
+----
+arconia skills catalog list
+arconia skills catalog list --name my-catalog
+arconia skills catalog list --ref ghcr.io/org/repo/catalog:1.0.0
+----
+
+**Options**
+
+* `--name`: The alias of a registered catalog to list.
+* `--ref`: The OCI artifact reference for the catalog to list.
+
+=== `update`
+
+Check for newer versions of registered catalogs and update them.
+
+[source,shell]
+----
+arconia skills catalog update
+arconia skills catalog update --name my-catalog
+----
+
+**Options**
+
+* `--name`: The alias of a specific catalog to update. If omitted, updates all registered catalogs.
+
+=== `remove`
+
+Remove a catalog from the local Arconia CLI configuration.
+
+[source,shell]
+----
+arconia skills catalog remove --name my-catalog
+----
+
+**Options**
+
+* `--name`: (Required) The alias of the catalog to remove.
+
+=== `push`
+
+Build and push a skills catalog as an OCI Index.
+
+[source,shell]
+----
+arconia skills catalog push --ref ghcr.io/org/skills-catalog --name arconia-io --tag 1.0.0 --skill ghcr.io/org/skills/my-skill:1.0.0
+arconia skills catalog push --ref ghcr.io/org/skills-catalog --name arconia-io --tag 1.0.0 --from-report publish-skills-report.json
+arconia skills catalog push --ref ghcr.io/org/skills-catalog --name arconia-io --tag 1.0.0 --skill ghcr.io/org/skills/my-skill:1.0.0 --output-report
+----
+
+**Options**
+
+* `--ref`: (Required) The OCI artifact reference for the catalog.
+* `--name`: (Required) The catalog identifier.
+* `--tag`: (Required) The semver version tag for the catalog.
+* `--additional-tag`: Additional tags to apply to the catalog.
+* `--from-report`: Path to a publish report file (from `skills push --output-report`).
+* `--skill`: Explicit skill OCI references to include.
+* `--description`: A short description of the catalog.
+* `--annotation`: Extra annotations in key=value format.
+* `--output-report`: Write a publish report file recording the published catalog artifact including its immutable digest. Defaults to `publish-skills-catalog-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+
+== See Also
+
+* xref:skills/skills.adoc[arconia skills]

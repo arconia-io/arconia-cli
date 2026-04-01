@@ -22,6 +22,7 @@ repositories {
 
 ext {
     set('arconiaVersion', "0.24.0")
+    set('orasJavaVersion', "0.5.1")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.9")
 }
@@ -30,9 +31,11 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
 
     implementation "info.picocli:picocli:${picocliVersion}"
+    implementation "org.jline:jline-terminal-ffm:${jlineVersion}"
     annotationProcessor "info.picocli:picocli-codegen:${picocliVersion}"
 
-    implementation "org.jline:jline-terminal-ffm:${jlineVersion}"
+    implementation "land.oras:oras-java-sdk:${orasJavaVersion}"
+    implementation "tools.jackson.dataformat:jackson-dataformat-yaml"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "io.arconia:arconia-spring-boot-starter:${arconiaVersion}"

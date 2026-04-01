@@ -8,6 +8,7 @@ import io.arconia.cli.commands.development.TestCommand;
 import io.arconia.cli.commands.image.ImageCommands;
 import io.arconia.cli.commands.refactoring.RewriteCommand;
 import io.arconia.cli.commands.refactoring.UpdateCommands;
+import io.arconia.cli.commands.skills.SkillsCommands;
 import io.arconia.cli.core.CliVersionProvider;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
@@ -34,6 +35,7 @@ import picocli.CommandLine.Model.CommandSpec;
         ImageCommands.class,
         UpdateCommands.class,
         RewriteCommand.class,
+        SkillsCommands.class,
         HelpCommand.class,
         VersionCommand.class
     }

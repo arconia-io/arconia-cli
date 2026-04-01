@@ -117,6 +117,60 @@ class IoUtilsTests {
                 .isThrownBy(() -> IoUtils.getExecutable(""));
     }
 
+    // --- deleteSkillDirectory ---
+
+    @Test
+    void deleteSkillDirectoryDeletesValidSkillDirectory() throws IOException {
+        // Set up: project/.agents/skills/my-skill/SKILL.md
+        Path skillsBase = Files.createDirectories(tempDir.resolve(".agents/skills"));
+        Path skillDir = Files.createDirectory(skillsBase.resolve("my-skill"));
+        Files.writeString(skillDir.resolve("SKILL.md"), "---\nname: my-skill\n---\n# My Skill");
+        Path scripts = Files.createDirectory(skillDir.resolve("scripts"));
+        Files.writeString(scripts.resolve("run.sh"), "#!/bin/bash");
+
+        IoUtils.deleteSkillDirectory(skillDir, tempDir, ".agents/skills");
+
+        assertThat(skillDir).doesNotExist();
+    }
+
+    @Test
+    void deleteSkillDirectoryRefusesPathOutsideSkillsDirectory() throws IOException {
+        // A directory that is NOT under .agents/skills/
+        Path outsideDir = Files.createDirectory(tempDir.resolve("not-skills"));
+        Files.writeString(outsideDir.resolve("SKILL.md"), "---\nname: bad\n---");
+
+        assertThatThrownBy(() ->
+            IoUtils.deleteSkillDirectory(outsideDir, tempDir, ".agents/skills"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("not inside the skills directory");
+    }
+
+    @Test
+    void deleteSkillDirectoryRefusesDeeplyNestedPath() throws IOException {
+        // A directory that is nested too deep: .agents/skills/a/b
+        Path skillsBase = Files.createDirectories(tempDir.resolve(".agents/skills"));
+        Path nested = Files.createDirectories(skillsBase.resolve("a/b"));
+        Files.writeString(nested.resolve("SKILL.md"), "---\nname: bad\n---");
+
+        assertThatThrownBy(() ->
+            IoUtils.deleteSkillDirectory(nested, tempDir, ".agents/skills"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("must be a direct child");
+    }
+
+    @Test
+    void deleteSkillDirectoryRefusesDirectoryWithoutSkillMd() throws IOException {
+        // A valid path but no SKILL.md
+        Path skillsBase = Files.createDirectories(tempDir.resolve(".agents/skills"));
+        Path skillDir = Files.createDirectory(skillsBase.resolve("no-skill-md"));
+        Files.writeString(skillDir.resolve("README.md"), "not a skill");
+
+        assertThatThrownBy(() ->
+            IoUtils.deleteSkillDirectory(skillDir, tempDir, ".agents/skills"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("does not contain SKILL.md");
+    }
+
     // --- copyFileToTemp ---
 
     @Test

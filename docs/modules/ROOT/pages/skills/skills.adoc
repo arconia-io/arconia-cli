@@ -1,0 +1,106 @@
+= `arconia skills`
+
+NOTE: The `arconia skills` commands are experimental and may change in future releases. They showcase the capabilities of the suggested [Agent Skills OCI Artifacts Specification](https://github.com/ThomasVitale/agents-skills-oci-artifacts-spec).
+
+The `arconia skills` command allows you to manage agent skills for your project. Agent skills are distributed as OCI artifacts.
+
+== Commands
+
+=== `add`
+
+Add agent skills to your project. You must provide either direct OCI references or lookup names from a registered catalog.
+
+[source,shell]
+----
+arconia skills add --ref ghcr.io/org/repo/skill:1.0.0
+arconia skills add --name my-skill
+----
+
+**Options**
+
+* `--ref`: The OCI artifact reference for the agent skill. Can be specified multiple times.
+* `--name`: The skill name to look up from a registered catalog. Can be specified multiple times.
+* `--catalog`: The registered catalog alias to search. If omitted, searches all registered catalogs.
+* `--project-dir`: The project root directory (defaults to the current working directory).
+
+=== `install`
+
+Install all agent skills declared in the project's configuration (e.g. `skills.json`).
+
+[source,shell]
+----
+arconia skills install
+----
+
+**Options**
+
+* `--project-dir`: The project root directory (defaults to the current working directory).
+
+=== `list`
+
+List installed agent skills.
+
+[source,shell]
+----
+arconia skills list
+----
+
+**Options**
+
+* `--project-dir`: The project root directory (defaults to the current working directory).
+
+=== `remove`
+
+Remove agent skills from the project.
+
+[source,shell]
+----
+arconia skills remove --name <skill-name>
+----
+
+**Options**
+
+* `--name`: (Required) The name of the agent skill to remove. Can be specified multiple times.
+* `-y, --yes`: Skip confirmation prompt.
+* `--project-dir`: The project root directory (defaults to the current working directory).
+
+=== `update`
+
+Update agent skills in the project.
+
+[source,shell]
+----
+arconia skills update
+arconia skills update --name some-skill
+----
+
+**Options**
+
+* `--name`: Update a specific skill by name. Can be specified multiple times. If omitted, updates all installed skills.
+* `--all`: Update all agent skills in the project.
+* `--project-dir`: The project root directory (defaults to the current working directory).
+
+=== `push`
+
+Push agent skill(s) as OCI artifact(s).
+
+[source,shell]
+----
+arconia skills push --ref ghcr.io/org/repo/skill --path skills/my-skill --tag 1.0.0
+arconia skills push --ref ghcr.io/org/repo/skill --path skills/my-skill --tag 1.0.0 --output-report
+arconia skills push --all --ref ghcr.io/org/repo/skills --path skills/ --tag 1.0.0 --output-report
+----
+
+**Options**
+
+* `--ref`: (Required) The OCI artifact reference. For a single skill: the full ref. With `--all`: the base ref prefix.
+* `--path`: (Required) The path to the skill directory, or with `--all`: the parent directory containing skill subdirectories.
+* `--tag`: (Required) The semver version tag (e.g. 1.0.0).
+* `--additional-tag`: Additional tags to apply to the artifact.
+* `--annotation`: Extra annotations in key=value format.
+* `--all`: Discover and push all skills found as direct subdirectories of `--path`.
+* `--output-report`: Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as catalog pushing (`skills catalog push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+
+== See Also
+
+* xref:skills/catalog.adoc[arconia skills catalog]

@@ -7,9 +7,10 @@ import java.io.StringWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import io.arconia.cli.commands.options.OutputOptions;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
+
+import io.arconia.cli.commands.options.OutputOptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -88,6 +89,46 @@ class ProcessExecutorTests {
         assertThatIllegalArgumentException()
             .isThrownBy(() -> ProcessExecutor.execute(createOutputOptions(), new String[]{"true"}, nonExistentDir))
             .withMessage("targetDirectory must be an existing directory");
+    }
+
+    // --- executeAndGetOutput ---
+
+    @Test
+    void executeAndGetOutput() {
+        String result = ProcessExecutor.executeAndGetOutput(new String[]{"echo", "hello world"}, tempDir);
+        assertThat(result).isEqualTo("hello world");
+    }
+
+    @Test
+    void executeAndGetOutputReturnsOnlyFirstLine() {
+        String result = ProcessExecutor.executeAndGetOutput(new String[]{"printf", "line1\nline2\nline3"}, tempDir);
+        assertThat(result).isEqualTo("line1");
+    }
+
+    @Test
+    void executeAndGetOutputReturnsNullForFailingCommand() {
+        String result = ProcessExecutor.executeAndGetOutput(new String[]{"false"}, tempDir);
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void executeAndGetOutputReturnsNullForNonExistentCommand() {
+        String result = ProcessExecutor.executeAndGetOutput(new String[]{"nonexistent-command-xyz"}, tempDir);
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void executeAndGetOutputRejectsNullCommand() {
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> ProcessExecutor.executeAndGetOutput(null, tempDir))
+            .withMessage("command cannot be null or empty");
+    }
+
+    @Test
+    void executeAndGetOutputRejectsNullTargetDirectory() {
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> ProcessExecutor.executeAndGetOutput(new String[]{"echo", "test"}, null))
+            .withMessage("targetDirectory cannot be null");
     }
 
 }
