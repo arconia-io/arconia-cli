@@ -7,6 +7,8 @@ import java.time.Instant;
 
 import org.springframework.util.Assert;
 
+import io.arconia.cli.utils.IoUtils;
+
 import land.oras.ContainerRef;
 import land.oras.Manifest;
 import land.oras.Registry;
@@ -94,14 +96,18 @@ public final class SkillInstaller {
         Path skillsDir = projectRoot.resolve(DEFAULT_SKILLS_PATH);
         Files.createDirectories(skillsDir);
 
-        // 4. Pull the artifact content to a temp directory
-        // Temp dir cleanup is left to the OS — avoids risky recursive deletes.
-        Path tempDir = Files.createTempDirectory("arconia-skill-");
-        registry.pullArtifact(containerRef, tempDir, true);
+        // 4. Pull the artifact content to a project-local temp directory, then extract
+        Path tempDir = IoUtils.createTempDirectory(projectRoot, ".arconia-skill-");
+        try {
+            registry.pullArtifact(containerRef, tempDir, true);
 
-        // 5. Find the downloaded tar.gz and extract it to the skills directory
-        Path tarGzFile = findTarGzFile(tempDir);
-        ArchiveUtils.uncompressuntar(tarGzFile, skillsDir, SupportedCompression.GZIP.getMediaType());
+            // 5. Find the downloaded tar.gz and extract it to the skills directory
+            Path tarGzFile = findTarGzFile(tempDir);
+            ArchiveUtils.uncompressuntar(tarGzFile, skillsDir, SupportedCompression.GZIP.getMediaType());
+        }
+        finally {
+            IoUtils.deleteTempDirectory(tempDir, projectRoot);
+        }
 
         Path installPath = skillsDir.resolve(skillName);
 

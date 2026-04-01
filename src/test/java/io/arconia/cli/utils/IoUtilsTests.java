@@ -171,6 +171,55 @@ class IoUtilsTests {
             .hasMessageContaining("does not contain SKILL.md");
     }
 
+    // --- createTempDirectory ---
+
+    @Test
+    void createTempDirectoryUnderParentCreatesDirectoryInParent() throws IOException {
+        Path result = IoUtils.createTempDirectory(tempDir, ".arconia-test-");
+        assertThat(result).exists().isDirectory();
+        assertThat(result.getParent()).isEqualTo(tempDir);
+        assertThat(result.getFileName().toString()).startsWith(".arconia-test-");
+    }
+
+    @Test
+    void createTempDirectoryUnderParentCreatesParentIfNeeded() throws IOException {
+        Path nestedParent = tempDir.resolve("a/b/c");
+        assertThat(nestedParent).doesNotExist();
+
+        Path result = IoUtils.createTempDirectory(nestedParent, ".arconia-test-");
+        assertThat(result).exists().isDirectory();
+        assertThat(nestedParent).exists();
+    }
+
+    // --- deleteTempDirectory ---
+
+    @Test
+    void deleteTempDirectoryDeletesDirectChildOfParent() throws IOException {
+        Path child = IoUtils.createTempDirectory(tempDir, ".arconia-test-");
+        Files.writeString(child.resolve("file.txt"), "content");
+
+        IoUtils.deleteTempDirectory(child, tempDir);
+
+        assertThat(child).doesNotExist();
+    }
+
+    @Test
+    void deleteTempDirectoryNoOpWhenDirectoryDoesNotExist() throws IOException {
+        Path nonExistent = tempDir.resolve(".arconia-test-gone");
+
+        // Should not throw
+        IoUtils.deleteTempDirectory(nonExistent, tempDir);
+    }
+
+    @Test
+    void deleteTempDirectoryRefusesNonDirectChild() throws IOException {
+        Path nested = Files.createDirectories(tempDir.resolve("a/b"));
+
+        assertThatThrownBy(() -> IoUtils.deleteTempDirectory(nested, tempDir))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("not a direct child");
+    }
+
     // --- copyFileToTemp ---
 
     @Test

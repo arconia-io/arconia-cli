@@ -56,22 +56,6 @@ public final class SkillTableFormatter {
         return lines;
     }
 
-    /**
-     * Formats verbose details for a single lockfile entry.
-     *
-     * @param entry the lockfile entry
-     * @param nameWidth the column width for alignment
-     * @return the formatted verbose lines (digest, install date)
-     */
-    public static List<String> formatInstalledSkillVerbose(SkillsLockfile.LockfileEntry entry, int nameWidth) {
-        Assert.notNull(entry, "entry cannot be null");
-
-        List<String> lines = new ArrayList<>();
-        lines.add("  %-" + nameWidth + "s  Digest: %s".formatted("", entry.source().digest()));
-        lines.add("  %-" + nameWidth + "s  Installed: %s".formatted("", entry.installedAt()));
-        return lines;
-    }
-
     // ---- Catalog skills table (from SkillSummary) ----
 
     /**
@@ -104,26 +88,6 @@ public final class SkillTableFormatter {
             lines.add(rowFormat.formatted(skill.name(), version, description));
         }
 
-        return lines;
-    }
-
-    /**
-     * Formats verbose details for a single skill summary.
-     *
-     * @param skill the skill summary
-     * @param nameWidth the column width for alignment
-     * @return the formatted verbose lines (ref, digest)
-     */
-    public static List<String> formatCatalogSkillVerbose(SkillCatalogService.SkillSummary skill, int nameWidth) {
-        Assert.notNull(skill, "skill cannot be null");
-
-        List<String> lines = new ArrayList<>();
-        if (skill.ref() != null) {
-            lines.add("  %-" + nameWidth + "s  Ref: %s".formatted("", skill.ref()));
-        }
-        if (skill.digest() != null) {
-            lines.add("  %-" + nameWidth + "s  Digest: %s".formatted("", skill.digest()));
-        }
         return lines;
     }
 

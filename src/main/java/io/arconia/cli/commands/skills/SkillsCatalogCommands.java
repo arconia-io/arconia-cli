@@ -257,9 +257,6 @@ public class SkillsCatalogCommands implements Runnable {
                 outputOptions.info("Updated %d catalog(s).".formatted(updatedCount));
             }
         }
-        catch (CliException e) {
-            throw e;
-        }
         catch (IOException e) {
             throw new CliException("Failed to update catalogs: %s".formatted(e.getMessage()), e);
         }
