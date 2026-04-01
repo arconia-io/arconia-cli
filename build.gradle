@@ -34,7 +34,11 @@ dependencies {
     implementation "org.jline:jline-terminal-ffm:${jlineVersion}"
     annotationProcessor "info.picocli:picocli-codegen:${picocliVersion}"
 
-    implementation "land.oras:oras-java-sdk:${orasJavaVersion}"
+    implementation("land.oras:oras-java-sdk:${orasJavaVersion}") {
+        exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params'
+        exclude group: 'org.hdrhistogram', module: 'HdrHistogram'
+        exclude group: 'org.latencyutils', module: 'LatencyUtils'
+    }
     implementation "tools.jackson.dataformat:jackson-dataformat-yaml"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
