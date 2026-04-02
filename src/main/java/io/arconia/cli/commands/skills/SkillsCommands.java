@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import picocli.CommandLine.Spec;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
 import io.arconia.cli.oci.OciRegistryProvider;
+import io.arconia.cli.skills.AgentVendor;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillBatchPublisher;
 import io.arconia.cli.skills.SkillBatchPublisher.BatchEntryResult;
@@ -65,6 +67,7 @@ public class SkillsCommands implements Runnable {
     public void add(
         @Option(names = {"--ref"}, arity = "1..*", description = "The OCI artifact reference for the agent skill (e.g. ghcr.io/org/repo/skill:1.0.0).") List<String> skillRefs,
         @Option(names = {"--name"}, arity = "1..*", description = "The skill name to look up from a registered collection.") List<String> skillNames,
+        @Option(names = {"--agent"}, arity = "1..*", description = "Additional agent vendors to also install the skill for (e.g. claude, vibe, continue, bob).") List<String> agents,
         @Option(names = {"--collection"}, description = "The registered collection alias to search. If omitted, searches all registered collections.") String collectionAlias,
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
         @Mixin OutputOptions outputOptions
@@ -76,6 +79,9 @@ public class SkillsCommands implements Runnable {
             throw new CliException("At least one of --ref or --name must be provided.");
         }
 
+        // Resolve --agent aliases to base paths
+        List<String> additionalBasePaths = resolveAgentBasePaths(agents);
+
         Path projectRoot = IoUtils.getProjectPath(projectDir);
         Registry ociRegistry = OciRegistryProvider.create();
         SkillInstaller installer = new SkillInstaller(ociRegistry);
@@ -83,7 +89,7 @@ public class SkillsCommands implements Runnable {
         // 1. Install by direct OCI reference
         if (hasRefs) {
             for (String ref : skillRefs) {
-                installByRef(ref, installer, projectRoot, outputOptions);
+                installByRef(ref, installer, projectRoot, additionalBasePaths, outputOptions);
             }
         }
 
@@ -91,25 +97,47 @@ public class SkillsCommands implements Runnable {
         if (hasNames) {
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
             for (String name : skillNames) {
-                installFromCollection(name, collectionAlias, collectionService, installer, projectRoot, outputOptions);
+                installFromCollection(name, collectionAlias, collectionService, installer, projectRoot, additionalBasePaths, outputOptions);
             }
+        }
+    }
+
+    /**
+     * Resolves agent vendor aliases to their skills base paths.
+     *
+     * @param agents the list of agent aliases from the CLI, or {@code null}
+     * @return the resolved base paths, or an empty list if no agents were specified
+     */
+    private List<String> resolveAgentBasePaths(@Nullable List<String> agents) {
+        if (agents == null || agents.isEmpty()) {
+            return Collections.emptyList();
+        }
+        try {
+            return AgentVendor.resolveBasePaths(agents);
+        }
+        catch (IllegalArgumentException e) {
+            throw new CliException(e.getMessage(), e);
         }
     }
 
     /**
      * Installs a skill by direct OCI reference.
      */
-    private void installByRef(String ref, SkillInstaller installer, Path projectRoot, OutputOptions outputOptions) {
+    private void installByRef(String ref, SkillInstaller installer, Path projectRoot,
+                              List<String> additionalBasePaths, OutputOptions outputOptions) {
         try {
             outputOptions.info("Resolving skill: %s".formatted(ref));
 
             SkillRef skillRef = SkillRef.parse(ref);
-            SkillInstaller.InstallResult result = installer.install(skillRef, projectRoot);
+            SkillInstaller.InstallResult result = installer.install(skillRef, projectRoot, additionalBasePaths);
 
             outputOptions.info("Installed skill '%s' → %s".formatted(
                 result.skillName(),
                 result.installPath()
             ));
+            if (!additionalBasePaths.isEmpty()) {
+                outputOptions.info("  Also copied to: %s".formatted(String.join(", ", additionalBasePaths)));
+            }
             outputOptions.verbose("Digest: %s".formatted(result.ref().digest()));
         }
         catch (IOException e) {
@@ -125,7 +153,7 @@ public class SkillsCommands implements Runnable {
      */
     private void installFromCollection(String skillName, String collectionAlias,
                                      SkillCollectionService collectionService, SkillInstaller installer,
-                                     Path projectRoot, OutputOptions outputOptions) {
+                                     Path projectRoot, List<String> additionalBasePaths, OutputOptions outputOptions) {
         try {
             SkillCollectionService.CollectionSkillMatch match = collectionService.resolveSkillFromCollection(skillName, collectionAlias);
             String ref = match.skill().ref();
@@ -136,7 +164,7 @@ public class SkillsCommands implements Runnable {
 
             outputOptions.verbose("Resolved skill '%s' from collection '%s' → %s".formatted(skillName, match.collectionName(), ref));
 
-            installByRef(ref, installer, projectRoot, outputOptions);
+            installByRef(ref, installer, projectRoot, additionalBasePaths, outputOptions);
         }
         catch (IOException e) {
             throw new CliException("Failed to resolve skill '%s' from collection: %s".formatted(skillName, e.getMessage()), e);
@@ -171,7 +199,12 @@ public class SkillsCommands implements Runnable {
                         ? "%s:%s".formatted(entry.source(), entry.version())
                         : entry.source();
 
-                installByRef(reference, installer, projectRoot, outputOptions);
+                // Use additionalBasePaths from the manifest entry
+                List<String> additionalBasePaths = entry.additionalBasePaths() != null
+                        ? entry.additionalBasePaths()
+                        : Collections.emptyList();
+
+                installByRef(reference, installer, projectRoot, additionalBasePaths, outputOptions);
             }
         }
         catch (IOException e) {
@@ -221,29 +254,47 @@ public class SkillsCommands implements Runnable {
             SkillsLockfile lockfile = SkillsLockfile.load(projectRoot);
 
             for (String skillName : skillNames) {
-                // 1. Find the entry in the lock file to get the path
+                // 1. Find the entry in the lock file to get the paths
                 SkillsLockfile.LockfileEntry lockEntry = lockfile.findEntry(skillName);
 
                 if (lockEntry != null) {
-                    Path skillDir = projectRoot.resolve(lockEntry.path());
-
                     // 2. Confirm before deleting
-                    if (!skipConfirmation && Files.exists(skillDir)) {
-                        boolean confirmed = confirm(
-                            "Remove skill '%s' and delete %s? [y/N]".formatted(skillName, lockEntry.path()));
-                        if (!confirmed) {
-                            outputOptions.info("⏭ Skipped '%s'.".formatted(skillName));
-                            continue;
+                    if (!skipConfirmation) {
+                        Path primaryDir = projectRoot.resolve(lockEntry.path());
+                        if (Files.exists(primaryDir)) {
+                            String pathsDescription = lockEntry.path();
+                            if (lockEntry.additionalPaths() != null && !lockEntry.additionalPaths().isEmpty()) {
+                                pathsDescription += " (+ %d additional)".formatted(lockEntry.additionalPaths().size());
+                            }
+                            boolean confirmed = confirm(
+                                "Remove skill '%s' and delete %s? [y/N]".formatted(skillName, pathsDescription));
+                            if (!confirmed) {
+                                outputOptions.info("⏭ Skipped '%s'.".formatted(skillName));
+                                continue;
+                            }
                         }
                     }
 
-                    // 3. Delete the skill directory (with safety validation)
-                    if (Files.exists(skillDir)) {
-                        IoUtils.deleteSkillDirectory(skillDir, projectRoot, SkillInstaller.DEFAULT_SKILLS_PATH);
-                        outputOptions.verbose("Deleted directory: %s".formatted(skillDir));
+                    // 3. Delete the primary skill directory (with safety validation)
+                    Path primaryDir = projectRoot.resolve(lockEntry.path());
+                    if (Files.exists(primaryDir)) {
+                        IoUtils.deleteSkillDirectory(primaryDir, projectRoot, SkillInstaller.DEFAULT_SKILLS_PATH);
+                        outputOptions.verbose("Deleted directory: %s".formatted(primaryDir));
                     }
 
-                    // 4. Remove from lock file
+                    // 4. Delete additional vendor directories
+                    if (lockEntry.additionalPaths() != null) {
+                        for (String additionalPath : lockEntry.additionalPaths()) {
+                            Path additionalDir = projectRoot.resolve(additionalPath);
+                            if (Files.exists(additionalDir)) {
+                                String basePath = IoUtils.deriveSkillsBasePath(additionalPath);
+                                IoUtils.deleteSkillDirectory(additionalDir, projectRoot, basePath);
+                                outputOptions.verbose("Deleted directory: %s".formatted(additionalDir));
+                            }
+                        }
+                    }
+
+                    // 5. Remove from lock file
                     lockfile = lockfile.removeEntry(skillName);
                     outputOptions.info("Removed skill '%s'.".formatted(skillName));
                 }
@@ -251,13 +302,13 @@ public class SkillsCommands implements Runnable {
                     outputOptions.verbose("Skill '%s' not found in %s, skipping.".formatted(skillName, SkillsLockfile.FILENAME));
                 }
 
-                // 5. Remove from manifest (always, even if not in lockfile)
+                // 6. Remove from manifest (always, even if not in lockfile)
                 if (manifest.findSkill(skillName) != null) {
                     manifest = manifest.removeSkill(skillName);
                 }
             }
 
-            // 6. Save updated files
+            // 7. Save updated files
             manifest.save(projectRoot);
             lockfile.save(projectRoot);
         }
@@ -279,6 +330,7 @@ public class SkillsCommands implements Runnable {
 
         try {
             SkillsLockfile lockfile = SkillsLockfile.load(projectRoot);
+            SkillsManifest manifest = SkillsManifest.load(projectRoot);
 
             if (lockfile.skills().isEmpty()) {
                 outputOptions.info("No skills installed. Nothing to update.");
@@ -312,6 +364,12 @@ public class SkillsCommands implements Runnable {
 
                     UpdateCheckResult checkResult = updater.checkForUpdate(entry);
 
+                    // Re-read additionalBasePaths from skills.json (source of truth)
+                    SkillsManifest.SkillEntry manifestEntry = manifest.findSkill(entry.name());
+                    List<String> additionalBasePaths = (manifestEntry != null && manifestEntry.additionalBasePaths() != null)
+                            ? manifestEntry.additionalBasePaths()
+                            : Collections.emptyList();
+
                     switch (checkResult) {
                         case UpdateCheckResult.UpToDate upToDate -> {
                             outputOptions.info("  ✓ %s (%s) is up to date.".formatted(upToDate.name(), upToDate.tag()));
@@ -320,7 +378,8 @@ public class SkillsCommands implements Runnable {
                             outputOptions.info("  ⬆ Updating %s (%s → %s)...".formatted(
                                 updateAvailable.name(), updateAvailable.currentTag(), updateAvailable.newestTag()));
 
-                            SkillInstaller.InstallResult result = updater.applyUpdate(updateAvailable.newestRef(), projectRoot);
+                            SkillInstaller.InstallResult result = updater.applyUpdate(
+                                updateAvailable.newestRef(), projectRoot, additionalBasePaths);
                             updatedCount++;
 
                             outputOptions.info("  ✅ Updated %s to %s".formatted(updateAvailable.name(), updateAvailable.newestTag()));

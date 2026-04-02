@@ -88,6 +88,7 @@ public record SkillsManifest(
      *   <li>{@code name} — required, human-readable skill identifier</li>
      *   <li>{@code source} — required, OCI repository reference without tag or digest</li>
      *   <li>{@code version} — optional, OCI tag to install; SHOULD follow Semantic Versioning 2.0.0</li>
+     *   <li>{@code additionalBasePaths} — optional, extra base directories to copy the skill into</li>
      * </ul>
      *
      * @param name human-readable skill identifier; SHOULD match the last path segment of {@code source}
@@ -96,12 +97,16 @@ public record SkillsManifest(
      *               (e.g. {@code ghcr.io/arconia-io/agent-skills/pull-request})
      * @param version OCI tag to install (e.g. {@code 1.2.0}); when {@code null} the CLI resolves
      *                the tag at install time and records the resolved digest in {@code skills.lock.json}
+     * @param additionalBasePaths extra base directories (e.g. {@code .claude/skills}, {@code .vibe/skills})
+     *                            where the skill should also be copied; when {@code null} or empty, the skill
+     *                            is only installed to the default {@code .agents/skills} directory
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record SkillEntry(
         String name,
         String source,
-        @Nullable String version
+        @Nullable String version,
+        @Nullable List<String> additionalBasePaths
     ) {
 
         public SkillEntry {
@@ -128,7 +133,8 @@ public record SkillsManifest(
             return new Builder()
                 .name(name)
                 .source(source)
-                .version(version);
+                .version(version)
+                .additionalBasePaths(additionalBasePaths != null ? new ArrayList<>(additionalBasePaths) : null);
         }
 
         /**
@@ -139,6 +145,7 @@ public record SkillsManifest(
             private String name;
             private String source;
             private @Nullable String version;
+            private @Nullable List<String> additionalBasePaths;
 
             private Builder() {}
 
@@ -157,8 +164,13 @@ public record SkillsManifest(
                 return this;
             }
 
+            public Builder additionalBasePaths(@Nullable List<String> additionalBasePaths) {
+                this.additionalBasePaths = additionalBasePaths;
+                return this;
+            }
+
             public SkillEntry build() {
-                return new SkillEntry(name, source, version);
+                return new SkillEntry(name, source, version, additionalBasePaths);
             }
 
         }

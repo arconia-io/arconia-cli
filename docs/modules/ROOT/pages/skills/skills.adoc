@@ -4,6 +4,38 @@ NOTE: The `arconia skills` commands are experimental and may change in future re
 
 The `arconia skills` command allows you to manage agent skills for your project. Agent skills are distributed as OCI artifacts.
 
+Skills are always installed into the default `.agents/skills` directory. Optionally, you can also copy them to additional vendor-specific directories using the `--agent` option.
+
+== Multi-Agent Vendor Support
+
+When adding skills with the `--agent` option, the skill is installed to `.agents/skills` and copied to the vendor-specific skills directory. This lets multiple coding agents share the same set of skills without duplicating OCI fetches.
+
+[cols="2,3", options="header"]
+|===
+| Alias(es) | Skills directory
+
+| `claude`, `claude-code`
+| `.claude/skills`
+
+| `vibe`, `mistral`, `mistral-vibe`
+| `.vibe/skills`
+
+| `continue`
+| `.continue/skills`
+
+| `bob`, `ibm-bob`
+| `.bob/skills`
+|===
+
+Multiple agents can be specified at once:
+
+[source,shell]
+----
+arconia skills add --ref ghcr.io/org/repo/skill:1.0.0 --agent claude --agent vibe
+----
+
+The agent configuration is persisted in `skills.json` (via the `additionalBasePaths` field) so that `arconia skills install` reproduces the same layout, and `arconia skills remove` cleans up all copies.
+
 == Commands
 
 === `add`
@@ -14,18 +46,21 @@ Add agent skills to your project. You must provide either direct OCI references 
 ----
 arconia skills add --ref ghcr.io/org/repo/skill:1.0.0
 arconia skills add --name my-skill
+arconia skills add --ref ghcr.io/org/repo/skill:1.0.0 --agent claude
+arconia skills add --name my-skill --agent claude --agent vibe
 ----
 
 **Options**
 
 * `--ref`: The OCI artifact reference for the agent skill. Can be specified multiple times.
 * `--name`: The skill name to look up from a registered collection. Can be specified multiple times.
+* `--agent`: Additional agent vendors to also install the skill for. Can be specified multiple times. See <<Multi-Agent Vendor Support>> for supported values.
 * `--collection`: The registered collection alias to search. If omitted, searches all registered collections.
 * `--project-dir`: The project root directory (defaults to the current working directory).
 
 === `install`
 
-Install all agent skills declared in the project's configuration (e.g. `skills.json`).
+Install all agent skills declared in the project's configuration (`skills.json`). If a skill entry includes `additionalBasePaths`, the skill is also copied to those vendor directories.
 
 [source,shell]
 ----
@@ -38,7 +73,7 @@ arconia skills install
 
 === `list`
 
-List installed agent skills.
+List installed agent skills. When a skill has been copied to additional vendor directories, those paths are shown on continuation lines.
 
 [source,shell]
 ----
@@ -51,7 +86,7 @@ arconia skills list
 
 === `remove`
 
-Remove agent skills from the project.
+Remove agent skills from the project. This deletes the skill from the primary `.agents/skills` directory and any additional vendor directories recorded in the lockfile.
 
 [source,shell]
 ----
@@ -66,7 +101,7 @@ arconia skills remove --name <skill-name>
 
 === `update`
 
-Update agent skills in the project.
+Update agent skills in the project. The update reads `additionalBasePaths` from `skills.json` and applies the update to all configured vendor directories.
 
 [source,shell]
 ----

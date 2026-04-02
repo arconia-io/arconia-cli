@@ -3,6 +3,7 @@ package io.arconia.cli.skills;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -230,6 +231,98 @@ class SkillsLockfileTests {
         assertThat(lockfile.findEntry("missing")).isNull();
     }
 
+    // --- additionalPaths ---
+
+    @Test
+    void additionalPathsIsNullByDefault() {
+        var entry = testEntry("skill", "sha256:abc");
+        assertThat(entry.additionalPaths()).isNull();
+    }
+
+    @Test
+    void builderSupportsAdditionalPaths() {
+        var entry = testEntryWithAdditionalPaths("skill", "sha256:abc",
+            List.of(".claude/skills/skill", ".vibe/skills/skill"));
+
+        assertThat(entry.additionalPaths())
+            .containsExactly(".claude/skills/skill", ".vibe/skills/skill");
+    }
+
+    @Test
+    void allPathsReturnsPrimaryOnly() {
+        var entry = testEntry("skill", "sha256:abc");
+        assertThat(entry.allPaths()).containsExactly(".agents/skills/skill");
+    }
+
+    @Test
+    void allPathsReturnsPrimaryAndAdditional() {
+        var entry = testEntryWithAdditionalPaths("skill", "sha256:abc",
+            List.of(".claude/skills/skill", ".vibe/skills/skill"));
+
+        assertThat(entry.allPaths()).containsExactly(
+            ".agents/skills/skill",
+            ".claude/skills/skill",
+            ".vibe/skills/skill"
+        );
+    }
+
+    @Test
+    void loadParsesAdditionalPaths() throws IOException {
+        Files.writeString(tempDir.resolve(SkillsLockfile.FILENAME), """
+            {
+              "lockfileVersion": 1,
+              "generatedAt": "2025-06-01T14:32:00Z",
+              "skills": [
+                {
+                  "name": "pull-request",
+                  "path": ".agents/skills/pull-request",
+                  "additionalPaths": [".claude/skills/pull-request", ".vibe/skills/pull-request"],
+                  "source": {
+                    "registry": "ghcr.io",
+                    "repository": "org/skills/pull-request",
+                    "tag": "1.2.0",
+                    "digest": "sha256:abc123",
+                    "ref": "ghcr.io/org/skills/pull-request:1.2.0@sha256:abc123"
+                  },
+                  "installedAt": "2025-06-01T14:32:00Z"
+                }
+              ]
+            }
+            """);
+
+        SkillsLockfile lockfile = SkillsLockfile.load(tempDir);
+        var entry = lockfile.skills().getFirst();
+
+        assertThat(entry.additionalPaths())
+            .containsExactly(".claude/skills/pull-request", ".vibe/skills/pull-request");
+    }
+
+    @Test
+    void saveAndLoadRoundTripWithAdditionalPaths() throws IOException {
+        var entry = testEntryWithAdditionalPaths("skill", "sha256:abc",
+            List.of(".claude/skills/skill"));
+
+        SkillsLockfile original = SkillsLockfile.builder().build().addOrUpdateEntry(entry);
+        original.save(tempDir);
+        SkillsLockfile loaded = SkillsLockfile.load(tempDir);
+
+        assertThat(loaded.skills().getFirst().additionalPaths())
+            .containsExactly(".claude/skills/skill");
+    }
+
+    @Test
+    void mutatePreservesAdditionalPaths() {
+        var entry = testEntryWithAdditionalPaths("skill", "sha256:abc",
+            List.of(".claude/skills/skill"));
+
+        var mutated = entry.mutate()
+            .source(entry.source().mutate().digest("sha256:new").build())
+            .build();
+
+        assertThat(mutated.additionalPaths()).containsExactly(".claude/skills/skill");
+        assertThat(mutated.source().digest()).isEqualTo("sha256:new");
+    }
+
     // --- helpers ---
 
     private static LockfileEntry testEntry(String name, String digest) {
@@ -243,6 +336,24 @@ class SkillsLockfileTests {
         return LockfileEntry.builder()
             .name(name)
             .path(".agents/skills/" + name)
+            .source(source)
+            .installedAt("2025-01-01T00:00:00Z")
+            .build();
+    }
+
+    private static LockfileEntry testEntryWithAdditionalPaths(String name, String digest,
+                                                               List<String> additionalPaths) {
+        var source = Source.builder()
+            .registry("ghcr.io")
+            .repository("org/" + name)
+            .tag("1.0.0")
+            .digest(digest)
+            .ref("ghcr.io/org/" + name + ":1.0.0@" + digest)
+            .build();
+        return LockfileEntry.builder()
+            .name(name)
+            .path(".agents/skills/" + name)
+            .additionalPaths(additionalPaths)
             .source(source)
             .installedAt("2025-01-01T00:00:00Z")
             .build();

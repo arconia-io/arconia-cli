@@ -20,9 +20,12 @@ public final class SkillTableFormatter {
 
     /**
      * Formats the installed skills from a lockfile into an aligned table.
+     * <p>
+     * When a skill has additional paths (vendor-specific copies), they are shown
+     * on continuation lines aligned under the PATHS column.
      *
      * @param lockfile the lockfile containing installed skills
-     * @return the formatted table lines (header + one row per skill)
+     * @return the formatted table lines (header + rows per skill)
      */
     public static List<String> formatInstalledSkills(SkillsLockfile lockfile) {
         Assert.notNull(lockfile, "lockfile cannot be null");
@@ -41,16 +44,28 @@ public final class SkillTableFormatter {
         }
 
         String rowFormat = "  %-" + nameWidth + "s  %-" + versionWidth + "s  %-" + sourceWidth + "s  %s";
-        lines.add(rowFormat.formatted("NAME", "VERSION", "SOURCE", "PATH"));
+        lines.add(rowFormat.formatted("NAME", "VERSION", "SOURCE", "PATHS"));
+
+        // Continuation line prefix: same width as NAME + VERSION + SOURCE columns, but empty
+        String continuationPrefix = "  " + " ".repeat(nameWidth) + "  " + " ".repeat(versionWidth) + "  " + " ".repeat(sourceWidth) + "  ";
 
         for (SkillsLockfile.LockfileEntry entry : lockfile.skills()) {
             String source = entry.source().registry() + "/" + entry.source().repository();
+
+            // First line: skill info + primary path
             lines.add(rowFormat.formatted(
                 entry.name(),
                 entry.source().tag(),
                 source,
                 entry.path()
             ));
+
+            // Additional paths on continuation lines
+            if (entry.additionalPaths() != null) {
+                for (String additionalPath : entry.additionalPaths()) {
+                    lines.add(continuationPrefix + additionalPath);
+                }
+            }
         }
 
         return lines;

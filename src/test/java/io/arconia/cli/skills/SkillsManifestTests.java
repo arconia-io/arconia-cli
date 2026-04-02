@@ -3,6 +3,7 @@ package io.arconia.cli.skills;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -215,6 +216,84 @@ class SkillsManifestTests {
     void findSkillReturnsNullWhenNotFound() {
         SkillsManifest manifest = SkillsManifest.builder().build();
         assertThat(manifest.findSkill("missing")).isNull();
+    }
+
+    // --- additionalBasePaths ---
+
+    @Test
+    void builderSupportsAdditionalBasePaths() {
+        var entry = SkillsManifest.SkillEntry.builder()
+            .name("skill")
+            .source("ghcr.io/org/skill")
+            .version("1.0.0")
+            .additionalBasePaths(List.of(".claude/skills", ".vibe/skills"))
+            .build();
+
+        assertThat(entry.additionalBasePaths()).containsExactly(".claude/skills", ".vibe/skills");
+    }
+
+    @Test
+    void additionalBasePathsIsNullByDefault() {
+        var entry = SkillsManifest.SkillEntry.builder()
+            .name("skill")
+            .source("ghcr.io/org/skill")
+            .version("1.0.0")
+            .build();
+
+        assertThat(entry.additionalBasePaths()).isNull();
+    }
+
+    @Test
+    void loadParsesAdditionalBasePaths() throws IOException {
+        Files.writeString(tempDir.resolve(SkillsManifest.FILENAME), """
+            {
+              "skills": [
+                {
+                  "name": "pull-request",
+                  "source": "ghcr.io/org/skills/pull-request",
+                  "version": "1.2.0",
+                  "additionalBasePaths": [".claude/skills", ".vibe/skills"]
+                }
+              ]
+            }
+            """);
+
+        SkillsManifest manifest = SkillsManifest.load(tempDir);
+
+        assertThat(manifest.skills().getFirst().additionalBasePaths())
+            .containsExactly(".claude/skills", ".vibe/skills");
+    }
+
+    @Test
+    void saveAndLoadRoundTripWithAdditionalBasePaths() throws IOException {
+        var entry = SkillsManifest.SkillEntry.builder()
+            .name("my-skill")
+            .source("ghcr.io/org/my-skill")
+            .version("2.0.0")
+            .additionalBasePaths(List.of(".claude/skills"))
+            .build();
+
+        SkillsManifest original = SkillsManifest.builder().build().addSkill(entry);
+        original.save(tempDir);
+        SkillsManifest loaded = SkillsManifest.load(tempDir);
+
+        assertThat(loaded.skills().getFirst().additionalBasePaths())
+            .containsExactly(".claude/skills");
+    }
+
+    @Test
+    void mutatePreservesAdditionalBasePaths() {
+        var entry = SkillsManifest.SkillEntry.builder()
+            .name("skill")
+            .source("ghcr.io/org/skill")
+            .version("1.0.0")
+            .additionalBasePaths(List.of(".claude/skills"))
+            .build();
+
+        var mutated = entry.mutate().version("2.0.0").build();
+
+        assertThat(mutated.version()).isEqualTo("2.0.0");
+        assertThat(mutated.additionalBasePaths()).containsExactly(".claude/skills");
     }
 
 }

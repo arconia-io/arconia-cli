@@ -2,6 +2,7 @@ package io.arconia.cli.skills;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -147,11 +148,27 @@ public final class SkillUpdater {
      * @throws IOException if the artifact cannot be pulled or extracted
      */
     public SkillInstaller.InstallResult applyUpdate(String newestRef, Path projectRoot) throws IOException {
+        return applyUpdate(newestRef, projectRoot, Collections.emptyList());
+    }
+
+    /**
+     * Applies an update by re-installing the skill from the given reference,
+     * also copying to the specified additional base paths.
+     *
+     * @param newestRef the OCI reference to install (e.g., {@code ghcr.io/org/skills/pull-request:2.0.0})
+     * @param projectRoot the project root directory
+     * @param additionalBasePaths extra base directories to copy the skill into
+     * @return the install result
+     * @throws IOException if the artifact cannot be pulled or extracted
+     */
+    public SkillInstaller.InstallResult applyUpdate(String newestRef, Path projectRoot,
+                                                     List<String> additionalBasePaths) throws IOException {
         Assert.hasText(newestRef, "newestRef cannot be null or empty");
         Assert.notNull(projectRoot, "projectRoot cannot be null");
+        Assert.notNull(additionalBasePaths, "additionalBasePaths cannot be null");
 
         SkillRef skillRef = SkillRef.parse(newestRef);
-        return installer.install(skillRef, projectRoot);
+        return installer.install(skillRef, projectRoot, additionalBasePaths);
     }
 
 }

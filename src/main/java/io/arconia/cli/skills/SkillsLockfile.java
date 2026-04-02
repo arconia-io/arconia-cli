@@ -116,15 +116,19 @@ public record SkillsLockfile(
      * Maps directly to the fields defined by the Agent Skills Lockfile OpenAPI schema:
      * <ul>
      *   <li>{@code name} — required, skill name as declared in {@code SKILL.md}</li>
-     *   <li>{@code path} — required, relative path to the extracted skill directory</li>
+     *   <li>{@code path} — required, relative path to the primary extracted skill directory</li>
+     *   <li>{@code additionalPaths} — optional, additional relative paths where the skill was copied</li>
      *   <li>{@code source} — required, OCI source information</li>
      *   <li>{@code installedAt} — required, ISO 8601 timestamp of installation</li>
      * </ul>
      *
      * @param name the skill name as declared in {@code SKILL.md}; used as the stable key
      *             for update checks and removal operations
-     * @param path relative path (from the project root) to the directory where the skill was extracted
+     * @param path relative path (from the project root) to the primary directory where the skill was extracted
      *             (e.g. {@code .agents/skills/pull-request})
+     * @param additionalPaths additional relative paths (from the project root) where the skill was copied
+     *                        for vendor-specific agent tools (e.g. {@code .claude/skills/pull-request});
+     *                        may be {@code null} or empty if no additional copies exist
      * @param source the OCI source information identifying the exact artifact that was installed
      * @param installedAt ISO 8601 timestamp recording when this skill was installed or last updated
      */
@@ -132,6 +136,7 @@ public record SkillsLockfile(
     public record LockfileEntry(
         String name,
         String path,
+        @Nullable List<String> additionalPaths,
         Source source,
         String installedAt
     ) {
@@ -141,6 +146,20 @@ public record SkillsLockfile(
             Assert.hasText(path, "path cannot be null or empty");
             Assert.notNull(source, "source cannot be null");
             Assert.hasText(installedAt, "installedAt cannot be null or empty");
+        }
+
+        /**
+         * Returns all paths where this skill is installed (primary + additional).
+         *
+         * @return all installation paths
+         */
+        public List<String> allPaths() {
+            List<String> all = new ArrayList<>();
+            all.add(path);
+            if (additionalPaths != null) {
+                all.addAll(additionalPaths);
+            }
+            return all;
         }
 
         /**
@@ -162,6 +181,7 @@ public record SkillsLockfile(
             return new Builder()
                 .name(name)
                 .path(path)
+                .additionalPaths(additionalPaths != null ? new ArrayList<>(additionalPaths) : null)
                 .source(source)
                 .installedAt(installedAt);
         }
@@ -173,6 +193,7 @@ public record SkillsLockfile(
 
             private String name;
             private String path;
+            private @Nullable List<String> additionalPaths;
             private Source source;
             private String installedAt;
 
@@ -188,6 +209,11 @@ public record SkillsLockfile(
                 return this;
             }
 
+            public Builder additionalPaths(@Nullable List<String> additionalPaths) {
+                this.additionalPaths = additionalPaths;
+                return this;
+            }
+
             public Builder source(Source source) {
                 this.source = source;
                 return this;
@@ -199,7 +225,7 @@ public record SkillsLockfile(
             }
 
             public LockfileEntry build() {
-                return new LockfileEntry(name, path, source, installedAt);
+                return new LockfileEntry(name, path, additionalPaths, source, installedAt);
             }
 
         }

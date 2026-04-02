@@ -99,7 +99,7 @@ public final class IoUtils {
      * @param skillDir the skill directory to delete
      * @param projectRoot the project root directory
      * @param skillsBasePath the expected skills base path relative to the project root
-     *                       (e.g., {@code ".agents/skills"})
+     *                       (e.g., {@code ".agents/skills"} or {@code ".claude/skills"})
      * @throws IOException if the directory cannot be deleted
      * @throws IllegalArgumentException if the path fails safety validation
      */
@@ -144,6 +144,59 @@ public final class IoUtils {
                     }
                 });
         }
+    }
+
+    /**
+     * Recursively copies an entire directory tree from source to target.
+     * <p>
+     * Creates the target directory and all parent directories as needed.
+     * If the target already exists, its contents are overwritten.
+     *
+     * @param source the source directory to copy from
+     * @param target the target directory to copy to
+     * @throws IOException if the directory cannot be copied
+     */
+    public static void copyDirectory(Path source, Path target) throws IOException {
+        Assert.notNull(source, "source must not be null");
+        Assert.notNull(target, "target must not be null");
+
+        try (Stream<Path> walk = Files.walk(source)) {
+            walk.forEach(sourcePath -> {
+                try {
+                    Path targetPath = target.resolve(source.relativize(sourcePath));
+                    if (Files.isDirectory(sourcePath)) {
+                        Files.createDirectories(targetPath);
+                    }
+                    else {
+                        Files.createDirectories(targetPath.getParent());
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+                catch (IOException e) {
+                    throw new RuntimeException("Failed to copy '%s': %s".formatted(sourcePath, e.getMessage()), e);
+                }
+            });
+        }
+    }
+
+    /**
+     * Derives the skills base path from a full skill installation path.
+     * <p>
+     * For example, given {@code .claude/skills/pull-request}, returns {@code .claude/skills}.
+     *
+     * @param skillPath the full relative skill path (e.g. {@code .claude/skills/pull-request})
+     * @return the base path (e.g. {@code .claude/skills})
+     */
+    public static String deriveSkillsBasePath(String skillPath) {
+        Assert.hasText(skillPath, "skillPath must not be empty");
+
+        Path path = Path.of(skillPath);
+        Path parent = path.getParent();
+        if (parent == null) {
+            throw new IllegalArgumentException(
+                "Cannot derive skills base path from '%s': no parent directory".formatted(skillPath));
+        }
+        return parent.toString();
     }
 
     public static Path copyFileToTemp(String resourcePath) throws IOException {

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.util.Assert;
 
@@ -65,7 +67,7 @@ public final class SkillInstaller {
     }
 
     /**
-     * Installs a skill from an OCI artifact into the project.
+     * Installs a skill from an OCI artifact into the project's default skills directory.
      *
      * @param skillRef the OCI reference for the skill artifact
      * @param projectRoot the project root directory
@@ -73,8 +75,26 @@ public final class SkillInstaller {
      * @throws IOException if the artifact cannot be pulled or extracted
      */
     public InstallResult install(SkillRef skillRef, Path projectRoot) throws IOException {
+        return install(skillRef, projectRoot, List.of());
+    }
+
+    /**
+     * Installs a skill from an OCI artifact into the project.
+     * <p>
+     * The skill is always extracted to the default {@code .agents/skills} directory.
+     * If additional base paths are specified, the skill is also copied to each of those
+     * directories. The OCI artifact is only fetched once.
+     *
+     * @param skillRef the OCI reference for the skill artifact
+     * @param projectRoot the project root directory
+     * @param additionalBasePaths extra base directories to copy the skill into (e.g. {@code .claude/skills})
+     * @return the result of the installation
+     * @throws IOException if the artifact cannot be pulled or extracted
+     */
+    public InstallResult install(SkillRef skillRef, Path projectRoot, List<String> additionalBasePaths) throws IOException {
         Assert.notNull(skillRef, "skillRef cannot be null");
         Assert.notNull(projectRoot, "projectRoot cannot be null");
+        Assert.notNull(additionalBasePaths, "additionalBasePaths cannot be null");
 
         // 1. Resolve the manifest to get the digest
         ContainerRef containerRef = skillRef.toContainerRef();
@@ -92,7 +112,7 @@ public final class SkillInstaller {
         // 2. Use the repository slug as the skill name (last segment of the OCI ref path)
         String skillName = skillRef.skillName();
 
-        // 3. Prepare the installation directory
+        // 3. Prepare the primary installation directory
         Path skillsDir = projectRoot.resolve(DEFAULT_SKILLS_PATH);
         Files.createDirectories(skillsDir);
 
@@ -111,11 +131,21 @@ public final class SkillInstaller {
 
         Path installPath = skillsDir.resolve(skillName);
 
-        // 6. Update skills.json
-        updateManifest(skillRef, skillName, projectRoot);
+        // 6. Copy to additional vendor directories
+        List<String> resolvedAdditionalPaths = new ArrayList<>();
+        for (String basePath : additionalBasePaths) {
+            Path vendorSkillsDir = projectRoot.resolve(basePath);
+            Files.createDirectories(vendorSkillsDir);
+            Path vendorInstallPath = vendorSkillsDir.resolve(skillName);
+            IoUtils.copyDirectory(installPath, vendorInstallPath);
+            resolvedAdditionalPaths.add(projectRoot.relativize(vendorInstallPath).toString());
+        }
 
-        // 7. Update skills.lock.json
-        updateLockfile(resolvedRef, skillName, installPath, projectRoot);
+        // 7. Update skills.json
+        updateManifest(skillRef, skillName, additionalBasePaths, projectRoot);
+
+        // 8. Update skills.lock.json
+        updateLockfile(resolvedRef, skillName, installPath, resolvedAdditionalPaths, projectRoot);
 
         return new InstallResult(resolvedRef, skillName, installPath);
     }
@@ -135,16 +165,20 @@ public final class SkillInstaller {
     /**
      * Updates the {@code skills.json} manifest file with the newly installed skill.
      */
-    private void updateManifest(SkillRef ref, String skillName, Path projectRoot) throws IOException {
+    private void updateManifest(SkillRef ref, String skillName, List<String> additionalBasePaths,
+                                Path projectRoot) throws IOException {
         SkillsManifest manifest = SkillsManifest.load(projectRoot);
 
-        var entry = SkillsManifest.SkillEntry.builder()
+        var entryBuilder = SkillsManifest.SkillEntry.builder()
             .name(skillName)
             .source("%s/%s".formatted(ref.registry(), ref.repository()))
-            .version(ref.effectiveTag())
-            .build();
+            .version(ref.effectiveTag());
 
-        manifest = manifest.addSkill(entry);
+        if (!additionalBasePaths.isEmpty()) {
+            entryBuilder.additionalBasePaths(additionalBasePaths);
+        }
+
+        manifest = manifest.addSkill(entryBuilder.build());
         manifest.save(projectRoot);
     }
 
@@ -152,7 +186,7 @@ public final class SkillInstaller {
      * Updates the {@code skills.lock.json} lock file with the exact resolved reference.
      */
     private void updateLockfile(SkillRef resolvedRef, String skillName, Path installPath,
-                                Path projectRoot) throws IOException {
+                                List<String> additionalPaths, Path projectRoot) throws IOException {
         SkillsLockfile lockfile = SkillsLockfile.load(projectRoot);
 
         var source = SkillsLockfile.Source.builder()
@@ -165,14 +199,17 @@ public final class SkillInstaller {
 
         String relativePath = projectRoot.relativize(installPath).toString();
 
-        var entry = SkillsLockfile.LockfileEntry.builder()
+        var entryBuilder = SkillsLockfile.LockfileEntry.builder()
             .name(skillName)
             .path(relativePath)
             .source(source)
-            .installedAt(Instant.now().toString())
-            .build();
+            .installedAt(Instant.now().toString());
 
-        lockfile = lockfile.addOrUpdateEntry(entry);
+        if (!additionalPaths.isEmpty()) {
+            entryBuilder.additionalPaths(additionalPaths);
+        }
+
+        lockfile = lockfile.addOrUpdateEntry(entryBuilder.build());
         lockfile.save(projectRoot);
     }
 
