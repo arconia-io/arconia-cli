@@ -136,7 +136,7 @@ public class SkillsCommands implements Runnable {
                 result.installPath()
             ));
             if (!additionalBasePaths.isEmpty()) {
-                outputOptions.info("  Also copied to: %s".formatted(String.join(", ", additionalBasePaths)));
+                outputOptions.info("  Also linked from: %s".formatted(String.join(", ", additionalBasePaths)));
             }
             outputOptions.verbose("Digest: %s".formatted(result.ref().digest()));
         }
@@ -282,15 +282,16 @@ public class SkillsCommands implements Runnable {
                         outputOptions.verbose("Deleted directory: %s".formatted(primaryDir));
                     }
 
-                    // 4. Delete additional vendor directories
+                    // 4. Delete additional vendor symlinks (with path containment check)
                     if (lockEntry.additionalPaths() != null) {
                         for (String additionalPath : lockEntry.additionalPaths()) {
-                            Path additionalDir = projectRoot.resolve(additionalPath);
-                            if (Files.exists(additionalDir)) {
-                                String basePath = IoUtils.deriveSkillsBasePath(additionalPath);
-                                IoUtils.deleteSkillDirectory(additionalDir, projectRoot, basePath);
-                                outputOptions.verbose("Deleted directory: %s".formatted(additionalDir));
+                            Path additionalDir = projectRoot.resolve(additionalPath).normalize();
+                            if (!additionalDir.toAbsolutePath().startsWith(projectRoot.toAbsolutePath().normalize())) {
+                                outputOptions.error("Skipping '%s': path resolves outside the project root.".formatted(additionalPath));
+                                continue;
                             }
+                            IoUtils.deleteSymlinkOrDirectory(additionalDir);
+                            outputOptions.verbose("Deleted symlink: %s".formatted(additionalDir));
                         }
                     }
 

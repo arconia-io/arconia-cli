@@ -147,19 +147,57 @@ public final class IoUtils {
     }
 
     /**
-     * Recursively copies an entire directory tree from source to target.
+     * Creates a per-skill symbolic link at {@code link} pointing to the primary skill
+     * directory at {@code target}.
      * <p>
-     * Creates the target directory and all parent directories as needed.
-     * If the target already exists, its contents are overwritten.
+     * For example, given:
+     * <ul>
+     *   <li>{@code link}   = {@code /project/.claude/skills/my-skill}</li>
+     *   <li>{@code target} = {@code /project/.agents/skills/my-skill}</li>
+     * </ul>
+     * The resulting symlink uses a relative path: {@code ../../.agents/skills/my-skill}.
+     * <p>
+     * Parent directories of the link are created as needed. If a symlink or directory
+     * already exists at the link location, it is removed first.
+     * <p>
+     * On systems where symbolic links are not supported or not permitted (e.g. Windows
+     * without Developer Mode), the method falls back to a recursive directory copy.
      *
-     * @param source the source directory to copy from
-     * @param target the target directory to copy to
-     * @throws IOException if the directory cannot be copied
+     * @param link the path where the symlink should be created (vendor skill directory)
+     * @param target the path the symlink should point to (primary skill directory)
+     * @throws IOException if neither the symlink nor the fallback copy can be created
      */
-    public static void copyDirectory(Path source, Path target) throws IOException {
-        Assert.notNull(source, "source must not be null");
+    public static void createSkillSymlink(Path link, Path target) throws IOException {
+        Assert.notNull(link, "link must not be null");
         Assert.notNull(target, "target must not be null");
 
+        Files.createDirectories(link.getParent());
+
+        // Remove existing entry (symlink or directory) at the link location
+        if (Files.isSymbolicLink(link)) {
+            Files.delete(link);
+        }
+        else if (Files.isDirectory(link)) {
+            deleteDirectoryRecursive(link);
+        }
+
+        // Try symlink first; fall back to copy on platforms that don't support it
+        try {
+            Path relativePath = link.getParent().relativize(target);
+            Files.createSymbolicLink(link, relativePath);
+        }
+        catch (UnsupportedOperationException | SecurityException | IOException e) {
+            // Symlinks not available (e.g. Windows without Developer Mode) – copy instead
+            copyDirectory(target, link);
+        }
+    }
+
+    /**
+     * Recursively copies an entire directory tree from source to target.
+     * <p>
+     * Used as a fallback when symbolic links are not available.
+     */
+    private static void copyDirectory(Path source, Path target) throws IOException {
         try (Stream<Path> walk = Files.walk(source)) {
             walk.forEach(sourcePath -> {
                 try {
@@ -172,10 +210,51 @@ public final class IoUtils {
                         Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
-                catch (IOException e) {
-                    throw new RuntimeException("Failed to copy '%s': %s".formatted(sourcePath, e.getMessage()), e);
+                catch (IOException ex) {
+                    throw new RuntimeException("Failed to copy '%s': %s".formatted(sourcePath, ex.getMessage()), ex);
                 }
             });
+        }
+    }
+
+    /**
+     * Deletes a symlink, or a regular file/directory.
+     * <p>
+     * If the path is a symbolic link, only the link itself is removed (not its target).
+     * If the path is a directory, it is deleted recursively.
+     *
+     * @param path the path to delete
+     * @throws IOException if deletion fails
+     */
+    public static void deleteSymlinkOrDirectory(Path path) throws IOException {
+        Assert.notNull(path, "path must not be null");
+
+        if (!Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
+            return;
+        }
+
+        if (Files.isSymbolicLink(path)) {
+            Files.delete(path);
+        }
+        else if (Files.isDirectory(path)) {
+            deleteDirectoryRecursive(path);
+        }
+    }
+
+    /**
+     * Recursively deletes a directory and all its contents.
+     */
+    private static void deleteDirectoryRecursive(Path dir) throws IOException {
+        try (Stream<Path> walk = Files.walk(dir)) {
+            walk.sorted(Comparator.reverseOrder())
+                .forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    }
+                    catch (IOException e) {
+                        // Best-effort: continue on failure
+                    }
+                });
         }
     }
 

@@ -60,10 +60,10 @@ public final class SkillTableFormatter {
                 entry.path()
             ));
 
-            // Additional paths on continuation lines
+            // Additional paths (symlinks) on continuation lines
             if (entry.additionalPaths() != null) {
                 for (String additionalPath : entry.additionalPaths()) {
-                    lines.add(continuationPrefix + additionalPath);
+                    lines.add(continuationPrefix + "↳ " + additionalPath);
                 }
             }
         }

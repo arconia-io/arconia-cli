@@ -82,8 +82,9 @@ public final class SkillInstaller {
      * Installs a skill from an OCI artifact into the project.
      * <p>
      * The skill is always extracted to the default {@code .agents/skills} directory.
-     * If additional base paths are specified, the skill is also copied to each of those
-     * directories. The OCI artifact is only fetched once.
+     * If additional base paths are specified, a per-skill symbolic link is created in each
+     * vendor directory pointing back to the primary install location. The OCI artifact is
+     * only fetched once.
      *
      * @param skillRef the OCI reference for the skill artifact
      * @param projectRoot the project root directory
@@ -131,13 +132,12 @@ public final class SkillInstaller {
 
         Path installPath = skillsDir.resolve(skillName);
 
-        // 6. Copy to additional vendor directories
+        // 6. Create symlinks in additional vendor directories
         List<String> resolvedAdditionalPaths = new ArrayList<>();
         for (String basePath : additionalBasePaths) {
-            Path vendorSkillsDir = projectRoot.resolve(basePath);
-            Files.createDirectories(vendorSkillsDir);
-            Path vendorInstallPath = vendorSkillsDir.resolve(skillName);
-            IoUtils.copyDirectory(installPath, vendorInstallPath);
+            Path vendorInstallPath = projectRoot.resolve(basePath).resolve(skillName).normalize();
+            validateInsideProjectRoot(vendorInstallPath, projectRoot, basePath);
+            IoUtils.createSkillSymlink(vendorInstallPath, installPath);
             resolvedAdditionalPaths.add(projectRoot.relativize(vendorInstallPath).toString());
         }
 
@@ -160,6 +160,24 @@ public final class SkillInstaller {
             }
         }
         throw new IOException("No tar.gz file found in pull output directory: " + directory);
+    }
+
+    /**
+     * Validates that the resolved path is inside the project root.
+     * Prevents path traversal via malicious {@code additionalBasePaths} in {@code skills.json}.
+     *
+     * @param resolvedPath the resolved absolute path to validate
+     * @param projectRoot the project root directory
+     * @param basePath the original base path (for error messages)
+     */
+    private static void validateInsideProjectRoot(Path resolvedPath, Path projectRoot, String basePath) {
+        Path normalizedResolved = resolvedPath.toAbsolutePath().normalize();
+        Path normalizedRoot = projectRoot.toAbsolutePath().normalize();
+        if (!normalizedResolved.startsWith(normalizedRoot)) {
+            throw new IllegalArgumentException(
+                "Refusing to create skill entry at '%s': additionalBasePath '%s' resolves outside the project root '%s'"
+                    .formatted(normalizedResolved, basePath, normalizedRoot));
+        }
     }
 
     /**

@@ -4,11 +4,13 @@ NOTE: The `arconia skills` commands are experimental and may change in future re
 
 The `arconia skills` command allows you to manage agent skills for your project. Agent skills are distributed as OCI artifacts.
 
-Skills are always installed into the default `.agents/skills` directory. Optionally, you can also copy them to additional vendor-specific directories using the `--agent` option.
+Skills are always installed into the default `.agents/skills` directory. Optionally, you can also symlink them into additional vendor-specific directories using the `--agent` option.
 
 == Multi-Agent Vendor Support
 
-When adding skills with the `--agent` option, the skill is installed to `.agents/skills` and copied to the vendor-specific skills directory. This lets multiple coding agents share the same set of skills without duplicating OCI fetches.
+When adding skills with the `--agent` option, the skill is extracted to `.agents/skills` and a per-skill symbolic link is created in each vendor-specific skills directory pointing back to the primary location. This lets multiple coding agents share the same set of skills without duplicating content or OCI fetches.
+
+NOTE: On Windows, symbolic links require Developer Mode or administrator privileges. If symlinks cannot be created, Arconia falls back to a recursive directory copy automatically.
 
 [cols="2,3", options="header"]
 |===
@@ -34,7 +36,7 @@ Multiple agents can be specified at once:
 arconia skills add --ref ghcr.io/org/repo/skill:1.0.0 --agent claude --agent vibe
 ----
 
-The agent configuration is persisted in `skills.json` (via the `additionalBasePaths` field) so that `arconia skills install` reproduces the same layout, and `arconia skills remove` cleans up all copies.
+The agent configuration is persisted in `skills.json` (via the `additionalBasePaths` field) so that `arconia skills install` reproduces the same layout, and `arconia skills remove` cleans up all symlinks.
 
 == Commands
 
@@ -60,7 +62,7 @@ arconia skills add --name my-skill --agent claude --agent vibe
 
 === `install`
 
-Install all agent skills declared in the project's configuration (`skills.json`). If a skill entry includes `additionalBasePaths`, the skill is also copied to those vendor directories.
+Install all agent skills declared in the project's configuration (`skills.json`). If a skill entry includes `additionalBasePaths`, symlinks are also created in those vendor directories.
 
 [source,shell]
 ----
@@ -73,7 +75,7 @@ arconia skills install
 
 === `list`
 
-List installed agent skills. When a skill has been copied to additional vendor directories, those paths are shown on continuation lines.
+List installed agent skills. When a skill has symlinks in additional vendor directories, those paths are shown on continuation lines.
 
 [source,shell]
 ----
@@ -86,7 +88,7 @@ arconia skills list
 
 === `remove`
 
-Remove agent skills from the project. This deletes the skill from the primary `.agents/skills` directory and any additional vendor directories recorded in the lockfile.
+Remove agent skills from the project. This deletes the skill from the primary `.agents/skills` directory and removes any vendor symlinks recorded in the lockfile.
 
 [source,shell]
 ----
