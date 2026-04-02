@@ -16,8 +16,8 @@ public final class OciUtils {
      * <p>
      * Examples:
      * <ul>
-     *   <li>{@code "ghcr.io/org/skills-catalog:1.0.0"} → {@code "ghcr.io/org/skills-catalog"}</li>
-     *   <li>{@code "ghcr.io/org/skills-catalog"} → {@code "ghcr.io/org/skills-catalog"}</li>
+     *   <li>{@code "ghcr.io/org/skills-collection:1.0.0"} → {@code "ghcr.io/org/skills-collection"}</li>
+     *   <li>{@code "ghcr.io/org/skills-collection"} → {@code "ghcr.io/org/skills-collection"}</li>
      * </ul>
      *
      * @param ref the OCI reference string

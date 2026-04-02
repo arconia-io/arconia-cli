@@ -17,12 +17,12 @@ import io.arconia.cli.utils.JsonUtils;
  * Model for an OCI artifact publish report (defaults to {@code publish-report.json}).
  * <p>
  * This report is optionally produced by publish commands such as
- * {@code skills push} and {@code skills catalog push}, and records every
+ * {@code skills push} and {@code skills collection push}, and records every
  * OCI artifact that was published during the operation. It serves as a
  * structured record of the published artifact(s) including their immutable
  * digests, enabling downstream operations such as:
  * <ul>
- *   <li>Catalog pushing via {@code skills catalog push --from-report}</li>
+ *   <li>Collection pushing via {@code skills collection push --from-report}</li>
  *   <li>Artifact signing (e.g., cosign)</li>
  *   <li>SLSA provenance attestation</li>
  * </ul>
@@ -42,9 +42,9 @@ public record ArtifactPublishReport(
     public static final String DEFAULT_SKILLS_FILENAME = "publish-skills-report.json";
 
     /**
-     * Default filename for the skills catalog publish report.
+     * Default filename for the skills collection publish report.
      */
-    public static final String DEFAULT_CATALOG_FILENAME = "publish-skills-catalog-report.json";
+    public static final String DEFAULT_COLLECTION_FILENAME = "publish-skills-collection-report.json";
 
     public ArtifactPublishReport {
         Assert.hasText(publishedAt, "publishedAt cannot be null or empty");
@@ -54,7 +54,7 @@ public record ArtifactPublishReport(
     /**
      * A single artifact entry in the publish report.
      *
-     * @param name the artifact name (e.g., skill name from SKILL.md frontmatter, or catalog name)
+     * @param name the artifact name (e.g., skill name from SKILL.md frontmatter, or collection name)
      * @param ref the full OCI artifact reference with tag (e.g., {@code ghcr.io/org/skills/pull-request:1.2.0})
      * @param version the semver version that was published
      * @param digest the immutable manifest digest

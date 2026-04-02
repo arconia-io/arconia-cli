@@ -14,31 +14,31 @@ import land.oras.ManifestDescriptor;
 import land.oras.Registry;
 
 /**
- * Reads and parses a Skills Catalog from an OCI-compliant registry.
+ * Reads and parses a Skills Collection from an OCI-compliant registry.
  * <p>
- * A catalog is an OCI Image Index ({@code application/vnd.oci.image.index.v1+json})
+ * A collection is an OCI Image Index ({@code application/vnd.oci.image.index.v1+json})
  * whose manifest descriptors carry per-skill annotations. This reader fetches the
  * index and extracts structured skill entries from those annotations, allowing
- * clients to browse the catalog without pulling individual skill artifacts.
+ * clients to browse the collection without pulling individual skill artifacts.
  *
- * @see SkillCatalogPublisher
+ * @see SkillCollectionPublisher
  */
-public final class SkillCatalogReader {
+public final class SkillCollectionReader {
 
     private final Registry registry;
 
     /**
-     * Creates a new catalog reader using the given registry client.
+     * Creates a new collection reader using the given registry client.
      *
      * @param registry the ORAS registry client
      */
-    public SkillCatalogReader(Registry registry) {
+    public SkillCollectionReader(Registry registry) {
         Assert.notNull(registry, "registry cannot be null");
         this.registry = registry;
     }
 
     /**
-     * A single skill entry extracted from a catalog index.
+     * A single skill entry extracted from a collection index.
      *
      * @param name the skill name
      * @param version the skill version
@@ -46,80 +46,80 @@ public final class SkillCatalogReader {
      * @param ref the canonical tag-based OCI reference
      * @param digest the skill manifest digest
      */
-    public record CatalogSkillInfo(
+    public record CollectionSkillInfo(
         String name,
         @Nullable String version,
         @Nullable String description,
         @Nullable String ref,
         String digest
     ) {
-        public CatalogSkillInfo {
+        public CollectionSkillInfo {
             Assert.hasText(name, "name cannot be null or empty");
             Assert.hasText(digest, "digest cannot be null or empty");
         }
     }
 
     /**
-     * Result of reading a catalog from the registry.
+     * Result of reading a collection from the registry.
      *
-     * @param catalogName the catalog identifier from annotations
-     * @param catalogVersion the catalog version from annotations
-     * @param description the catalog description
+     * @param collectionName the collection identifier from annotations
+     * @param collectionVersion the collection version from annotations
+     * @param description the collection description
      * @param skills the list of skill entries
      * @param index the raw OCI Index
      */
-    public record CatalogInfo(
-        @Nullable String catalogName,
-        @Nullable String catalogVersion,
+    public record CollectionInfo(
+        @Nullable String collectionName,
+        @Nullable String collectionVersion,
         @Nullable String description,
-        List<CatalogSkillInfo> skills,
+        List<CollectionSkillInfo> skills,
         Index index
     ) {
-        public CatalogInfo {
+        public CollectionInfo {
             Assert.notNull(skills, "skills cannot be null");
             Assert.notNull(index, "index cannot be null");
         }
     }
 
     /**
-     * Fetches and parses a catalog from the registry.
+     * Fetches and parses a collection from the registry.
      * <p>
-     * Only the catalog index manifest is fetched — individual skill artifacts
+     * Only the collection index manifest is fetched — individual skill artifacts
      * are NOT downloaded. All skill metadata is extracted from the descriptor
      * annotations within the index.
      *
-     * @param catalogRef the OCI reference for the catalog (e.g., {@code ghcr.io/org/skills-catalog:latest})
-     * @return the parsed catalog information
+     * @param collectionRef the OCI reference for the collection (e.g., {@code ghcr.io/org/skills-collection:latest})
+     * @return the parsed collection information
      */
-    public CatalogInfo read(String catalogRef) {
-        Assert.hasText(catalogRef, "catalogRef cannot be empty");
+    public CollectionInfo read(String collectionRef) {
+        Assert.hasText(collectionRef, "collectionRef cannot be empty");
 
-        ContainerRef containerRef = ContainerRef.parse(catalogRef);
+        ContainerRef containerRef = ContainerRef.parse(collectionRef);
         Index index = registry.getIndex(containerRef);
 
-        // Extract catalog-level annotations
+        // Extract collection-level annotations
         Map<String, String> indexAnnotations = index.getAnnotations();
-        String catalogName = getAnnotation(indexAnnotations, SkillAnnotations.CATALOG_NAME);
-        String catalogVersion = getAnnotation(indexAnnotations, SkillAnnotations.OCI_VERSION);
+        String collectionName = getAnnotation(indexAnnotations, SkillAnnotations.COLLECTION_NAME);
+        String collectionVersion = getAnnotation(indexAnnotations, SkillAnnotations.OCI_VERSION);
         String description = getAnnotation(indexAnnotations, SkillAnnotations.OCI_DESCRIPTION);
 
         // Extract skill entries from manifest descriptors
         List<ManifestDescriptor> manifests = index.getManifests();
         if (manifests == null) {
-            return new CatalogInfo(catalogName, catalogVersion, description, Collections.emptyList(), index);
+            return new CollectionInfo(collectionName, collectionVersion, description, Collections.emptyList(), index);
         }
 
-        List<CatalogSkillInfo> skills = manifests.stream()
+        List<CollectionSkillInfo> skills = manifests.stream()
             .map(this::extractSkillInfo)
             .toList();
 
-        return new CatalogInfo(catalogName, catalogVersion, description, skills, index);
+        return new CollectionInfo(collectionName, collectionVersion, description, skills, index);
     }
 
     /**
-     * Extracts a {@link CatalogSkillInfo} from a manifest descriptor's annotations.
+     * Extracts a {@link CollectionSkillInfo} from a manifest descriptor's annotations.
      */
-    private CatalogSkillInfo extractSkillInfo(ManifestDescriptor descriptor) {
+    private CollectionSkillInfo extractSkillInfo(ManifestDescriptor descriptor) {
         Map<String, String> annotations = descriptor.getAnnotations();
 
         String name = getAnnotation(annotations, SkillAnnotations.SKILL_NAME);
@@ -137,7 +137,7 @@ public final class SkillCatalogReader {
         String ref = getAnnotation(annotations, SkillAnnotations.SKILL_REF);
         String digest = descriptor.getDigest();
 
-        return new CatalogSkillInfo(name, version, desc, ref, digest);
+        return new CollectionSkillInfo(name, version, desc, ref, digest);
     }
 
     /**

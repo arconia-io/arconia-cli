@@ -12,24 +12,24 @@ import picocli.CommandLine;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link SkillsCatalogCommands}.
+ * Unit tests for {@link SkillsCollectionCommands}.
  */
 @SpringBootTest
-class SkillsCatalogCommandsTests {
+class SkillsCollectionCommandsTests {
 
     @Autowired
     CommandLine commandLine;
 
     @Test
-    void catalogHelpOption() {
+    void collectionHelpOption() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog", "--help");
+        int exitCode = commandLine.execute("skills", "collection", "--help");
 
         assertThat(exitCode).isZero();
         String out = output.toString();
-        assertThat(out).contains("Usage: arconia skills catalog");
+        assertThat(out).contains("Usage: arconia skills collection");
         assertThat(out).contains("push");
         assertThat(out).contains("list");
         assertThat(out).contains("add");
@@ -37,26 +37,26 @@ class SkillsCatalogCommandsTests {
     }
 
     @Test
-    void catalogCommandShowsUsage() {
+    void collectionCommandShowsUsage() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog");
+        int exitCode = commandLine.execute("skills", "collection");
 
         assertThat(exitCode).isZero();
-        assertThat(output.toString()).contains("Usage: arconia skills catalog");
+        assertThat(output.toString()).contains("Usage: arconia skills collection");
     }
 
     @Test
-    void catalogPushHelpOption() {
+    void collectionPushHelpOption() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog", "push", "--help");
+        int exitCode = commandLine.execute("skills", "collection", "push", "--help");
 
         assertThat(exitCode).isZero();
         String out = output.toString();
-        assertThat(out).contains("Usage: arconia skills catalog push");
+        assertThat(out).contains("Usage: arconia skills collection push");
         assertThat(out).contains("--ref");
         assertThat(out).contains("--name");
         assertThat(out).contains("--tag");
@@ -68,75 +68,75 @@ class SkillsCatalogCommandsTests {
     }
 
     @Test
-    void catalogPushRequiresRefAndName() {
+    void collectionPushRequiresRefAndName() {
         var output = new StringWriter();
         var error = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
         commandLine.setErr(new PrintWriter(error));
 
-        int exitCode = commandLine.execute("skills", "catalog", "push");
+        int exitCode = commandLine.execute("skills", "collection", "push");
 
         assertThat(exitCode).isNotZero();
         assertThat(error.toString()).contains("--ref");
     }
 
     @Test
-    void catalogListHelpOption() {
+    void collectionListHelpOption() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog", "list", "--help");
+        int exitCode = commandLine.execute("skills", "collection", "list", "--help");
 
         assertThat(exitCode).isZero();
         String out = output.toString();
-        assertThat(out).contains("Usage: arconia skills catalog list");
+        assertThat(out).contains("Usage: arconia skills collection list");
         assertThat(out).contains("--ref");
         assertThat(out).contains("--name");
     }
 
     @Test
-    void catalogAddHelpOption() {
+    void collectionAddHelpOption() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog", "add", "--help");
+        int exitCode = commandLine.execute("skills", "collection", "add", "--help");
 
         assertThat(exitCode).isZero();
         String out = output.toString();
-        assertThat(out).contains("Usage: arconia skills catalog add");
+        assertThat(out).contains("Usage: arconia skills collection add");
         assertThat(out).contains("--name");
         assertThat(out).contains("--ref");
     }
 
     @Test
-    void catalogAddRequiresNameAndRef() {
+    void collectionAddRequiresNameAndRef() {
         var error = new StringWriter();
         commandLine.setErr(new PrintWriter(error));
 
-        int exitCode = commandLine.execute("skills", "catalog", "add");
+        int exitCode = commandLine.execute("skills", "collection", "add");
 
         assertThat(exitCode).isNotZero();
     }
 
     @Test
-    void catalogRemoveHelpOption() {
+    void collectionRemoveHelpOption() {
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
 
-        int exitCode = commandLine.execute("skills", "catalog", "remove", "--help");
+        int exitCode = commandLine.execute("skills", "collection", "remove", "--help");
 
         assertThat(exitCode).isZero();
         String out = output.toString();
-        assertThat(out).contains("Usage: arconia skills catalog remove");
+        assertThat(out).contains("Usage: arconia skills collection remove");
         assertThat(out).contains("--name");
     }
 
     @Test
-    void catalogRemoveRequiresName() {
+    void collectionRemoveRequiresName() {
         var error = new StringWriter();
         commandLine.setErr(new PrintWriter(error));
 
-        int exitCode = commandLine.execute("skills", "catalog", "remove");
+        int exitCode = commandLine.execute("skills", "collection", "remove");
 
         assertThat(exitCode).isNotZero();
     }

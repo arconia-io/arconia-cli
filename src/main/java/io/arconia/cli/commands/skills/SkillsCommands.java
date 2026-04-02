@@ -24,7 +24,7 @@ import io.arconia.cli.oci.OciRegistryProvider;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillBatchPublisher;
 import io.arconia.cli.skills.SkillBatchPublisher.BatchEntryResult;
-import io.arconia.cli.skills.SkillCatalogService;
+import io.arconia.cli.skills.SkillCollectionService;
 import io.arconia.cli.skills.SkillInstaller;
 import io.arconia.cli.skills.SkillPublisher;
 import io.arconia.cli.skills.SkillRef;
@@ -42,7 +42,7 @@ import io.arconia.cli.utils.OciUtils;
     name = "skills",
     description = "Install and manage agent skills.",
     subcommands = {
-        SkillsCatalogCommands.class
+        SkillsCollectionCommands.class
     }
 )
 public class SkillsCommands implements Runnable {
@@ -61,11 +61,11 @@ public class SkillsCommands implements Runnable {
         spec.commandLine().usage(spec.commandLine().getOut());
     }
 
-    @Command(name = "add", description = "Add agent skills to the project. Use --ref for direct OCI references, or --name to look up skills from a registered catalog.")
+    @Command(name = "add", description = "Add agent skills to the project. Use --ref for direct OCI references, or --name to look up skills from a registered collection.")
     public void add(
         @Option(names = {"--ref"}, arity = "1..*", description = "The OCI artifact reference for the agent skill (e.g. ghcr.io/org/repo/skill:1.0.0).") List<String> skillRefs,
-        @Option(names = {"--name"}, arity = "1..*", description = "The skill name to look up from a registered catalog.") List<String> skillNames,
-        @Option(names = {"--catalog"}, description = "The registered catalog alias to search. If omitted, searches all registered catalogs.") String catalogAlias,
+        @Option(names = {"--name"}, arity = "1..*", description = "The skill name to look up from a registered collection.") List<String> skillNames,
+        @Option(names = {"--collection"}, description = "The registered collection alias to search. If omitted, searches all registered collections.") String collectionAlias,
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
         @Mixin OutputOptions outputOptions
     ) {
@@ -87,11 +87,11 @@ public class SkillsCommands implements Runnable {
             }
         }
 
-        // 2. Install by name from catalog
+        // 2. Install by name from collection
         if (hasNames) {
-            SkillCatalogService catalogService = new SkillCatalogService(ociRegistry);
+            SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
             for (String name : skillNames) {
-                installFromCatalog(name, catalogAlias, catalogService, installer, projectRoot, outputOptions);
+                installFromCollection(name, collectionAlias, collectionService, installer, projectRoot, outputOptions);
             }
         }
     }
@@ -121,25 +121,25 @@ public class SkillsCommands implements Runnable {
     }
 
     /**
-     * Resolves a skill name from registered catalogs and installs it.
+     * Resolves a skill name from registered collections and installs it.
      */
-    private void installFromCatalog(String skillName, String catalogAlias,
-                                     SkillCatalogService catalogService, SkillInstaller installer,
+    private void installFromCollection(String skillName, String collectionAlias,
+                                     SkillCollectionService collectionService, SkillInstaller installer,
                                      Path projectRoot, OutputOptions outputOptions) {
         try {
-            SkillCatalogService.CatalogSkillMatch match = catalogService.resolveSkillFromCatalog(skillName, catalogAlias);
+            SkillCollectionService.CollectionSkillMatch match = collectionService.resolveSkillFromCollection(skillName, collectionAlias);
             String ref = match.skill().ref();
 
             if (ref == null || ref.isBlank()) {
-                throw new CliException("Skill '%s' in catalog '%s' has no OCI reference.".formatted(skillName, match.catalogName()));
+                throw new CliException("Skill '%s' in collection '%s' has no OCI reference.".formatted(skillName, match.collectionName()));
             }
 
-            outputOptions.verbose("Resolved skill '%s' from catalog '%s' → %s".formatted(skillName, match.catalogName(), ref));
+            outputOptions.verbose("Resolved skill '%s' from collection '%s' → %s".formatted(skillName, match.collectionName(), ref));
 
             installByRef(ref, installer, projectRoot, outputOptions);
         }
         catch (IOException e) {
-            throw new CliException("Failed to resolve skill '%s' from catalog: %s".formatted(skillName, e.getMessage()), e);
+            throw new CliException("Failed to resolve skill '%s' from collection: %s".formatted(skillName, e.getMessage()), e);
         }
         catch (IllegalArgumentException e) {
             throw new CliException(e.getMessage(), e);

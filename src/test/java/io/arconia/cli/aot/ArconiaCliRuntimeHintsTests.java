@@ -30,8 +30,8 @@ class ArconiaCliRuntimeHintsTests {
         var orasModelClasses = ArconiaCliRuntimeHints.findSkillsClasses();
         assertThat(orasModelClasses).isNotEmpty();
         assertThat(orasModelClasses).contains(
-                TypeReference.of("io.arconia.cli.skills.SkillCatalogRegistry"),
-                TypeReference.of("io.arconia.cli.skills.SkillCatalogRegistry$CatalogEntry")
+                TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry"),
+                TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry$CollectionEntry")
         );
     }
 
@@ -39,9 +39,9 @@ class ArconiaCliRuntimeHintsTests {
     void shouldRegisterReflectionHintsForSkillsClasses() {
         RuntimeHints hints = register();
         assertThat(RuntimeHintsPredicates.reflection()
-                .onType(TypeReference.of("io.arconia.cli.skills.SkillCatalogRegistry")).test(hints)).isTrue();
+                .onType(TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry")).test(hints)).isTrue();
         assertThat(RuntimeHintsPredicates.reflection()
-                .onType(TypeReference.of("io.arconia.cli.skills.SkillCatalogRegistry$CatalogEntry")).test(hints)).isTrue();
+                .onType(TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry$CollectionEntry")).test(hints)).isTrue();
     }
 
     @Test

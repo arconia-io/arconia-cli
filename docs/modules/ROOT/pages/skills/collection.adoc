@@ -1,0 +1,91 @@
+= `arconia skills collection`
+
+NOTE: The `arconia skills collection` commands are experimental and may change in future releases. They showcase the capabilities of the suggested https://github.com/ThomasVitale/agents-skills-oci-artifacts-spec[Agent Skills OCI Artifacts Specification].
+
+The `arconia skills collection` command manages collections of agent skills. Collections are OCI indexes that list available skills and their locations.
+
+== Commands
+
+=== `add`
+
+Register a collection and fetch its contents into the local cache.
+
+[source,shell]
+----
+arconia skills collection add --name my-collection --ref ghcr.io/org/repo/collection:1.0.0
+----
+
+**Options**
+
+* `--name`: (Required) The alias to assign to the collection.
+* `--ref`: (Required) The OCI artifact reference for the collection index.
+
+=== `list`
+
+List available skills in a collection. You can query a collection by direct OCI reference, by its registered alias, or list all registered collections.
+
+[source,shell]
+----
+arconia skills collection list
+arconia skills collection list --name my-collection
+arconia skills collection list --ref ghcr.io/org/repo/collection:1.0.0
+----
+
+**Options**
+
+* `--name`: The alias of a registered collection to list.
+* `--ref`: The OCI artifact reference for the collection to list.
+
+=== `update`
+
+Check for newer versions of registered collections and update them.
+
+[source,shell]
+----
+arconia skills collection update
+arconia skills collection update --name my-collection
+----
+
+**Options**
+
+* `--name`: The alias of a specific collection to update. If omitted, updates all registered collections.
+
+=== `remove`
+
+Remove a collection from the local Arconia CLI configuration.
+
+[source,shell]
+----
+arconia skills collection remove --name my-collection
+----
+
+**Options**
+
+* `--name`: (Required) The alias of the collection to remove.
+
+=== `push`
+
+Build and push a skills collection as an OCI Index.
+
+[source,shell]
+----
+arconia skills collection push --ref ghcr.io/org/skills-collection --name arconia-io --tag 1.0.0 --skill ghcr.io/org/skills/my-skill:1.0.0
+arconia skills collection push --ref ghcr.io/org/skills-collection --name arconia-io --tag 1.0.0 --from-report publish-skills-report.json
+arconia skills collection push --ref ghcr.io/org/skills-collection --name arconia-io --tag 1.0.0 --skill ghcr.io/org/skills/my-skill:1.0.0 --output-report
+----
+
+**Options**
+
+* `--ref`: (Required) The OCI artifact reference for the collection.
+* `--name`: (Required) The collection identifier.
+* `--tag`: (Required) The semver version tag for the collection.
+* `--additional-tag`: Additional tags to apply to the collection.
+* `--from-report`: Path to a publish report file (from `skills push --output-report`).
+* `--skill`: Explicit skill OCI references to include.
+* `--description`: A short description of the collection.
+* `--annotation`: Extra annotations in key=value format.
+* `--output-report`: Write a publish report file recording the published collection artifact including its immutable digest. Defaults to `publish-skills-collection-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+
+== See Also
+
+* xref:skills/skills.adoc[arconia skills]

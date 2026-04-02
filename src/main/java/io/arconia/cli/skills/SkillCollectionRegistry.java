@@ -15,30 +15,30 @@ import io.arconia.cli.utils.JsonUtils;
 import io.arconia.cli.utils.SystemUtils;
 
 /**
- * User-level registry of known skill catalogs.
+ * User-level registry of known skill collections.
  * <p>
- * Stores catalog registrations in a platform-appropriate config directory:
+ * Stores collection registrations in a platform-appropriate config directory:
  * <ul>
- *   <li>Linux/macOS: {@code ~/.config/arconia/skills/catalogs.json} (XDG standard)</li>
- *   <li>Windows: {@code %APPDATA%\arconia\skills\catalogs.json}</li>
+ *   <li>Linux/macOS: {@code ~/.config/arconia/skills/collections.json} (XDG standard)</li>
+ *   <li>Windows: {@code %APPDATA%\arconia\skills\collections.json}</li>
  *   <li>Overridden by {@code XDG_CONFIG_HOME} if set on any platform</li>
  * </ul>
  * <p>
  * This is a CLI-level concern — not a project-level file — and is NOT intended
- * to be committed to version control. Catalog contents are always fetched live
+ * to be committed to version control. Collection contents are always fetched live
  * from the OCI registry; this file only stores the registered aliases and refs.
  *
- * @param catalogs the list of registered catalog entries
+ * @param collections the list of registered collection entries
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record SkillCatalogRegistry(
-    List<CatalogEntry> catalogs
+public record SkillCollectionRegistry(
+    List<CollectionEntry> collections
 ) {
 
     /**
-     * The filename for the catalog registry.
+     * The filename for the collection registry.
      */
-    public static final String FILENAME = "catalogs.json";
+    public static final String FILENAME = "collections.json";
 
     /**
      * The subdirectory under the user's config home where Arconia CLI stores
@@ -46,12 +46,12 @@ public record SkillCatalogRegistry(
      */
     public static final String CONFIG_SUBDIR = ".config/arconia/skills";
 
-    public SkillCatalogRegistry {
-        Assert.notNull(catalogs, "catalogs cannot be null");
+    public SkillCollectionRegistry {
+        Assert.notNull(collections, "collections cannot be null");
     }
 
     /**
-     * Creates a new builder for {@link SkillCatalogRegistry}.
+     * Creates a new builder for {@link SkillCollectionRegistry}.
      *
      * @return a new builder
      */
@@ -67,32 +67,32 @@ public record SkillCatalogRegistry(
      */
     public Builder mutate() {
         return new Builder()
-            .catalogs(new ArrayList<>(catalogs));
+            .collections(new ArrayList<>(collections));
     }
 
     /**
-     * A registered catalog entry.
+     * A registered collection entry.
      *
-     * @param name a short alias for the catalog (e.g., {@code "arconia"})
-     * @param ref the OCI reference for the catalog (e.g., {@code "ghcr.io/arconia-io/skills-catalog:latest"})
+     * @param name a short alias for the collection (e.g., {@code "arconia"})
+     * @param ref the OCI reference for the collection (e.g., {@code "ghcr.io/arconia-io/skills-collection:latest"})
      * @param digest the immutable manifest digest from the last fetch (e.g., {@code "sha256:abc..."}), or {@code null} if never fetched
      * @param lastFetchedAt ISO 8601 timestamp of the last successful fetch, or {@code null} if never fetched
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record CatalogEntry(
+    public record CollectionEntry(
         String name,
         String ref,
         @Nullable String digest,
         @Nullable String lastFetchedAt
     ) {
 
-        public CatalogEntry {
+        public CollectionEntry {
             Assert.hasText(name, "name cannot be null or empty");
             Assert.hasText(ref, "ref cannot be null or empty");
         }
 
         /**
-         * Creates a new builder for {@link CatalogEntry}.
+         * Creates a new builder for {@link CollectionEntry}.
          *
          * @return a new builder
          */
@@ -115,7 +115,7 @@ public record SkillCatalogRegistry(
         }
 
         /**
-         * Builder for {@link CatalogEntry}.
+         * Builder for {@link CollectionEntry}.
          */
         public static class Builder {
 
@@ -146,8 +146,8 @@ public record SkillCatalogRegistry(
                 return this;
             }
 
-            public CatalogEntry build() {
-                return new CatalogEntry(name, ref, digest, lastFetchedAt);
+            public CollectionEntry build() {
+                return new CollectionEntry(name, ref, digest, lastFetchedAt);
             }
 
         }
@@ -157,14 +157,14 @@ public record SkillCatalogRegistry(
     /**
      * Creates an empty registry.
      *
-     * @return an empty catalog registry
+     * @return an empty collection registry
      */
-    public static SkillCatalogRegistry empty() {
-        return new SkillCatalogRegistry(new ArrayList<>());
+    public static SkillCollectionRegistry empty() {
+        return new SkillCollectionRegistry(new ArrayList<>());
     }
 
     /**
-     * Resolves the path to the catalog registry file.
+     * Resolves the path to the collection registry file.
      * <p>
      * Resolution order:
      * <ol>
@@ -173,7 +173,7 @@ public record SkillCatalogRegistry(
      *   <li>Fallback: {@code ~/.config/arconia/skills/}</li>
      * </ol>
      *
-     * @return the path to the catalog registry file
+     * @return the path to the collection registry file
      */
     public static Path registryPath() {
         Path configDir = resolveConfigDir();
@@ -203,20 +203,20 @@ public record SkillCatalogRegistry(
     }
 
     /**
-     * Loads the catalog registry from the user's config directory.
+     * Loads the collection registry from the user's config directory.
      * Returns an empty registry if the file does not exist.
      *
      * @return the loaded registry
      * @throws IOException if the file cannot be read
      */
-    public static SkillCatalogRegistry load() throws IOException {
+    public static SkillCollectionRegistry load() throws IOException {
         Path path = registryPath();
         if (!Files.exists(path)) {
             return empty();
         }
 
         String json = Files.readString(path);
-        return JsonUtils.getJsonMapper().readValue(json, SkillCatalogRegistry.class);
+        return JsonUtils.getJsonMapper().readValue(json, SkillCollectionRegistry.class);
     }
 
     /**
@@ -233,69 +233,69 @@ public record SkillCatalogRegistry(
     }
 
     /**
-     * Returns a new registry with the given catalog added or updated.
-     * If a catalog with the same name already exists, it is replaced.
+     * Returns a new registry with the given collection added or updated.
+     * If a collection with the same name already exists, it is replaced.
      *
-     * @param entry the catalog entry to add
-     * @return a new registry with the catalog added
+     * @param entry the collection entry to add
+     * @return a new registry with the collection added
      */
-    public SkillCatalogRegistry addCatalog(CatalogEntry entry) {
+    public SkillCollectionRegistry addCollection(CollectionEntry entry) {
         Assert.notNull(entry, "entry cannot be null");
 
-        List<CatalogEntry> updated = new ArrayList<>(catalogs.stream()
+        List<CollectionEntry> updated = new ArrayList<>(collections.stream()
             .filter(c -> !c.name().equals(entry.name()))
             .toList());
         updated.add(entry);
-        return new SkillCatalogRegistry(updated);
+        return new SkillCollectionRegistry(updated);
     }
 
     /**
-     * Returns a new registry with the named catalog removed.
+     * Returns a new registry with the named collection removed.
      *
-     * @param name the catalog name to remove
-     * @return a new registry without the named catalog
+     * @param name the collection name to remove
+     * @return a new registry without the named collection
      */
-    public SkillCatalogRegistry removeCatalog(String name) {
+    public SkillCollectionRegistry removeCollection(String name) {
         Assert.hasText(name, "name cannot be null or empty");
 
-        List<CatalogEntry> updated = new ArrayList<>(catalogs.stream()
+        List<CollectionEntry> updated = new ArrayList<>(collections.stream()
             .filter(c -> !c.name().equals(name))
             .toList());
-        return new SkillCatalogRegistry(updated);
+        return new SkillCollectionRegistry(updated);
     }
 
     /**
-     * Finds a catalog entry by name.
+     * Finds a collection entry by name.
      *
-     * @param name the catalog name
+     * @param name the collection name
      * @return the matching entry, or {@code null} if not found
      */
     @Nullable
-    public CatalogEntry findCatalog(String name) {
+    public CollectionEntry findCollection(String name) {
         Assert.hasText(name, "name cannot be null or empty");
 
-        return catalogs.stream()
+        return collections.stream()
             .filter(c -> c.name().equals(name))
             .findFirst()
             .orElse(null);
     }
 
     /**
-     * Builder for {@link SkillCatalogRegistry}.
+     * Builder for {@link SkillCollectionRegistry}.
      */
     public static class Builder {
 
-        private List<CatalogEntry> catalogs = new ArrayList<>();
+        private List<CollectionEntry> collections = new ArrayList<>();
 
         private Builder() {}
 
-        public Builder catalogs(List<CatalogEntry> catalogs) {
-            this.catalogs = catalogs;
+        public Builder collections(List<CollectionEntry> collections) {
+            this.collections = collections;
             return this;
         }
 
-        public SkillCatalogRegistry build() {
-            return new SkillCatalogRegistry(catalogs);
+        public SkillCollectionRegistry build() {
+            return new SkillCollectionRegistry(collections);
         }
 
     }

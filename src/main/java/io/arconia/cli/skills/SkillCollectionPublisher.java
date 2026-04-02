@@ -21,29 +21,29 @@ import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.GitUtils;
 
 /**
- * Publishes a Skills Catalog as an OCI Image Index to an OCI-compliant registry.
+ * Publishes a Skills Collection as an OCI Image Index to an OCI-compliant registry.
  * <p>
- * Implements the catalog publishing workflow defined in the Agent Skills OCI Artifact
- * Specification. The catalog is an OCI Image Index whose manifest entries
+ * Implements the collection publishing workflow defined in the Agent Skills OCI Artifact
+ * Specification. The collection is an OCI Image Index whose manifest entries
  * reference individual Skill Artifacts by digest, with per-descriptor annotations
- * that enable browsing the catalog without pulling individual skills.
+ * that enable browsing the collection without pulling individual skills.
  */
-public final class SkillCatalogPublisher {
+public final class SkillCollectionPublisher {
 
     private final Registry registry;
 
     /**
-     * Creates a new catalog publisher using the given registry client.
+     * Creates a new collection publisher using the given registry client.
      *
      * @param registry the ORAS registry client
      */
-    public SkillCatalogPublisher(Registry registry) {
+    public SkillCollectionPublisher(Registry registry) {
         Assert.notNull(registry, "registry must not be null");
         this.registry = registry;
     }
 
     /**
-     * A skill reference to include in the catalog, along with its metadata.
+     * A skill reference to include in the collection, along with its metadata.
      *
      * @param name the skill name
      * @param version the skill version
@@ -51,14 +51,14 @@ public final class SkillCatalogPublisher {
      * @param digest the manifest digest
      * @param description optional skill description
      */
-    public record CatalogSkillEntry(
+    public record CollectionSkillEntry(
         String name,
         String version,
         String ref,
         String digest,
         @Nullable String description
     ) {
-        public CatalogSkillEntry {
+        public CollectionSkillEntry {
             Assert.hasText(name, "name cannot be null or empty");
             Assert.hasText(version, "version cannot be null or empty");
             Assert.hasText(ref, "ref cannot be null or empty");
@@ -67,11 +67,11 @@ public final class SkillCatalogPublisher {
     }
 
     /**
-     * Result of a successful catalog publish operation.
+     * Result of a successful collection publish operation.
      *
-     * @param ref the catalog reference including the resolved digest
+     * @param ref the collection reference including the resolved digest
      * @param index the OCI Index that was pushed
-     * @param skillCount the number of skills in the catalog
+     * @param skillCount the number of skills in the collection
      */
     public record PublishResult(
         String ref,
@@ -87,29 +87,29 @@ public final class SkillCatalogPublisher {
     }
 
     /**
-     * Publishes a catalog from a {@link ArtifactPublishReport} produced by a push operation.
+     * Publishes a collection from a {@link ArtifactPublishReport} produced by a push operation.
      * <p>
      * The publish report already contains all necessary metadata (names, refs, versions,
      * digests), so no additional registry calls are needed to resolve skill manifests.
      *
      * @param report the publish report from a prior push (single or batch)
-     * @param catalogRef the target OCI reference for the catalog
-     * @param catalogName the catalog identifier
-     * @param catalogVersion the version to use for the catalog itself
+     * @param collectionRef the target OCI reference for the collection
+     * @param collectionName the collection identifier
+     * @param collectionVersion the version to use for the collection itself
      * @param extraAnnotations additional annotations to include, or {@code null}
      * @return the result of the publish operation
      */
-    public PublishResult publishFromReport(ArtifactPublishReport report, ContainerRef catalogRef,
-                                            String catalogName, String catalogVersion,
+    public PublishResult publishFromReport(ArtifactPublishReport report, ContainerRef collectionRef,
+                                            String collectionName, String collectionVersion,
                                             Map<String, String> extraAnnotations) {
         Assert.notNull(report, "report cannot be null");
-        Assert.notNull(catalogRef, "catalogRef cannot be null");
-        Assert.hasText(catalogName, "catalogName cannot be null or empty");
-        Assert.hasText(catalogVersion, "catalogVersion cannot be null or empty");
+        Assert.notNull(collectionRef, "collectionRef cannot be null");
+        Assert.hasText(collectionName, "collectionName cannot be null or empty");
+        Assert.hasText(collectionVersion, "collectionVersion cannot be null or empty");
         Assert.notNull(extraAnnotations, "extraAnnotations cannot be null");
 
-        List<CatalogSkillEntry> entries = report.artifacts().stream()
-            .map(s -> new CatalogSkillEntry(
+        List<CollectionSkillEntry> entries = report.artifacts().stream()
+            .map(s -> new CollectionSkillEntry(
                 s.name(),
                 s.version(),
                 s.ref(),
@@ -118,31 +118,31 @@ public final class SkillCatalogPublisher {
             ))
             .toList();
 
-        return publish(entries, catalogRef, catalogName, catalogVersion, extraAnnotations);
+        return publish(entries, collectionRef, collectionName, collectionVersion, extraAnnotations);
     }
 
     /**
-     * Publishes a catalog from a list of explicit skill OCI references.
+     * Publishes a collection from a list of explicit skill OCI references.
      * <p>
      * For each skill reference, the manifest is fetched from the registry to
      * resolve the digest and extract annotations (name, version, description).
      *
      * @param skillRefs the list of skill OCI references (e.g., {@code ghcr.io/org/skills/pull-request:1.2.0})
-     * @param catalogRef the target OCI reference for the catalog
-     * @param catalogName the catalog identifier
-     * @param catalogVersion the catalog version
+     * @param collectionRef the target OCI reference for the collection
+     * @param collectionName the collection identifier
+     * @param collectionVersion the collection version
      * @return the result of the publish operation
      */
-    public PublishResult publishFromRefs(List<String> skillRefs, ContainerRef catalogRef,
-                                          String catalogName, String catalogVersion,
+    public PublishResult publishFromRefs(List<String> skillRefs, ContainerRef collectionRef,
+                                          String collectionName, String collectionVersion,
                                           Map<String, String> extraAnnotations) {
         Assert.notNull(skillRefs, "skillRefs cannot be null");
-        Assert.notNull(catalogRef, "catalogRef cannot be null");
-        Assert.hasText(catalogName, "catalogName cannot be null or empty");
-        Assert.hasText(catalogVersion, "catalogVersion cannot be null or empty");
+        Assert.notNull(collectionRef, "collectionRef cannot be null");
+        Assert.hasText(collectionName, "collectionName cannot be null or empty");
+        Assert.hasText(collectionVersion, "collectionVersion cannot be null or empty");
         Assert.notNull(extraAnnotations, "extraAnnotations cannot be null");
 
-        List<CatalogSkillEntry> entries = new ArrayList<>();
+        List<CollectionSkillEntry> entries = new ArrayList<>();
 
         for (String ref : skillRefs) {
             ContainerRef skillContainerRef = ContainerRef.parse(ref);
@@ -153,20 +153,20 @@ public final class SkillCatalogPublisher {
 
             String fallbackName = SkillRef.parse(ref).skillName();
             String name = annotations != null ? annotations.getOrDefault(SkillAnnotations.SKILL_NAME, fallbackName) : fallbackName;
-            String version = annotations != null ? annotations.getOrDefault(SkillAnnotations.OCI_VERSION, catalogVersion) : catalogVersion;
+            String version = annotations != null ? annotations.getOrDefault(SkillAnnotations.OCI_VERSION, collectionVersion) : collectionVersion;
             String description = annotations != null ? annotations.get(SkillAnnotations.OCI_DESCRIPTION) : null;
 
-            entries.add(new CatalogSkillEntry(name, version, ref, digest, description));
+            entries.add(new CollectionSkillEntry(name, version, ref, digest, description));
         }
 
-        return publish(entries, catalogRef, catalogName, catalogVersion, extraAnnotations);
+        return publish(entries, collectionRef, collectionName, collectionVersion, extraAnnotations);
     }
 
     /**
      * Core publish logic: builds the OCI Index from skill entries and pushes it.
      */
-    private PublishResult publish(List<CatalogSkillEntry> entries, ContainerRef catalogRef,
-                                   String catalogName, String catalogVersion,
+    private PublishResult publish(List<CollectionSkillEntry> entries, ContainerRef collectionRef,
+                                   String collectionName, String collectionVersion,
                                    Map<String, String> extraAnnotations) {
         // 1. Build ManifestDescriptors for each skill
         List<ManifestDescriptor> descriptors = entries.stream()
@@ -175,13 +175,13 @@ public final class SkillCatalogPublisher {
 
         // 2. Build the OCI Index
         // Note: OCI Image Index does not support a config descriptor per the spec.
-        // Catalog metadata is conveyed via annotations on the index and its manifest descriptors.
+        // Collection metadata is conveyed via annotations on the index and its manifest descriptors.
         Index index = Index.fromManifests(descriptors)
-            .withArtifactType(ArtifactType.from(SkillMediaTypes.CATALOG_ARTIFACT_TYPE))
-            .withAnnotations(buildCatalogAnnotations(catalogName, catalogVersion, extraAnnotations));
+            .withArtifactType(ArtifactType.from(SkillMediaTypes.COLLECTION_ARTIFACT_TYPE))
+            .withAnnotations(buildCollectionAnnotations(collectionName, collectionVersion, extraAnnotations));
 
         // 3. Push the index
-        Index pushed = registry.pushIndex(catalogRef, index);
+        Index pushed = registry.pushIndex(collectionRef, index);
 
         // Resolve the digest from the ManifestDescriptor set by the registry response.
         // Note: Index does not override getDigest() like Manifest does, so we must
@@ -193,7 +193,7 @@ public final class SkillCatalogPublisher {
         // The post-push Index object may have extra fields (e.g. digest)
         // that alter the JSON, causing a different digest on re-push.
         return new PublishResult(
-            "%s@%s".formatted(catalogRef, digest),
+            "%s@%s".formatted(collectionRef, digest),
             digest,
             index,
             entries.size()
@@ -201,10 +201,10 @@ public final class SkillCatalogPublisher {
     }
 
     /**
-     * Tags an already-published catalog index with an additional tag.
+     * Tags an already-published collection index with an additional tag.
      *
      * @param previousResult the result from a prior publish call
-     * @param baseRef the base catalog reference without tag or digest (e.g., {@code ghcr.io/org/skills-catalog})
+     * @param baseRef the base collection reference without tag or digest (e.g., {@code ghcr.io/org/skills-collection})
      * @param newTag the additional tag to apply
      * @return the index as stored under the new tag
      */
@@ -220,7 +220,7 @@ public final class SkillCatalogPublisher {
     /**
      * Builds a {@link ManifestDescriptor} for a skill entry with enriched annotations.
      */
-    private ManifestDescriptor buildManifestDescriptor(CatalogSkillEntry entry) {
+    private ManifestDescriptor buildManifestDescriptor(CollectionSkillEntry entry) {
         Map<String, String> annotations = new LinkedHashMap<>();
         annotations.put(SkillAnnotations.SKILL_NAME, entry.name());
         annotations.put(SkillAnnotations.OCI_VERSION, entry.version());
@@ -244,22 +244,22 @@ public final class SkillCatalogPublisher {
     }
 
     /**
-     * Builds catalog-level annotations for the OCI Index.
+     * Builds collection-level annotations for the OCI Index.
      * <p>
-     * Includes standard OCI annotations, catalog-specific annotations,
+     * Includes standard OCI annotations, collection-specific annotations,
      * auto-detected git metadata (source URL and revision), and any
      * user-provided extra annotations.
      * <p>
      * Precedence (highest wins): extra annotations &gt; auto-detected &gt; defaults.
      */
-    private Map<String, String> buildCatalogAnnotations(String catalogName, String catalogVersion, Map<String, String> extraAnnotations) {
+    private Map<String, String> buildCollectionAnnotations(String collectionName, String collectionVersion, Map<String, String> extraAnnotations) {
         Map<String, String> annotations = new LinkedHashMap<>();
 
         // Standard OCI annotations
         annotations.put(SkillAnnotations.OCI_CREATED, DateTimeUtils.nowIso());
-        annotations.put(SkillAnnotations.OCI_TITLE, catalogName);
-        annotations.put(SkillAnnotations.OCI_DESCRIPTION, "Agent Skills Catalog");
-        annotations.put(SkillAnnotations.OCI_VERSION, catalogVersion);
+        annotations.put(SkillAnnotations.OCI_TITLE, collectionName);
+        annotations.put(SkillAnnotations.OCI_DESCRIPTION, "Agent Skills Collection");
+        annotations.put(SkillAnnotations.OCI_VERSION, collectionVersion);
 
         // Auto-detect source and revision from git (best-effort, uses current directory)
         String remoteUrl = GitUtils.getRemoteUrl(null);
@@ -271,8 +271,8 @@ public final class SkillCatalogPublisher {
             annotations.put(SkillAnnotations.OCI_REVISION, revision);
         }
 
-        // Catalog-specific annotations
-        annotations.put(SkillAnnotations.CATALOG_NAME, catalogName);
+        // Collection-specific annotations
+        annotations.put(SkillAnnotations.COLLECTION_NAME, collectionName);
 
         // User-provided annotations override everything
         if (!CollectionUtils.isEmpty(extraAnnotations)) {

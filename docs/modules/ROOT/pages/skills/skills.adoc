@@ -1,6 +1,6 @@
 = `arconia skills`
 
-NOTE: The `arconia skills` commands are experimental and may change in future releases. They showcase the capabilities of the suggested [Agent Skills OCI Artifacts Specification](https://github.com/ThomasVitale/agents-skills-oci-artifacts-spec).
+NOTE: The `arconia skills` commands are experimental and may change in future releases. They showcase the capabilities of the suggested https://github.com/ThomasVitale/agents-skills-oci-artifacts-spec[Agent Skills OCI Artifacts Specification].
 
 The `arconia skills` command allows you to manage agent skills for your project. Agent skills are distributed as OCI artifacts.
 
@@ -8,7 +8,7 @@ The `arconia skills` command allows you to manage agent skills for your project.
 
 === `add`
 
-Add agent skills to your project. You must provide either direct OCI references or lookup names from a registered catalog.
+Add agent skills to your project. You must provide either direct OCI references or lookup names from a registered collection.
 
 [source,shell]
 ----
@@ -19,8 +19,8 @@ arconia skills add --name my-skill
 **Options**
 
 * `--ref`: The OCI artifact reference for the agent skill. Can be specified multiple times.
-* `--name`: The skill name to look up from a registered catalog. Can be specified multiple times.
-* `--catalog`: The registered catalog alias to search. If omitted, searches all registered catalogs.
+* `--name`: The skill name to look up from a registered collection. Can be specified multiple times.
+* `--collection`: The registered collection alias to search. If omitted, searches all registered collections.
 * `--project-dir`: The project root directory (defaults to the current working directory).
 
 === `install`
@@ -99,8 +99,8 @@ arconia skills push --all --ref ghcr.io/org/repo/skills --path skills/ --tag 1.0
 * `--additional-tag`: Additional tags to apply to the artifact.
 * `--annotation`: Extra annotations in key=value format.
 * `--all`: Discover and push all skills found as direct subdirectories of `--path`.
-* `--output-report`: Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as catalog pushing (`skills catalog push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+* `--output-report`: Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as collection pushing (`skills collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
 
 == See Also
 
-* xref:skills/catalog.adoc[arconia skills catalog]
+* xref:skills/collection.adoc[arconia skills collection]

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * Formats skill and catalog data into aligned tabular text for CLI output.
+ * Formats skill and collection data into aligned tabular text for CLI output.
  * <p>
  * Produces a list of formatted lines (header + rows) that the calling command
  * can print via its own output mechanism, keeping presentation logic separate
@@ -56,7 +56,7 @@ public final class SkillTableFormatter {
         return lines;
     }
 
-    // ---- Catalog skills table (from SkillSummary) ----
+    // ---- Collection skills table (from SkillSummary) ----
 
     /**
      * Formats a list of skill summaries into an aligned table.
@@ -64,7 +64,7 @@ public final class SkillTableFormatter {
      * @param skills the skill summaries to format
      * @return the formatted table lines (header + one row per skill)
      */
-    public static List<String> formatCatalogSkills(List<SkillCatalogService.SkillSummary> skills) {
+    public static List<String> formatCollectionSkills(List<SkillCollectionService.SkillSummary> skills) {
         Assert.notNull(skills, "skills cannot be null");
 
         List<String> lines = new ArrayList<>();
@@ -72,7 +72,7 @@ public final class SkillTableFormatter {
         // Compute column widths
         int nameWidth = "NAME".length();
         int versionWidth = "VERSION".length();
-        for (SkillCatalogService.SkillSummary skill : skills) {
+        for (SkillCollectionService.SkillSummary skill : skills) {
             nameWidth = Math.max(nameWidth, skill.name().length());
             if (skill.version() != null) {
                 versionWidth = Math.max(versionWidth, skill.version().length());
@@ -82,7 +82,7 @@ public final class SkillTableFormatter {
         String rowFormat = "  %-" + nameWidth + "s  %-" + versionWidth + "s  %s";
         lines.add(rowFormat.formatted("NAME", "VERSION", "DESCRIPTION"));
 
-        for (SkillCatalogService.SkillSummary skill : skills) {
+        for (SkillCollectionService.SkillSummary skill : skills) {
             String version = skill.version() != null ? skill.version() : "";
             String description = skill.description() != null ? skill.description() : "";
             lines.add(rowFormat.formatted(skill.name(), version, description));
@@ -97,11 +97,11 @@ public final class SkillTableFormatter {
      * @param skills the skill summaries
      * @return the maximum name width (at least as wide as "NAME")
      */
-    public static int computeNameWidth(List<SkillCatalogService.SkillSummary> skills) {
+    public static int computeNameWidth(List<SkillCollectionService.SkillSummary> skills) {
         Assert.notNull(skills, "skills cannot be null");
 
         int nameWidth = "NAME".length();
-        for (SkillCatalogService.SkillSummary skill : skills) {
+        for (SkillCollectionService.SkillSummary skill : skills) {
             nameWidth = Math.max(nameWidth, skill.name().length());
         }
         return nameWidth;

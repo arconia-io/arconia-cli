@@ -62,16 +62,16 @@ public final class SkillAnnotations {
     public static final String SKILL_COMPATIBILITY = "io.agentskills.skill.compatibility";
 
     /**
-     * Canonical tag-based reference for a skill within a catalog.
+     * Canonical tag-based reference for a skill within a collection.
      */
     public static final String SKILL_REF = "io.agentskills.skill.ref";
 
-    // --- Catalog annotations (io.agentskills.catalog.*) ---
+    // --- Collection annotations (io.agentskills.collection.*) ---
 
     /**
-     * Unique identifier for a catalog.
+     * Unique identifier for a collection.
      */
-    public static final String CATALOG_NAME = "io.agentskills.catalog.name";
+    public static final String COLLECTION_NAME = "io.agentskills.collection.name";
 
 
 }

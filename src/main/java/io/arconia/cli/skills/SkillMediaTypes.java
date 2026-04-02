@@ -26,8 +26,8 @@ public final class SkillMediaTypes {
     public static final String SKILL_CONTENT_LAYER = "application/vnd.agentskills.skill.content.v1.tar+gzip";
 
     /**
-     * Artifact type for a skills catalog index.
+     * Artifact type for a skills collection index.
      */
-    public static final String CATALOG_ARTIFACT_TYPE = "application/vnd.agentskills.catalog.v1";
+    public static final String COLLECTION_ARTIFACT_TYPE = "application/vnd.agentskills.collection.v1";
 
 }

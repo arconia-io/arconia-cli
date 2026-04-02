@@ -16,19 +16,19 @@ import io.arconia.cli.utils.JsonUtils;
 import io.arconia.cli.utils.SystemUtils;
 
 /**
- * Local cache of catalog contents, stored under the platform-appropriate cache directory.
+ * Local cache of collection contents, stored under the platform-appropriate cache directory.
  * <p>
  * Cache location:
  * <ul>
- *   <li>Linux/macOS: {@code ~/.cache/arconia/skills/<catalog-name>.json} (XDG standard)</li>
- *   <li>Windows: {@code %LOCALAPPDATA%\arconia\skills\<catalog-name>.json}</li>
+ *   <li>Linux/macOS: {@code ~/.cache/arconia/skills/<collection-name>.json} (XDG standard)</li>
+ *   <li>Windows: {@code %LOCALAPPDATA%\arconia\skills\<collection-name>.json}</li>
  *   <li>Overridden by {@code XDG_CACHE_HOME} if set on any platform</li>
  * </ul>
  * <p>
  * The cache is disposable — it can be safely deleted at any time and will be
  * regenerated on the next fetch.
  */
-public final class SkillCatalogCache {
+public final class SkillCollectionCache {
 
     /**
      * Default cache TTL: 24 hours.
@@ -40,33 +40,33 @@ public final class SkillCatalogCache {
      */
     public static final String CACHE_SUBDIR = ".cache/arconia/skills";
 
-    private SkillCatalogCache() {}
+    private SkillCollectionCache() {}
 
     /**
-     * A cached catalog entry containing the skills list and metadata.
+     * A cached collection entry containing the skills list and metadata.
      *
-     * @param catalogName the catalog name/alias
-     * @param catalogVersion the catalog version (may be {@code null})
-     * @param description the catalog description (may be {@code null})
+     * @param collectionName the collection name/alias
+     * @param collectionVersion the collection version (may be {@code null})
+     * @param description the collection description (may be {@code null})
      * @param skills the list of cached skill entries
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record CachedCatalog(
-        String catalogName,
-        @Nullable String catalogVersion,
+    public record CachedCollection(
+        String collectionName,
+        @Nullable String collectionVersion,
         @Nullable String description,
         List<CachedSkill> skills
     ) {
 
-        public CachedCatalog {
-            Assert.hasText(catalogName, "catalogName cannot be null or be empty");
+        public CachedCollection {
+            Assert.hasText(collectionName, "collectionName cannot be null or be empty");
             Assert.notNull(skills, "skills cannot be null");
         }
 
     }
 
     /**
-     * A cached skill entry within a catalog.
+     * A cached skill entry within a collection.
      *
      * @param name the skill name
      * @param version the skill version (may be {@code null})
@@ -121,66 +121,66 @@ public final class SkillCatalogCache {
     }
 
     /**
-     * Returns the path to the cache file for a given catalog name.
+     * Returns the path to the cache file for a given collection name.
      *
-     * @param catalogName the catalog name
+     * @param collectionName the collection name
      * @return the cache file path
      */
-    public static Path cacheFile(String catalogName) {
-        Assert.hasText(catalogName, "catalogName must not be empty");
-        return cacheDir().resolve(catalogName + ".json");
+    public static Path cacheFile(String collectionName) {
+        Assert.hasText(collectionName, "collectionName must not be empty");
+        return cacheDir().resolve(collectionName + ".json");
     }
 
     /**
-     * Loads a cached catalog by name.
+     * Loads a cached collection by name.
      *
-     * @param catalogName the catalog name
-     * @return the cached catalog, or {@code null} if not cached
+     * @param collectionName the collection name
+     * @return the cached collection, or {@code null} if not cached
      * @throws IOException if the cache file cannot be read
      */
     @Nullable
-    public static CachedCatalog load(String catalogName) throws IOException {
-        Assert.hasText(catalogName, "catalogName cannot be empty");
+    public static CachedCollection load(String collectionName) throws IOException {
+        Assert.hasText(collectionName, "collectionName cannot be empty");
 
-        Path path = cacheFile(catalogName);
+        Path path = cacheFile(collectionName);
         if (!Files.exists(path)) {
             return null;
         }
 
         String json = Files.readString(path);
-        return JsonUtils.getJsonMapper().readValue(json, CachedCatalog.class);
+        return JsonUtils.getJsonMapper().readValue(json, CachedCollection.class);
     }
 
     /**
-     * Saves a catalog to the cache.
+     * Saves a collection to the cache.
      *
-     * @param catalogName the catalog name (used as the filename)
-     * @param catalog the catalog data to cache
+     * @param collectionName the collection name (used as the filename)
+     * @param collection the collection data to cache
      * @throws IOException if the cache file cannot be written
      */
-    public static void save(String catalogName, CachedCatalog catalog) throws IOException {
-        Assert.hasText(catalogName, "catalogName cannot be null or be empty");
-        Assert.notNull(catalog, "catalog cannot be null");
+    public static void save(String collectionName, CachedCollection collection) throws IOException {
+        Assert.hasText(collectionName, "collectionName cannot be null or be empty");
+        Assert.notNull(collection, "collection cannot be null");
 
-        Path path = cacheFile(catalogName);
+        Path path = cacheFile(collectionName);
         Files.createDirectories(path.getParent());
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(catalog);
+        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(collection);
         Files.writeString(path, json + "\n");
     }
 
     /**
-     * Deletes the cache file for a given catalog.
+     * Deletes the cache file for a given collection.
      *
-     * @param catalogName the catalog name
+     * @param collectionName the collection name
      * @throws IOException if the file cannot be deleted
      */
-    public static void delete(String catalogName) throws IOException {
-        Assert.hasText(catalogName, "catalogName cannot be empty");
-        Files.deleteIfExists(cacheFile(catalogName));
+    public static void delete(String collectionName) throws IOException {
+        Assert.hasText(collectionName, "collectionName cannot be empty");
+        Files.deleteIfExists(cacheFile(collectionName));
     }
 
     /**
-     * Checks whether a catalog's cache is still fresh based on the
+     * Checks whether a collection's cache is still fresh based on the
      * {@code lastFetchedAt} timestamp in the registry entry.
      *
      * @param lastFetchedAt the ISO 8601 timestamp from the registry entry, or {@code null}
@@ -201,40 +201,40 @@ public final class SkillCatalogCache {
     }
 
     /**
-     * Converts a {@link SkillCatalogReader.CatalogInfo} (fetched from registry)
-     * into a {@link CachedCatalog} for local storage.
+     * Converts a {@link SkillCollectionReader.CollectionInfo} (fetched from registry)
+     * into a {@link CachedCollection} for local storage.
      *
-     * @param info the catalog info from the registry
-     * @return the cached catalog representation
+     * @param info the collection info from the registry
+     * @return the cached collection representation
      */
-    public static CachedCatalog fromCatalogInfo(SkillCatalogReader.CatalogInfo info) {
+    public static CachedCollection fromCollectionInfo(SkillCollectionReader.CollectionInfo info) {
         Assert.notNull(info, "info cannot be null");
 
         List<CachedSkill> skills = info.skills().stream()
             .map(s -> new CachedSkill(s.name(), s.version(), s.description(), s.ref(), s.digest()))
             .toList();
 
-        return new CachedCatalog(
-            info.catalogName() != null ? info.catalogName() : "unknown",
-            info.catalogVersion(),
+        return new CachedCollection(
+            info.collectionName() != null ? info.collectionName() : "unknown",
+            info.collectionVersion(),
             info.description(),
             skills
         );
     }
 
     /**
-     * Finds a skill by name across a cached catalog.
+     * Finds a skill by name across a cached collection.
      *
-     * @param catalog the cached catalog to search
+     * @param collection the cached collection to search
      * @param skillName the skill name to find
      * @return the matching skill, or {@code null} if not found
      */
     @Nullable
-    public static CachedSkill findSkill(CachedCatalog catalog, String skillName) {
-        Assert.notNull(catalog, "catalog cannot be null");
+    public static CachedSkill findSkill(CachedCollection collection, String skillName) {
+        Assert.notNull(collection, "collection cannot be null");
         Assert.hasText(skillName, "skillName cannot be null or empty");
 
-        return catalog.skills().stream()
+        return collection.skills().stream()
             .filter(s -> s.name().equals(skillName))
             .findFirst()
             .orElse(null);

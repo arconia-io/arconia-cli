@@ -17,7 +17,7 @@
 ** xref:update/spring-boot.adoc[arconia update spring-boot]
 * Skills
 ** xref:skills/skills.adoc[arconia skills]
-** xref:skills/catalog.adoc[arconia skills catalog]
+** xref:skills/collection.adoc[arconia skills collection]
 * xref:security.adoc[Security]
 * Contributing
 ** xref:contributing/development.adoc[Development]

@@ -24,8 +24,8 @@ class ArtifactPublishReportTests {
     }
 
     @Test
-    void defaultCatalogFilenameIsCorrect() {
-        assertThat(ArtifactPublishReport.DEFAULT_CATALOG_FILENAME).isEqualTo("publish-skills-catalog-report.json");
+    void defaultCollectionFilenameIsCorrect() {
+        assertThat(ArtifactPublishReport.DEFAULT_COLLECTION_FILENAME).isEqualTo("publish-skills-collection-report.json");
     }
 
     @Test
