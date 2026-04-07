@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.JsonUtils;
+import io.arconia.cli.json.JsonParser;
 
 /**
  * The {@code skills.json} intent file declaring which agent skills a project requires.
@@ -194,7 +194,7 @@ public record SkillsManifest(
         }
 
         String json = Files.readString(manifestPath);
-        return JsonUtils.getJsonMapper().readValue(json, SkillsManifest.class);
+        return JsonParser.fromJson(json, SkillsManifest.class);
     }
 
     /**
@@ -207,7 +207,7 @@ public record SkillsManifest(
         Assert.notNull(projectRoot, "projectRoot cannot be null");
 
         Path manifestPath = projectRoot.resolve(FILENAME);
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        String json = JsonParser.toJsonPrettyPrint(this);
         Files.writeString(manifestPath, json + "\n");
     }
 

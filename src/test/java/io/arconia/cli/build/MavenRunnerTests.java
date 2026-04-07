@@ -12,11 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
+
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.openrewrite.RewriteArguments;
 import io.arconia.cli.openrewrite.UpdateArguments;
-import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -161,8 +162,7 @@ class MavenRunnerTests {
             .build();
         var command = runner.constructRewriteCommand(options);
 
-        assertThat(command).contains("-Drewrite.recipeArtifactCoordinates=org.example:my-recipes:2.0.0");
-    }
+        assertThat(command).anySatisfy(arg -> assertThat(arg).contains("org.example:my-recipes:2.0.0"));    }
 
     // -- constructUpdateCommand tests --
 

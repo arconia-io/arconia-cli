@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.JsonUtils;
+import io.arconia.cli.json.JsonParser;
 
 /**
  * The {@code skills.lock.json} lock file recording the exact installation state of every
@@ -371,7 +371,7 @@ public record SkillsLockfile(
         }
 
         String json = Files.readString(lockfilePath);
-        return JsonUtils.getJsonMapper().readValue(json, SkillsLockfile.class);
+        return JsonParser.fromJson(json, SkillsLockfile.class);
     }
 
     /**
@@ -384,7 +384,7 @@ public record SkillsLockfile(
         Assert.notNull(projectRoot, "projectRoot cannot be null");
 
         Path lockfilePath = projectRoot.resolve(FILENAME);
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        String json = JsonParser.toJsonPrettyPrint(this);
         Files.writeString(lockfilePath, json + "\n");
     }
 

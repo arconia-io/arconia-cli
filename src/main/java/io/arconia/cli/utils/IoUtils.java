@@ -3,6 +3,7 @@ package io.arconia.cli.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,8 +11,10 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -21,24 +24,142 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+/**
+ * Utility methods for file system operations.
+ */
 public final class IoUtils {
+
+    public static final String TEMP_DIR_PREFIX = ".arconia-tmp-";
 
     private IoUtils() {}
 
+    /**
+     * Returns the path to the project directory.
+     */
     public static Path getProjectPath() {
         return getProjectPath(null);
     }
 
+    /**
+     * Returns the path to the project directory for the given path.
+     */
     public static Path getProjectPath(@Nullable String path) {
         if (StringUtils.hasText(path)) {
-            return Path.of(path);
+            return Path.of(path).toAbsolutePath();
         }
 
         return getWorkingDirectory();
     }
 
+    /**
+     * Returns the path to the current working directory.
+     */
     public static Path getWorkingDirectory() {
         return Path.of(System.getProperty("user.dir")).toAbsolutePath();
+    }
+
+    /**
+     * Discovers all subdirectories under the given parent directory that contain a file
+     * with the given name.
+     */
+    public static List<Path> discoverSubDirectoriesWithFile(Path parentPath, String fileName) throws IOException {
+        Assert.notNull(parentPath, "parentPath cannot be null");
+        Assert.hasText(fileName, "fileName cannot be null or empty");
+
+        List<Path> projectDirs = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(parentPath)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry) && Files.exists(entry.resolve(fileName))) {
+                    projectDirs.add(entry);
+                }
+            }
+        }
+        projectDirs.sort(Path::compareTo);
+        return projectDirs;
+    }
+
+    /**
+     * Recursively deletes empty directories starting from the given directory.
+     * <p>
+     * Traverses depth-first so that after a nested empty directory is removed,
+     * its now-empty parent is also eligible for deletion.
+     * Only directories that contain no remaining entries are deleted; directories
+     * that still contain files or non-empty subdirectories are left untouched.
+     */
+    public static void deleteEmptyDirectoriesRecursively(Path directory) throws IOException {
+        Assert.notNull(directory, "directory cannot be null");
+
+        Path normalizedDir = directory.toAbsolutePath().normalize();
+
+        if (!Files.isDirectory(normalizedDir)) {
+            return;
+        }
+
+        try (Stream<Path> walk = Files.walk(normalizedDir)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .filter(Files::isDirectory)
+                    .forEach(dir -> {
+                        try (Stream<Path> contents = Files.list(dir)) {
+                            if (contents.findAny().isEmpty()) {
+                                Files.deleteIfExists(dir);
+                            }
+                        }
+                        catch (IOException ignored) {
+                            // Best-effort: continue on failure.
+                        }
+                    });
+        }
+    }
+
+    /**
+     * Copies a file from the classpath to a temporary file.
+     */
+    public static Path copyFileToTemp(String resourcePath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(resourcePath);
+
+        if (!resource.exists()) {
+            throw new IOException("File not found: " + resourcePath);
+        }
+
+        Path tempFile = createTempFile("temp-", "-" + resourcePath.substring(resourcePath.lastIndexOf('/') + 1));
+        tempFile.toFile().deleteOnExit();
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return tempFile;
+    }
+
+    /**
+     * Creates a temporary file with owner-only permissions.
+     */
+    public static Path createTempFile(String prefix, String suffix) throws IOException {
+        if (isPosixFileSystem()) {
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions
+                    .asFileAttribute(PosixFilePermissions.fromString("rw-------"));
+            return Files.createTempFile(prefix, suffix, attr);
+        }
+        return Files.createTempFile(prefix, suffix);
+    }
+
+    private static boolean isPosixFileSystem() {
+        return FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    }
+
+    //------
+
+    /**
+     * Finds the first {@code *.tar.gz} file in the given directory.
+     */
+    public static Path findTarGzFile(Path directory) throws IOException {
+        Assert.notNull(directory, "directory cannot be null");
+        try (var stream = Files.newDirectoryStream(directory, "*.tar.gz")) {
+            for (Path entry : stream) {
+                return entry;
+            }
+        }
+        throw new IOException("No tar.gz file found in directory: " + directory);
     }
 
     @Nullable
@@ -278,69 +399,40 @@ public final class IoUtils {
         return parent.toString();
     }
 
-    public static Path copyFileToTemp(String resourcePath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(resourcePath);
-
-        if (!resource.exists()) {
-            throw new IOException("File not found: " + resourcePath);
-        }
-
-        Path tempFile = createTempFile("temp-", "-" + resourcePath.substring(resourcePath.lastIndexOf('/') + 1));
-        tempFile.toFile().deleteOnExit();
-
-        try (InputStream inputStream = resource.getInputStream()) {
-            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        return tempFile;
-    }
-
     /**
-     * Creates a temporary directory with owner-only permissions under the given parent
-     * directory.
-     *
-     * @param parentDir the parent directory in which to create the temp directory
-     * @param prefix the prefix for the temporary directory name
-     * @return the path to the created temporary directory
-     * @throws IOException if the directory cannot be created
+     * Creates a temporary directory with owner-only permissions under the given parent directory.
      */
-    public static Path createTempDirectory(Path parentDir, String prefix) throws IOException {
-        Assert.notNull(parentDir, "parentDir must not be null");
-        Assert.hasText(prefix, "prefix must not be empty");
-        Files.createDirectories(parentDir);
+    public static Path createTempDirectory(Path parentDirectory) throws IOException {
+        Assert.notNull(parentDirectory, "parentDirectory cannot be null");
+
+        String prefix = TEMP_DIR_PREFIX;
+        Files.createDirectories(parentDirectory);
         if (isPosixFileSystem()) {
-            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions
-                .asFileAttribute(PosixFilePermissions.fromString("rwx------"));
-            return Files.createTempDirectory(parentDir, prefix, attr);
+            FileAttribute<Set<PosixFilePermission>> attr = ownerOnlyDirPosixAttribute();
+            return Files.createTempDirectory(parentDirectory, prefix, attr);
         }
-        return Files.createTempDirectory(parentDir, prefix);
+        return Files.createTempDirectory(parentDirectory, prefix);
     }
 
     /**
-     * Safely deletes a temporary directory and all its contents.
+     * Safely deletes a temporary directory and all its contents on a best-effort basis.
      * <p>
-     * Enforces that the directory is a direct child of the expected parent to prevent
-     * accidental deletion of unrelated directories.
-     *
-     * @param tempDir the temporary directory to delete
-     * @param expectedParent the parent directory that must contain the temp directory
-     * @throws IOException if the directory cannot be deleted
-     * @throws IllegalArgumentException if the temp directory is not a direct child of the
-     * expected parent
+     * Enforces that the directory name starts with the expected temp prefix to prevent
+     * accidental deletion of unrelated directories. Individual entry deletions are
+     * best-effort: failures are ignored so that a partially cleaned-up temp directory
+     * does not surface as an error to the user. Given the explicit prefix naming convention,
+     * a partially cleaned-up directory can be recognized by the user and manually removed.
      */
-    public static void deleteTempDirectory(Path tempDir, Path expectedParent) throws IOException {
+    public static void deleteTempDirectory(Path tempDir) throws IOException {
         Assert.notNull(tempDir, "tempDir must not be null");
-        Assert.notNull(expectedParent, "expectedParent must not be null");
 
         Path normalizedTempDir = tempDir.toAbsolutePath().normalize();
-        Path normalizedParent = expectedParent.toAbsolutePath().normalize();
 
-        // Safety check: must be a direct child of the expected parent
-        if (normalizedTempDir.getParent() == null
-                || !normalizedTempDir.getParent().equals(normalizedParent)) {
+        String dirName = normalizedTempDir.getFileName() != null ? normalizedTempDir.getFileName().toString() : "";
+        if (!dirName.startsWith(TEMP_DIR_PREFIX)) {
             throw new IllegalArgumentException(
-                "Refusing to delete '%s': not a direct child of '%s'".formatted(
-                    normalizedTempDir, normalizedParent));
+                "Refusing to delete '%s': directory name does not start with '%s'"
+                    .formatted(normalizedTempDir, TEMP_DIR_PREFIX));
         }
 
         if (!Files.exists(normalizedTempDir)) {
@@ -353,32 +445,19 @@ public final class IoUtils {
                     try {
                         Files.deleteIfExists(path);
                     }
-                    catch (IOException e) {
-                        // Best-effort: continue on failure
+                    catch (IOException ignored) {
+                        // Best-effort: a leftover temp file is cosmetic, not a failure.
                     }
                 });
         }
     }
 
-    /**
-     * Creates a temporary file with owner-only permissions.
-     *
-     * @param prefix the prefix for the temporary file name
-     * @param suffix the suffix for the temporary file name
-     * @return the path to the created temporary file
-     * @throws IOException if the file cannot be created
-     */
-    public static Path createTempFile(String prefix, String suffix) throws IOException {
-        if (isPosixFileSystem()) {
-            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions
-                .asFileAttribute(PosixFilePermissions.fromString("rw-------"));
-            return Files.createTempFile(prefix, suffix, attr);
-        }
-        return Files.createTempFile(prefix, suffix);
+    private static FileAttribute<Set<PosixFilePermission>> ownerOnlyDirPosixAttribute() {
+        return PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
     }
 
-    private static boolean isPosixFileSystem() {
-        return FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    private static FileAttribute<Set<PosixFilePermission>> ownerOnlyFilePosixAttribute() {
+        return PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"));
     }
 
 }

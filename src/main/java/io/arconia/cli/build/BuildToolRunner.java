@@ -66,10 +66,14 @@ public interface BuildToolRunner {
     OutputOptions getOutputOptions();
 
     static BuildToolRunner create(OutputOptions outputOptions, List<String> additionalParameters) {
+        return create(IoUtils.getProjectPath(), outputOptions, additionalParameters);
+    }
+
+    static BuildToolRunner create(Path projectPath, OutputOptions outputOptions, List<String> additionalParameters) {
+        Assert.notNull(projectPath, "projectPath cannot be null");
         Assert.notNull(outputOptions, "outputOptions cannot be null");
         Assert.notNull(additionalParameters, "additionalParameters cannot be null");
 
-        var projectPath = IoUtils.getProjectPath();
         var buildTool = BuildTool.detectFromProjectPath(projectPath);
 
         if (buildTool == null) {

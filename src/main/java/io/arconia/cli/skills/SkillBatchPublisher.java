@@ -1,7 +1,6 @@
 package io.arconia.cli.skills;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.Assert;
+
+import io.arconia.cli.utils.IoUtils;
 
 /**
  * Discovers and publishes multiple skill directories found under a parent path.
@@ -98,7 +99,7 @@ public final class SkillBatchPublisher {
                 "Path is not a directory: %s".formatted(parentPath));
         }
 
-        List<Path> skillDirs = discoverSkillDirectories(parentPath);
+        List<Path> skillDirs = IoUtils.discoverSubDirectoriesWithFile(parentPath, SkillFrontmatterParser.SKILL_FILENAME);
         List<BatchEntryResult> results = new ArrayList<>();
         int successCount = 0;
 
@@ -149,29 +150,6 @@ public final class SkillBatchPublisher {
         applyAdditionalTags(result, skillRef, additionalTags);
 
         return result;
-    }
-
-    /**
-     * Discovers skill directories as direct subdirectories of the given parent path.
-     * A directory is considered a skill directory if it contains a {@code SKILL.md} file.
-     *
-     * @param parentPath the parent directory to search
-     * @return sorted list of discovered skill directories
-     * @throws IOException if the directory cannot be read
-     */
-    public List<Path> discoverSkillDirectories(Path parentPath) throws IOException {
-        Assert.notNull(parentPath, "parentPath cannot be null");
-
-        List<Path> skillDirs = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(parentPath)) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry) && Files.exists(entry.resolve(SkillFrontmatterParser.SKILL_FILENAME))) {
-                    skillDirs.add(entry);
-                }
-            }
-        }
-        skillDirs.sort(Path::compareTo);
-        return skillDirs;
     }
 
     /**

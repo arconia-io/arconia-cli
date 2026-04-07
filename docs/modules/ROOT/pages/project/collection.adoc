@@ -1,0 +1,72 @@
+= `arconia project collection`
+
+The `arconia project collection` command manages collections of projects. Collections are OCI indexes that list available projects and their locations.
+
+== Commands
+
+=== `add`
+
+Register a project collection with the Arconia CLI configuration and fetch its contents into the local cache.
+
+[source,shell]
+----
+arconia project collection add --name my-collection --ref ghcr.io/org/project-collection:1.0.0
+----
+
+**Options**
+
+* `--name`: (Required) A short alias for the collection (e.g. `arconia-project-collection`).
+* `--ref`: (Required) The OCI artifact reference for the collection (e.g. `ghcr.io/org/project-collection:4.2.0`).
+
+=== `remove`
+
+Remove a collection from the Arconia CLI configuration.
+
+[source,shell]
+----
+arconia project collection remove --name my-collection
+----
+
+**Options**
+
+* `--name`: (Required) The alias of the collection to remove.
+
+=== `list`
+
+List available projects in a collection. Uses `--name` for a specific collection or lists all projects from all registered collections.
+
+[source,shell]
+----
+arconia project collection list
+arconia project collection list --name my-collection
+----
+
+**Options**
+
+* `--name`: The alias of a registered collection for which to list the projects. If omitted, lists all registered collections.
+
+=== `push`
+
+Publish a project collection as an OCI artifact.
+
+[source,shell]
+----
+arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --project ghcr.io/org/projects/my-project:1.0.0
+arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --from-report project-push-report.json
+arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --from-report --report
+----
+
+**Options**
+
+* `--ref`: (Required) The full OCI artifact reference for a project collection (e.g. `ghcr.io/org/projects/collection`).
+* `--name`: (Required) The collection identifier (e.g. `arconia-project-collection`).
+* `--description`: A short description of the collection. Defaults to `A collection of projects published as OCI Artifacts and managed by the Arconia CLI.`
+* `--tag`: The version tag (e.g. `latest`, semantic version number, commit sha). Defaults to `latest`.
+* `--from-report`: Path to a push report file (from `arconia project push --report`). Defaults to `project-push-report.json` when specified without a path.
+* `--project`: Explicit project OCI references to include (e.g. `--project ghcr.io/org/projects/project:1.0.0`). Can be specified multiple times.
+* `--annotation`: Extra annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
+* `--report`: Write a publish report file. Defaults to `project-collection-push-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+
+== See Also
+
+* xref:project/project.adoc[arconia project]

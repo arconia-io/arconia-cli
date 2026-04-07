@@ -19,40 +19,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ArconiaCliRuntimeHintsTests {
 
     @Test
-    void shouldRegisterOpenRewriteInitScript() {
+    void shouldRegisterResources() {
         RuntimeHints hints = register();
-        assertThat(hints.resources().resourcePatternHints()).singleElement()
-            .satisfies(include("openrewrite/init-rewrite.gradle"));
+        assertThat(hints.resources().resourcePatternHints()).hasSize(2)
+                .anySatisfy(include("openrewrite/init-rewrite.gradle"))
+                .anySatisfy(include("recipes/project-customization.yml"));
     }
 
     @Test
-    void shouldDiscoverSkillsClasses() {
-        var orasModelClasses = ArconiaCliRuntimeHints.findSkillsClasses();
-        assertThat(orasModelClasses).isNotEmpty();
-        assertThat(orasModelClasses).contains(
-                TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry"),
-                TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry$CollectionEntry")
-        );
-    }
-
-    @Test
-    void shouldRegisterReflectionHintsForSkillsClasses() {
+    void shouldRegisterReflectionHintsForArconiaClasses() {
         RuntimeHints hints = register();
+        assertThat(RuntimeHintsPredicates.reflection()
+                .onType(TypeReference.of("io.arconia.cli.project.oci.ProjectConfig")).test(hints)).isTrue();
+        assertThat(RuntimeHintsPredicates.reflection()
+                .onType(TypeReference.of("io.arconia.cli.project.ProjectPushReport$ArtifactEntry")).test(hints)).isTrue();
         assertThat(RuntimeHintsPredicates.reflection()
                 .onType(TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry")).test(hints)).isTrue();
         assertThat(RuntimeHintsPredicates.reflection()
                 .onType(TypeReference.of("io.arconia.cli.skills.SkillCollectionRegistry$CollectionEntry")).test(hints)).isTrue();
-    }
-
-    @Test
-    void shouldDiscoverOrasModelClasses() {
-        var orasModelClasses = ArconiaCliRuntimeHints.findOrasModelClasses();
-        assertThat(orasModelClasses).isNotEmpty();
-        assertThat(orasModelClasses).contains(
-            TypeReference.of("land.oras.Config"),
-            TypeReference.of("land.oras.auth.AuthStore$ConfigFile"),
-            TypeReference.of("land.oras.exception.Error")
-        );
     }
 
     @Test

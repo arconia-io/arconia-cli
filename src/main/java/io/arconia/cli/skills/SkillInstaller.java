@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.IoUtils;
-
 import land.oras.ContainerRef;
 import land.oras.Manifest;
 import land.oras.Registry;
 import land.oras.utils.ArchiveUtils;
 import land.oras.utils.SupportedCompression;
+
+import io.arconia.cli.utils.IoUtils;
 
 /**
  * Installs agent skills from OCI artifacts into a project's skills directory.
@@ -118,16 +118,16 @@ public final class SkillInstaller {
         Files.createDirectories(skillsDir);
 
         // 4. Pull the artifact content to a project-local temp directory, then extract
-        Path tempDir = IoUtils.createTempDirectory(projectRoot, ".arconia-skill-");
+        Path tempDir = IoUtils.createTempDirectory(projectRoot);
         try {
             registry.pullArtifact(containerRef, tempDir, true);
 
             // 5. Find the downloaded tar.gz and extract it to the skills directory
-            Path tarGzFile = findTarGzFile(tempDir);
+            Path tarGzFile = IoUtils.findTarGzFile(tempDir);
             ArchiveUtils.uncompressuntar(tarGzFile, skillsDir, SupportedCompression.GZIP.getMediaType());
         }
         finally {
-            IoUtils.deleteTempDirectory(tempDir, projectRoot);
+            IoUtils.deleteTempDirectory(tempDir);
         }
 
         Path installPath = skillsDir.resolve(skillName);
@@ -148,18 +148,6 @@ public final class SkillInstaller {
         updateLockfile(resolvedRef, skillName, installPath, resolvedAdditionalPaths, projectRoot);
 
         return new InstallResult(resolvedRef, skillName, installPath);
-    }
-
-    /**
-     * Finds the first tar.gz file in the given directory.
-     */
-    private Path findTarGzFile(Path directory) throws IOException {
-        try (var stream = Files.newDirectoryStream(directory, "*.tar.gz")) {
-            for (Path entry : stream) {
-                return entry;
-            }
-        }
-        throw new IOException("No tar.gz file found in pull output directory: " + directory);
     }
 
     /**

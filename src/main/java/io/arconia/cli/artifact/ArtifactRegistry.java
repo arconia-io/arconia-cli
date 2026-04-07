@@ -1,13 +1,13 @@
-package io.arconia.cli.oci;
+package io.arconia.cli.artifact;
 
 import land.oras.Registry;
 
 /**
  * Central factory for creating ORAS registry clients.
  */
-public final class OciRegistryProvider {
+public final class ArtifactRegistry {
 
-    private OciRegistryProvider() {}
+    private ArtifactRegistry() {}
 
     /**
      * Creates an ORAS registry client with default settings.

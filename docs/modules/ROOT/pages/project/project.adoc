@@ -1,0 +1,50 @@
+= `arconia project`
+
+The `arconia project` command allows you to create and publish projects as OCI artifacts.
+
+== Commands
+
+=== `create`
+
+Create a new project from a template.
+
+[source,shell]
+----
+arconia project create --name my-project --template my-template
+arconia project create --name my-project --template my-template --group com.example --description "My project" --package-name com.example.myproject
+arconia project create --name my-project --template my-template --path /path/to/projects
+----
+
+**Options**
+
+* `--name`: The project name.
+* `--template`: The project template to use.
+* `--group`: The group ID for the project. Defaults to `com.example`.
+* `--description`: The description for the project.
+* `--package-name`: The package name for the project.
+* `--path`: The path where the project will be created. Defaults to the current working directory.
+
+=== `push`
+
+Publish a project as an OCI artifact. Exactly one of `--ref` or `--base-ref` must be specified.
+
+[source,shell]
+----
+arconia project push --ref ghcr.io/org/projects/my-project --tag 1.0.0
+arconia project push --ref ghcr.io/org/projects/my-project --tag 1.0.0 --report
+arconia project push --base-ref ghcr.io/org/projects --tag 1.0.0
+arconia project push --base-ref ghcr.io/org/projects --path /path/to/projects --tag 1.0.0 --report
+----
+
+**Options**
+
+* `--ref`: The full OCI artifact reference for a single project (e.g. `ghcr.io/org/projects/my-project`). Mutually exclusive with `--base-ref`.
+* `--base-ref`: The base OCI reference for all discovered projects (e.g. `ghcr.io/org/projects`). Discovers and pushes all projects found as direct subdirectories of `--path`. Mutually exclusive with `--ref`.
+* `--path`: Path to the project directory, or with `--base-ref`: the parent directory to discover projects in. Defaults to the current working directory.
+* `--tag`: The version tag (e.g. `latest`, semantic version number, commit sha). Defaults to `latest`.
+* `--annotation`: Extra annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
+* `--report`: Write a publish report file. Defaults to `project-push-report.json` when specified without a path. The report can be used for downstream operations such as collection pushing (`arconia project collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+
+== See Also
+
+* xref:project/collection.adoc[arconia project collection]

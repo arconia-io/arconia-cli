@@ -15,9 +15,10 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
+import io.arconia.cli.artifact.ArtifactAnnotations;
+import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
-import io.arconia.cli.oci.OciRegistryProvider;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillCollectionPublisher;
 import io.arconia.cli.skills.SkillCollectionService;
@@ -28,12 +29,8 @@ import io.arconia.cli.skills.SkillCollectionService.CollectionView;
 import io.arconia.cli.skills.SkillCollectionService.RegisteredCollection;
 import io.arconia.cli.skills.SkillTableFormatter;
 import io.arconia.cli.utils.DateTimeUtils;
-import io.arconia.cli.utils.OciUtils;
 import io.arconia.cli.utils.SemverUtils;
 
-/**
- * CLI commands for managing agent skills collections.
- */
 @Component
 @Command(
     name = "collection",
@@ -78,12 +75,12 @@ public class SkillsCollectionCommands implements Runnable {
         outputOptions.newLine();
 
         try {
-            Map<String, String> extraAnnotations = OciUtils.parseAnnotations(annotations);
+            Map<String, String> extraAnnotations = ArtifactAnnotations.parseAnnotations(annotations);
             if (collectionDescription != null && !collectionDescription.isBlank()) {
                 extraAnnotations.put("org.opencontainers.image.description", collectionDescription);
             }
 
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillCollectionPublisher publisher = new SkillCollectionPublisher(ociRegistry);
 
             String fullRef = "%s:%s".formatted(collectionRef, tag);
@@ -156,7 +153,7 @@ public class SkillsCollectionCommands implements Runnable {
         outputOptions.newLine();
 
         try {
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             boolean existed = collectionService.addCollection(collectionName, collectionRef);
@@ -179,7 +176,7 @@ public class SkillsCollectionCommands implements Runnable {
         @Mixin OutputOptions outputOptions
     ) {
         try {
-            SkillCollectionService collectionService = new SkillCollectionService(OciRegistryProvider.create());
+            SkillCollectionService collectionService = new SkillCollectionService(ArtifactRegistry.create());
             RegisteredCollection removed = collectionService.removeCollection(collectionName);
 
             if (removed == null) {
@@ -200,7 +197,7 @@ public class SkillsCollectionCommands implements Runnable {
         @Mixin OutputOptions outputOptions
     ) {
         try {
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             // Determine which collection names to update
@@ -271,7 +268,7 @@ public class SkillsCollectionCommands implements Runnable {
         outputOptions.newLine();
 
         try {
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             if (collectionRef != null && !collectionRef.isBlank()) {

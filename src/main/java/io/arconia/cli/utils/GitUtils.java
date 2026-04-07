@@ -13,9 +13,6 @@ public final class GitUtils {
     /**
      * Returns the current Git commit SHA (short form) for the given directory,
      * or {@code null} if the directory is not inside a Git repository.
-     *
-     * @param workingDir the directory to inspect
-     * @return the short commit SHA, or {@code null}
      */
     @Nullable
     public static String getRevision(@Nullable Path workingDir) {
@@ -28,9 +25,6 @@ public final class GitUtils {
     /**
      * Returns the remote "origin" URL for the given directory,
      * or {@code null} if not available.
-     *
-     * @param workingDir the directory to inspect, or {@code null} for the current directory
-     * @return the origin URL, or {@code null}
      */
     @Nullable
     public static String getRemoteUrl(@Nullable Path workingDir) {

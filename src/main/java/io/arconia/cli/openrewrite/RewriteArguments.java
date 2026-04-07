@@ -1,12 +1,15 @@
 package io.arconia.cli.openrewrite;
 
+import java.nio.file.Path;
+
 import org.jspecify.annotations.Nullable;
 
 public record RewriteArguments(
     boolean dryRun,
     String rewriteRecipeName,
     @Nullable String rewriteRecipeLibrary,
-    @Nullable String rewriteRecipeVersion
+    @Nullable String rewriteRecipeVersion,
+    @Nullable Path rewriteConfigFile
 ) {
 
     public static Builder builder() {
@@ -20,6 +23,8 @@ public record RewriteArguments(
         private String rewriteRecipeLibrary;
         @Nullable
         private String rewriteRecipeVersion;
+        @Nullable
+        private Path rewriteConfigFile;
 
         private Builder() {}
 
@@ -43,9 +48,14 @@ public record RewriteArguments(
             return this;
         }
 
+        public Builder rewriteConfigFile(Path rewriteConfigFile) {
+            this.rewriteConfigFile = rewriteConfigFile;
+            return this;
+        }
+
         public RewriteArguments build() {
-            return new RewriteArguments(dryRun, rewriteRecipeName, rewriteRecipeLibrary, rewriteRecipeVersion);
+            return new RewriteArguments(dryRun, rewriteRecipeName, rewriteRecipeLibrary, rewriteRecipeVersion, rewriteConfigFile);
         }
     }
-    
+
 }

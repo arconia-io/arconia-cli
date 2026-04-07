@@ -17,6 +17,7 @@ import land.oras.Manifest;
 import land.oras.ManifestDescriptor;
 import land.oras.Registry;
 
+import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.GitUtils;
 
@@ -153,8 +154,8 @@ public final class SkillCollectionPublisher {
 
             String fallbackName = SkillRef.parse(ref).skillName();
             String name = annotations != null ? annotations.getOrDefault(SkillAnnotations.SKILL_NAME, fallbackName) : fallbackName;
-            String version = annotations != null ? annotations.getOrDefault(SkillAnnotations.OCI_VERSION, collectionVersion) : collectionVersion;
-            String description = annotations != null ? annotations.get(SkillAnnotations.OCI_DESCRIPTION) : null;
+            String version = annotations != null ? annotations.getOrDefault(ArtifactAnnotations.OCI_VERSION, collectionVersion) : collectionVersion;
+            String description = annotations != null ? annotations.get(ArtifactAnnotations.OCI_DESCRIPTION) : null;
 
             entries.add(new CollectionSkillEntry(name, version, ref, digest, description));
         }
@@ -223,12 +224,12 @@ public final class SkillCollectionPublisher {
     private ManifestDescriptor buildManifestDescriptor(CollectionSkillEntry entry) {
         Map<String, String> annotations = new LinkedHashMap<>();
         annotations.put(SkillAnnotations.SKILL_NAME, entry.name());
-        annotations.put(SkillAnnotations.OCI_VERSION, entry.version());
-        annotations.put(SkillAnnotations.OCI_TITLE, entry.name());
+        annotations.put(ArtifactAnnotations.OCI_VERSION, entry.version());
+        annotations.put(ArtifactAnnotations.OCI_TITLE, entry.name());
         annotations.put(SkillAnnotations.SKILL_REF, entry.ref());
 
         if (StringUtils.hasText(entry.description())) {
-            annotations.put(SkillAnnotations.OCI_DESCRIPTION, entry.description());
+            annotations.put(ArtifactAnnotations.OCI_DESCRIPTION, entry.description());
         }
 
         // Create a descriptor referencing the skill manifest by digest.
@@ -256,19 +257,19 @@ public final class SkillCollectionPublisher {
         Map<String, String> annotations = new LinkedHashMap<>();
 
         // Standard OCI annotations
-        annotations.put(SkillAnnotations.OCI_CREATED, DateTimeUtils.nowIso());
-        annotations.put(SkillAnnotations.OCI_TITLE, collectionName);
-        annotations.put(SkillAnnotations.OCI_DESCRIPTION, "Agent Skills Collection");
-        annotations.put(SkillAnnotations.OCI_VERSION, collectionVersion);
+        annotations.put(ArtifactAnnotations.OCI_CREATED, DateTimeUtils.nowIso());
+        annotations.put(ArtifactAnnotations.OCI_TITLE, collectionName);
+        annotations.put(ArtifactAnnotations.OCI_DESCRIPTION, "Agent Skills Collection");
+        annotations.put(ArtifactAnnotations.OCI_VERSION, collectionVersion);
 
         // Auto-detect source and revision from git (best-effort, uses current directory)
         String remoteUrl = GitUtils.getRemoteUrl(null);
         if (StringUtils.hasText(remoteUrl)) {
-            annotations.put(SkillAnnotations.OCI_SOURCE, remoteUrl);
+            annotations.put(ArtifactAnnotations.OCI_SOURCE, remoteUrl);
         }
         String revision = GitUtils.getRevision(null);
         if (StringUtils.hasText(revision)) {
-            annotations.put(SkillAnnotations.OCI_REVISION, revision);
+            annotations.put(ArtifactAnnotations.OCI_REVISION, revision);
         }
 
         // Collection-specific annotations

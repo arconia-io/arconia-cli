@@ -8,12 +8,22 @@ initscript {
 
 def recipeLibrary = System.getProperty('recipeLibrary')
 def recipeVersion = System.getProperty('recipeVersion')
+def rewriteConfigFile = System.getProperty('rewriteConfigFile')
 
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
         rewrite platform("org.openrewrite.recipe:rewrite-recipe-bom:latest.release")
         rewrite platform("io.arconia.migrations:rewrite-bom:latest.release")
+
+        rewrite "io.arconia.migrations:rewrite-arconia"
+        rewrite "io.arconia.migrations:rewrite-docling"
+        rewrite "io.arconia.migrations:rewrite-spring"
+        rewrite "io.arconia.migrations:rewrite-test"
+
+        rewrite "org.openrewrite:rewrite-java"
+        rewrite "org.openrewrite.recipe:rewrite-java-dependencies"
+
         if (recipeLibrary != null) {
             if (recipeVersion != null) {
                 rewrite("${recipeLibrary}:${recipeVersion}")
@@ -24,6 +34,9 @@ rootProject {
     }
     rewrite {
         exportDatatables = true
+        if (rewriteConfigFile != null) {
+            configFile = file("${rewriteConfigFile}")
+        }
     }
     afterEvaluate {
         if (repositories.isEmpty()) {

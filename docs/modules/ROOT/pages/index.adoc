@@ -69,6 +69,12 @@ These commands use https://docs.openrewrite.org/[OpenRewrite] recipes to automat
 
 * **xref:migration/rewrite.adoc[arconia rewrite]** — Runs any OpenRewrite recipe for custom migration or refactoring tasks beyond the built-in `update` commands.
 
+=== Projects
+
+* **xref:project/project.adoc[arconia project create]** — Creates a new project from a template.
+* **xref:project/project.adoc[arconia project push]** — Publishes a project (or a batch of projects) as OCI artifact(s).
+* **xref:project/collection.adoc[arconia project collection]** — Manages collections of projects distributed as OCI artifacts.
+
 == Authors
 
 The Arconia CLI is maintained by https://thomasvitale.com[Thomas Vitale].

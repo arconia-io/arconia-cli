@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.JsonUtils;
+import io.arconia.cli.json.JsonParser;
 import io.arconia.cli.utils.SystemUtils;
 
 /**
@@ -148,7 +148,7 @@ public final class SkillCollectionCache {
         }
 
         String json = Files.readString(path);
-        return JsonUtils.getJsonMapper().readValue(json, CachedCollection.class);
+        return JsonParser.fromJson(json, CachedCollection.class);
     }
 
     /**
@@ -164,7 +164,7 @@ public final class SkillCollectionCache {
 
         Path path = cacheFile(collectionName);
         Files.createDirectories(path.getParent());
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(collection);
+        String json = JsonParser.toJsonPrettyPrint(collection);
         Files.writeString(path, json + "\n");
     }
 

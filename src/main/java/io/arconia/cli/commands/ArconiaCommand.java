@@ -2,19 +2,21 @@ package io.arconia.cli.commands;
 
 import org.springframework.stereotype.Component;
 
+import picocli.CommandLine.Command;
+import picocli.CommandLine.HelpCommand;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.ScopeType;
+import picocli.CommandLine.Spec;
+
 import io.arconia.cli.commands.development.BuildCommand;
 import io.arconia.cli.commands.development.DevCommand;
 import io.arconia.cli.commands.development.TestCommand;
 import io.arconia.cli.commands.image.ImageCommands;
+import io.arconia.cli.commands.project.ProjectCommands;
 import io.arconia.cli.commands.refactoring.RewriteCommand;
 import io.arconia.cli.commands.refactoring.UpdateCommands;
 import io.arconia.cli.commands.skills.SkillsCommands;
 import io.arconia.cli.core.CliVersionProvider;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.HelpCommand;
-import picocli.CommandLine.ScopeType;
-import picocli.CommandLine.Spec;
-import picocli.CommandLine.Model.CommandSpec;
 
 @Component
 @Command(
@@ -25,19 +27,19 @@ import picocli.CommandLine.Model.CommandSpec;
     mixinStandardHelpOptions = true,
     optionListHeading = "Options:%n",
     scope = ScopeType.INHERIT,
-    showEndOfOptionsDelimiterInUsageHelp = true,
     sortOptions = false,
     versionProvider = CliVersionProvider.class,
     subcommands = {
-        DevCommand.class,
-        BuildCommand.class,
-        TestCommand.class,
-        ImageCommands.class,
-        UpdateCommands.class,
-        RewriteCommand.class,
-        SkillsCommands.class,
-        HelpCommand.class,
-        VersionCommand.class
+            DevCommand.class,
+            BuildCommand.class,
+            TestCommand.class,
+            ImageCommands.class,
+            UpdateCommands.class,
+            RewriteCommand.class,
+            ProjectCommands.class,
+            SkillsCommands.class,
+            HelpCommand.class,
+            VersionCommand.class
     }
 )
 public class ArconiaCommand implements Runnable {

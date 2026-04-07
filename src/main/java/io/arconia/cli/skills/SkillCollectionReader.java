@@ -13,6 +13,8 @@ import land.oras.Index;
 import land.oras.ManifestDescriptor;
 import land.oras.Registry;
 
+import io.arconia.cli.artifact.ArtifactAnnotations;
+
 /**
  * Reads and parses a Skills Collection from an OCI-compliant registry.
  * <p>
@@ -100,8 +102,8 @@ public final class SkillCollectionReader {
         // Extract collection-level annotations
         Map<String, String> indexAnnotations = index.getAnnotations();
         String collectionName = getAnnotation(indexAnnotations, SkillAnnotations.COLLECTION_NAME);
-        String collectionVersion = getAnnotation(indexAnnotations, SkillAnnotations.OCI_VERSION);
-        String description = getAnnotation(indexAnnotations, SkillAnnotations.OCI_DESCRIPTION);
+        String collectionVersion = getAnnotation(indexAnnotations, ArtifactAnnotations.OCI_VERSION);
+        String description = getAnnotation(indexAnnotations, ArtifactAnnotations.OCI_DESCRIPTION);
 
         // Extract skill entries from manifest descriptors
         List<ManifestDescriptor> manifests = index.getManifests();
@@ -125,15 +127,15 @@ public final class SkillCollectionReader {
         String name = getAnnotation(annotations, SkillAnnotations.SKILL_NAME);
         if (!StringUtils.hasText(name)) {
             // Fall back to OCI title
-            name = getAnnotation(annotations, SkillAnnotations.OCI_TITLE);
+            name = getAnnotation(annotations, ArtifactAnnotations.OCI_TITLE);
         }
         if (!StringUtils.hasText(name)) {
             // Last resort: use the digest as identifier
             name = descriptor.getDigest();
         }
 
-        String version = getAnnotation(annotations, SkillAnnotations.OCI_VERSION);
-        String desc = getAnnotation(annotations, SkillAnnotations.OCI_DESCRIPTION);
+        String version = getAnnotation(annotations, ArtifactAnnotations.OCI_VERSION);
+        String desc = getAnnotation(annotations, ArtifactAnnotations.OCI_DESCRIPTION);
         String ref = getAnnotation(annotations, SkillAnnotations.SKILL_REF);
         String digest = descriptor.getDigest();
 

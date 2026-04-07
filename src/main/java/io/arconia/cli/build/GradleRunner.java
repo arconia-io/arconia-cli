@@ -191,6 +191,10 @@ public class GradleRunner implements BuildToolRunner {
             command.add("-DrecipeVersion=" + recipeVersion);
         }
 
+        if (rewriteArguments.rewriteConfigFile() != null) {
+            command.add("-DrewriteConfigFile=" + rewriteArguments.rewriteConfigFile().toAbsolutePath());
+        }
+
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);
         }

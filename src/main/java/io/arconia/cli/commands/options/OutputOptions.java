@@ -52,6 +52,11 @@ public class OutputOptions {
         }
     }
 
+    public void table(String table) {
+        out().print(table);
+        out().flush();
+    }
+
     public void newLine() {
         out().println();
         out().flush();

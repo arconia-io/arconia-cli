@@ -1,11 +1,5 @@
 package io.arconia.cli.utils;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.util.CollectionUtils;
-
 public final class OciUtils {
 
     private OciUtils() {}
@@ -29,25 +23,6 @@ public final class OciUtils {
             return ref.substring(0, colonIdx);
         }
         return ref;
-    }
-
-    /**
-     * Parses a list of {@code key=value} strings into a map.
-     */
-    public static Map<String, String> parseAnnotations(List<String> pairs) {
-        Map<String, String> map = new LinkedHashMap<>();
-        if (CollectionUtils.isEmpty(pairs)) {
-            return map;
-        }
-        for (String pair : pairs) {
-            int eq = pair.indexOf('=');
-            if (eq <= 0) {
-                throw new IllegalArgumentException(
-                        "Invalid annotation format '%s': expected key=value".formatted(pair));
-            }
-            map.put(pair.substring(0, eq), pair.substring(eq + 1));
-        }
-        return map;
     }
 
 }

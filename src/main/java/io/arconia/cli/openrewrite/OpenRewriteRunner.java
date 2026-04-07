@@ -1,5 +1,6 @@
 package io.arconia.cli.openrewrite;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.util.Assert;
@@ -15,6 +16,13 @@ public class OpenRewriteRunner {
         Assert.notNull(outputOptions, "outputOptions cannot be null");
         Assert.notNull(additionalParameters, "additionalParameters cannot be null");
         this.buildToolRunner = BuildToolRunner.create(outputOptions, additionalParameters);
+    }
+
+    public OpenRewriteRunner(Path projectPath, OutputOptions outputOptions, List<String> additionalParameters) {
+        Assert.notNull(projectPath, "projectPath cannot be null");
+        Assert.notNull(outputOptions, "outputOptions cannot be null");
+        Assert.notNull(additionalParameters, "additionalParameters cannot be null");
+        this.buildToolRunner = BuildToolRunner.create(projectPath, outputOptions, additionalParameters);
     }
 
     public void update(UpdateArguments updateArguments) {

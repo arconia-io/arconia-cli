@@ -15,6 +15,9 @@
 ** xref:update/maven.adoc[arconia update maven]
 ** xref:update/spring-ai.adoc[arconia update spring-ai]
 ** xref:update/spring-boot.adoc[arconia update spring-boot]
+* Projects
+** xref:project/project.adoc[arconia project]
+** xref:project/collection.adoc[arconia project collection]
 * Skills
 ** xref:skills/skills.adoc[arconia skills]
 ** xref:skills/collection.adoc[arconia skills collection]

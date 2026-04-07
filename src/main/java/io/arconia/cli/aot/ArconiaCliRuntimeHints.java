@@ -19,7 +19,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import land.oras.OrasModel;
 
 /**
- * {@link RuntimeHintsRegistrar} for locating the classpath resources required by the Arconia CLI.
+ * Hints for the GraalVM compiler to ensure proper runtime behavior of the Arconia CLI.
  */
 public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -44,33 +44,36 @@ public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
 
     @Override
     public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
-        hints.resources()
-                .registerResource(new ClassPathResource("openrewrite/init-rewrite.gradle"));
-        findSkillsClasses().forEach(type -> hints.reflection()
+        // Resources
+        hints.resources().registerResource(new ClassPathResource("openrewrite/init-rewrite.gradle"));
+        hints.resources().registerResource(new ClassPathResource("recipes/project-customization.yml"));
+
+        // Reflection
+        findArconiaClasses().forEach(type -> hints.reflection()
                 .registerType(type, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
         findOrasModelClasses().forEach(type -> hints.reflection()
                 .registerType(type, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS, MemberCategory.ACCESS_DECLARED_FIELDS));
         CAFFEINE_CLASSES.forEach(className -> hints.reflection()
-                .registerType(TypeReference.of(className),
-                        MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.ACCESS_DECLARED_FIELDS));
+                .registerType(TypeReference.of(className), MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.ACCESS_DECLARED_FIELDS));
     }
 
     /**
-     * Scans the {@code io.arconia.cli.skills} package for classes annotated with {@link JsonIgnoreProperties @JsonIgnoreProperties}.
+     * Scans the given Arconia packages for classes annotated with {@link JsonIgnoreProperties @JsonIgnoreProperties}.
      */
-    static Set<TypeReference> findSkillsClasses() {
+    private static Set<TypeReference> findArconiaClasses() {
         var scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(JsonIgnoreProperties.class));
-        return scanner.findCandidateComponents("io.arconia.cli.skills")
-                .stream()
+        var candidateComponents = scanner.findCandidateComponents("io.arconia.cli.project");
+        candidateComponents.addAll(scanner.findCandidateComponents("io.arconia.cli.skills"));
+        return candidateComponents.stream()
                 .map(bd -> TypeReference.of(Objects.requireNonNull(bd.getBeanClassName())))
                 .collect(Collectors.toUnmodifiableSet());
     }
 
     /**
-     * Scans the {@code land.oras} package for classes annotated with {@link OrasModel @OrasModel}.
+     * Scans the Oras Java SDK for classes annotated with {@link OrasModel @OrasModel}.
      */
-    static Set<TypeReference> findOrasModelClasses() {
+    private static Set<TypeReference> findOrasModelClasses() {
         var scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(OrasModel.class));
         return scanner.findCandidateComponents("land.oras")

@@ -1,0 +1,55 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: io.arconia.rewrite.CustomizeProjectTemplate
+displayName: Customize project coordinates and base package
+description: Changes the project groupId, artifactId, and base package in Maven or Gradle projects.
+recipeList:
+  # General
+  - io.arconia.rewrite.spring.boot.properties.ChangeSpringBootPropertyValue:
+      propertyKey: "spring.application.name"
+      newPropertyValue: "${{name}}"
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: ${{oldPackageName}}
+      newPackageName: ${{packageName}}
+      recursive: true
+
+  # Maven
+  - org.openrewrite.xml.ChangeTagValue:
+      elementName: /project/groupId
+      newValue: ${{group}}
+  - org.openrewrite.xml.ChangeTagValue:
+      elementName: /project/artifactId
+      newValue: ${{name}}
+  - org.openrewrite.xml.ChangeTagValue:
+      elementName: /project/name
+      newValue: ${{name}}
+  - org.openrewrite.xml.ChangeTagValue:
+      elementName: /project/description
+      newValue: ${{description}}
+
+  # Gradle (gradle.properties)
+  - org.openrewrite.properties.ChangePropertyValue:
+      propertyKey: group
+      newValue: ${{group}}
+      fileMatcher: "**/gradle.properties"
+
+  # Gradle (build.gradle / build.gradle.kts)
+  - org.openrewrite.text.FindAndReplace:
+      find: "^(\\s*group\\s*=\\s*)['\"].*?['\"]"
+      replace: "$1\"${{group}}\""
+      regex: true
+      multiline: true
+      filePattern: "**/build.gradle*"
+  - org.openrewrite.text.FindAndReplace:
+      find: "^(\\s*description\\s*=\\s*)['\"].*?['\"]"
+      replace: "$1\"${{description}}\""
+      regex: true
+      multiline: true
+      filePattern: "**/build.gradle*"
+
+  # Gradle (settings.gradle / settings.gradle.kts)
+  - org.openrewrite.text.FindAndReplace:
+      find: "^(\\s*rootProject\\.name\\s*=\\s*)['\"].*?['\"]"
+      replace: "$1\"${{name}}\""
+      regex: true
+      multiline: true
+      filePattern: "**/settings.gradle*"

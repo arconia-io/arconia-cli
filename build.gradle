@@ -42,6 +42,7 @@ dependencies {
     implementation "tools.jackson.dataformat:jackson-dataformat-yaml"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation "io.arconia:arconia-spring-boot-starter:${arconiaVersion}"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }

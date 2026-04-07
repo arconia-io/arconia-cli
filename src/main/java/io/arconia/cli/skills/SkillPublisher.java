@@ -22,9 +22,10 @@ import land.oras.utils.ArchiveUtils;
 import land.oras.utils.SupportedAlgorithm;
 import land.oras.utils.SupportedCompression;
 
+import io.arconia.cli.artifact.ArtifactAnnotations;
+import io.arconia.cli.json.JsonParser;
 import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.GitUtils;
-import io.arconia.cli.utils.JsonUtils;
 import io.arconia.cli.utils.SemverUtils;
 
 /**
@@ -202,7 +203,7 @@ public final class SkillPublisher {
      * @return the OCI config descriptor
      */
     private Config buildConfig(SkillConfig skillConfig) {
-        byte[] configBytes = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsBytes(skillConfig);
+        byte[] configBytes = JsonParser.toBytes(skillConfig);
         String digest = SupportedAlgorithm.SHA256.digest(configBytes);
         long size = configBytes.length;
         String dataBase64 = Base64.getEncoder().encodeToString(configBytes);
@@ -225,27 +226,27 @@ public final class SkillPublisher {
         Map<String, String> annotations = new LinkedHashMap<>();
 
         // Standard OCI annotations
-        annotations.put(SkillAnnotations.OCI_CREATED, DateTimeUtils.nowIso());
-        annotations.put(SkillAnnotations.OCI_TITLE, config.name());
+        annotations.put(ArtifactAnnotations.OCI_CREATED, DateTimeUtils.nowIso());
+        annotations.put(ArtifactAnnotations.OCI_TITLE, config.name());
 
         if (config.description() != null) {
-            annotations.put(SkillAnnotations.OCI_DESCRIPTION, config.description());
+            annotations.put(ArtifactAnnotations.OCI_DESCRIPTION, config.description());
         }
         if (config.license() != null) {
-            annotations.put(SkillAnnotations.OCI_LICENSES, config.license());
+            annotations.put(ArtifactAnnotations.OCI_LICENSES, config.license());
         }
         if (config.version() != null) {
-            annotations.put(SkillAnnotations.OCI_VERSION, config.version());
+            annotations.put(ArtifactAnnotations.OCI_VERSION, config.version());
         }
 
         // Auto-detect source and revision from Git (best-effort)
         String remoteUrl = GitUtils.getRemoteUrl(skillDirectory);
         if (StringUtils.hasText(remoteUrl)) {
-            annotations.put(SkillAnnotations.OCI_SOURCE, remoteUrl);
+            annotations.put(ArtifactAnnotations.OCI_SOURCE, remoteUrl);
         }
         String revision = GitUtils.getRevision(skillDirectory);
         if (StringUtils.hasText(revision)) {
-            annotations.put(SkillAnnotations.OCI_REVISION, revision);
+            annotations.put(ArtifactAnnotations.OCI_REVISION, revision);
         }
 
         // Agent Skills annotations

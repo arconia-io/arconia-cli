@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.JsonUtils;
+import io.arconia.cli.json.JsonParser;
 
 /**
  * Model for an OCI artifact publish report (defaults to {@code publish-report.json}).
@@ -111,7 +111,7 @@ public record ArtifactPublishReport(
     public void save(Path path) throws IOException {
         Assert.notNull(path, "path cannot be null");
 
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        String json = JsonParser.toJsonPrettyPrint(this);
         Files.writeString(path, json + "\n");
     }
 
@@ -126,7 +126,7 @@ public record ArtifactPublishReport(
         Assert.notNull(path, "path cannot be null");
 
         String json = Files.readString(path);
-        return JsonUtils.getJsonMapper().readValue(json, ArtifactPublishReport.class);
+        return JsonParser.fromJson(json, ArtifactPublishReport.class);
     }
 
 }

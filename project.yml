@@ -1,0 +1,9 @@
+---
+name: arconia-cli
+description: Arconia CLI is a powerful tool designed to streamline and enhance the developer experience when working with Spring Boot applications.
+type: cli
+license: Apache-2.0
+tags:
+  - spring-boot
+  - cli
+  - developer-experience

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
-import io.arconia.cli.utils.JsonUtils;
+import io.arconia.cli.json.JsonParser;
 import io.arconia.cli.utils.SystemUtils;
 
 /**
@@ -216,7 +216,7 @@ public record SkillCollectionRegistry(
         }
 
         String json = Files.readString(path);
-        return JsonUtils.getJsonMapper().readValue(json, SkillCollectionRegistry.class);
+        return JsonParser.fromJson(json, SkillCollectionRegistry.class);
     }
 
     /**
@@ -228,7 +228,7 @@ public record SkillCollectionRegistry(
     public void save() throws IOException {
         Path path = registryPath();
         Files.createDirectories(path.getParent());
-        String json = JsonUtils.getJsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        String json = JsonParser.toJsonPrettyPrint(this);
         Files.writeString(path, json + "\n");
     }
 

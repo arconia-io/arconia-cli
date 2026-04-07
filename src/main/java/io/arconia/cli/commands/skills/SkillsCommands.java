@@ -19,14 +19,16 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
+import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
-import io.arconia.cli.oci.OciRegistryProvider;
+import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.skills.AgentVendor;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillBatchPublisher;
 import io.arconia.cli.skills.SkillBatchPublisher.BatchEntryResult;
 import io.arconia.cli.skills.SkillCollectionService;
+import io.arconia.cli.skills.SkillFrontmatterParser;
 import io.arconia.cli.skills.SkillInstaller;
 import io.arconia.cli.skills.SkillPublisher;
 import io.arconia.cli.skills.SkillRef;
@@ -37,7 +39,6 @@ import io.arconia.cli.skills.SkillsLockfile;
 import io.arconia.cli.skills.SkillsManifest;
 import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.IoUtils;
-import io.arconia.cli.utils.OciUtils;
 
 @Component
 @Command(
@@ -83,7 +84,7 @@ public class SkillsCommands implements Runnable {
         List<String> additionalBasePaths = resolveAgentBasePaths(agents);
 
         Path projectRoot = IoUtils.getProjectPath(projectDir);
-        Registry ociRegistry = OciRegistryProvider.create();
+        Registry ociRegistry = ArtifactRegistry.create();
         SkillInstaller installer = new SkillInstaller(ociRegistry);
 
         // 1. Install by direct OCI reference
@@ -191,7 +192,7 @@ public class SkillsCommands implements Runnable {
 
             outputOptions.info("Installing %d skill(s) from %s...".formatted(manifest.skills().size(), SkillsManifest.FILENAME));
 
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillInstaller installer = new SkillInstaller(ociRegistry);
 
             for (SkillsManifest.SkillEntry entry : manifest.skills()) {
@@ -354,7 +355,7 @@ public class SkillsCommands implements Runnable {
                 }
             }
 
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillInstaller installer = new SkillInstaller(ociRegistry);
             SkillUpdater updater = new SkillUpdater(ociRegistry, installer);
             int updatedCount = 0;
@@ -418,9 +419,9 @@ public class SkillsCommands implements Runnable {
     ) {
         try {
             Path basePath = Path.of(skillPath).toAbsolutePath();
-            Map<String, String> extraAnnotations = OciUtils.parseAnnotations(annotations);
+            Map<String, String> extraAnnotations = ArtifactAnnotations.parseAnnotations(annotations);
 
-            Registry ociRegistry = OciRegistryProvider.create();
+            Registry ociRegistry = ArtifactRegistry.create();
             SkillPublisher publisher = new SkillPublisher(ociRegistry);
             SkillBatchPublisher batchPublisher = new SkillBatchPublisher(publisher);
 
@@ -444,7 +445,7 @@ public class SkillsCommands implements Runnable {
     private void pushSingleSkill(SkillBatchPublisher batchPublisher, Path skillDirectory, String skillRef, String tag,
                                   List<String> additionalTags, Map<String, String> extraAnnotations,
                                   @Nullable String outputReport, OutputOptions outputOptions) throws IOException {
-        
+
         outputOptions.newLine();
         outputOptions.info("Publishing skill '%s'...".formatted(skillDirectory.getFileName()));
         outputOptions.newLine();
@@ -490,7 +491,7 @@ public class SkillsCommands implements Runnable {
                                List<String> additionalTags, Map<String, String> extraAnnotations,
                                @Nullable String outputReport, OutputOptions outputOptions) throws IOException {
 
-        List<Path> skillDirs = batchPublisher.discoverSkillDirectories(parentPath);
+        List<Path> skillDirs = IoUtils.discoverSubDirectoriesWithFile(parentPath, SkillFrontmatterParser.SKILL_FILENAME);
 
         outputOptions.newLine();
         if (skillDirs.isEmpty()) {
@@ -512,7 +513,7 @@ public class SkillsCommands implements Runnable {
                 case BatchEntryResult.Success success -> {
                     SkillPublisher.PublishResult publishResult = success.publishResult();
                     SkillRef targetRef = success.targetRef();
-                    
+
                     outputOptions.info("Published skill '%s'".formatted(publishResult.config().name()));
                     outputOptions.info("OCI Artifact: %s".formatted(targetRef.fullTagReference()));
 
