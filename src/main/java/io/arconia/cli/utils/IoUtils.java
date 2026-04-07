@@ -155,8 +155,9 @@ public final class IoUtils {
     public static Path findTarGzFile(Path directory) throws IOException {
         Assert.notNull(directory, "directory cannot be null");
         try (var stream = Files.newDirectoryStream(directory, "*.tar.gz")) {
-            for (Path entry : stream) {
-                return entry;
+            var iterator = stream.iterator();
+            if (iterator.hasNext()) {
+                return iterator.next();
             }
         }
         throw new IOException("No tar.gz file found in directory: " + directory);
