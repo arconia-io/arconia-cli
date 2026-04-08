@@ -32,6 +32,7 @@ class ProjectCollectionCommandsTests {
         assertThat(out).contains("Usage: arconia project collection");
         assertThat(out).contains("add");
         assertThat(out).contains("remove");
+        assertThat(out).contains("update");
         assertThat(out).contains("list");
         assertThat(out).contains("push");
     }
@@ -104,6 +105,19 @@ class ProjectCollectionCommandsTests {
         assertThat(exitCode).isZero();
         String out = output.toString();
         assertThat(out).contains("Usage: arconia project collection list");
+        assertThat(out).contains("--name");
+    }
+
+    @Test
+    void updateHelpOption() {
+        var output = new StringWriter();
+        commandLine.setOut(new PrintWriter(output));
+
+        int exitCode = commandLine.execute("project", "collection", "update", "--help");
+
+        assertThat(exitCode).isZero();
+        String out = output.toString();
+        assertThat(out).contains("Usage: arconia project collection update");
         assertThat(out).contains("--name");
     }
 

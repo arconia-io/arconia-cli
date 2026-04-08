@@ -1,6 +1,6 @@
 = `arconia project`
 
-The `arconia project` command allows you to create and publish projects as OCI artifacts.
+The `arconia project` command allows you to create new projects from templates and publish them as OCI artifacts. Published projects can be organized into collections for discovery and sharing.
 
 == Commands
 

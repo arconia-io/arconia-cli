@@ -1,6 +1,6 @@
 = `arconia project collection`
 
-The `arconia project collection` command manages collections of projects. Collections are OCI indexes that list available projects and their locations.
+The `arconia project collection` command manages collections of projects. Collections are OCI indexes that group available projects and their locations, making them easy to discover and share.
 
 == Commands
 
@@ -18,9 +18,37 @@ arconia project collection add --name my-collection --ref ghcr.io/org/project-co
 * `--name`: (Required) A short alias for the collection (e.g. `arconia-project-collection`).
 * `--ref`: (Required) The OCI artifact reference for the collection (e.g. `ghcr.io/org/project-collection:4.2.0`).
 
+=== `list`
+
+List available projects in a collection. Displays each project's name, description, type, and labels in a table format grouped by collection.
+
+[source,shell]
+----
+arconia project collection list
+arconia project collection list --name my-collection
+----
+
+**Options**
+
+* `--name`: The alias of a registered collection for which to list the projects. If omitted, lists projects from all registered collections.
+
+=== `update`
+
+Update a registered collection or all registered collections. For each collection, checks whether a newer semver tag is available in the OCI registry. If a newer version is found, the stored ref is updated to the latest tag and the cache is refreshed. Otherwise, the existing ref is re-fetched to refresh the cache and digest.
+
+[source,shell]
+----
+arconia project collection update
+arconia project collection update --name my-collection
+----
+
+**Options**
+
+* `--name`: The alias of a specific collection to update. If omitted, updates all registered collections.
+
 === `remove`
 
-Remove a collection from the Arconia CLI configuration.
+Remove a collection from the Arconia CLI configuration and local cache.
 
 [source,shell]
 ----
@@ -31,23 +59,9 @@ arconia project collection remove --name my-collection
 
 * `--name`: (Required) The alias of the collection to remove.
 
-=== `list`
-
-List available projects in a collection. Uses `--name` for a specific collection or lists all projects from all registered collections.
-
-[source,shell]
-----
-arconia project collection list
-arconia project collection list --name my-collection
-----
-
-**Options**
-
-* `--name`: The alias of a registered collection for which to list the projects. If omitted, lists all registered collections.
-
 === `push`
 
-Publish a project collection as an OCI artifact.
+Publish a project collection as an OCI artifact. At least one of `--from-report` or `--project` must be provided.
 
 [source,shell]
 ----

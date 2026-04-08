@@ -83,6 +83,34 @@ class ProjectCollectionServiceTests {
                 .hasMessageContaining("collectionName cannot be null or empty");
     }
 
+    @Test
+    void updateCollectionThrowsWhenCollectionNameIsNull() {
+        assertThatThrownBy(() -> service.updateCollection(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("collectionName cannot be null or empty");
+    }
+
+    @Test
+    void updateCollectionThrowsWhenCollectionNameIsEmpty() {
+        assertThatThrownBy(() -> service.updateCollection(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("collectionName cannot be null or empty");
+    }
+
+    @Test
+    void listCollectionThrowsWhenCollectionNameIsNull() {
+        assertThatThrownBy(() -> service.listCollection(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("collectionName cannot be null or empty");
+    }
+
+    @Test
+    void listCollectionThrowsWhenCollectionNameIsEmpty() {
+        assertThatThrownBy(() -> service.listCollection(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("collectionName cannot be null or empty");
+    }
+
     private static OutputOptions createOutputOptions() {
         TestCommand testCommand = new TestCommand();
         new CommandLine(testCommand)

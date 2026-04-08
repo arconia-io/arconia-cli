@@ -17,18 +17,14 @@ import picocli.CommandLine.Spec;
 
 import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.artifact.ArtifactRegistry;
-import io.arconia.cli.commands.options.CliTableFormatter;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
 import io.arconia.cli.project.ProjectPushReport;
 import io.arconia.cli.project.collection.ProjectCollectionPublisher;
 import io.arconia.cli.project.collection.ProjectCollectionPushArguments;
 import io.arconia.cli.project.collection.ProjectCollectionPushReport;
-import io.arconia.cli.project.collection.service.ProjectCollectionCache;
-import io.arconia.cli.project.collection.service.ProjectCollectionHeader;
 import io.arconia.cli.project.collection.service.ProjectCollectionRegistry;
 import io.arconia.cli.project.collection.service.ProjectCollectionService;
-import io.arconia.cli.project.collection.service.ProjectCollectionSummary;
 
 @Component
 @Command(
@@ -36,8 +32,6 @@ import io.arconia.cli.project.collection.service.ProjectCollectionSummary;
         description = "Manage project collections."
 )
 public class ProjectCollectionCommands implements Runnable {
-
-    private static final List<String> PROJECT_TABLE_HEADERS = List.of("NAME", "DESCRIPTION", "TYPE", "LABELS");
 
     @Spec
     CommandSpec spec;
@@ -83,20 +77,11 @@ public class ProjectCollectionCommands implements Runnable {
             @Option(names = {"--name"}, description = "The alias of a registered collection for which to list the projects.") @Nullable String collectionName,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
+        Registry ociRegistry = ArtifactRegistry.create();
+        ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
+
         if (StringUtils.hasText(collectionName)) {
-            var collection = ProjectCollectionRegistry.findCollection(collectionName);
-            if (collection == null) {
-                outputOptions.error("Collection '%s' is not registered. Run 'arconia project collection add' to register it first.".formatted(collectionName));
-                return;
-            }
-            var index = ProjectCollectionCache.load(collectionName);
-            if (index == null) {
-                outputOptions.error("No cached data found for collection '%s'. Run 'arconia project collection add' to register it first.".formatted(collectionName));
-                return;
-            }
-            printCollectionHeader(outputOptions, new ProjectCollectionHeader(collection.name(), collection.ref(), index.getAnnotations().get(ArtifactAnnotations.OCI_DESCRIPTION)));
-            outputOptions.newLine();
-            outputOptions.table(CliTableFormatter.format(outputOptions.colorScheme(), PROJECT_TABLE_HEADERS, toProjectRows(ProjectCollectionCache.toProjectSummaries(index)), 3));
+            collectionService.listCollection(collectionName);
         }
         else {
             var registry = ProjectCollectionRegistry.load();
@@ -105,31 +90,33 @@ public class ProjectCollectionCommands implements Runnable {
                 return;
             }
             for (var entry : registry.collections()) {
-                var index = ProjectCollectionCache.load(entry.name());
                 outputOptions.newLine();
-                if (index == null) {
-                    printCollectionHeader(outputOptions, new ProjectCollectionHeader(entry.name(), entry.ref(), null));
-                    outputOptions.info("  No cached data. Run 'arconia project collection add --name %s' to refresh.".formatted(entry.name()));
-                    continue;
-                }
-                printCollectionHeader(outputOptions, new ProjectCollectionHeader(entry.name(), entry.ref(), index.getAnnotations().get(ArtifactAnnotations.OCI_DESCRIPTION)));
-                outputOptions.newLine();
-                outputOptions.table(CliTableFormatter.format(outputOptions.colorScheme(), PROJECT_TABLE_HEADERS, toProjectRows(ProjectCollectionCache.toProjectSummaries(index)), 3));
+                collectionService.listCollection(entry.name());
             }
         }
     }
 
-    private static void printCollectionHeader(OutputOptions outputOptions, ProjectCollectionHeader header) {
-        outputOptions.info("📦 %s (%s)".formatted(header.name(), header.ref()));
-        if (StringUtils.hasText(header.description())) {
-            outputOptions.info("   %s".formatted(header.description()));
-        }
-    }
+    @Command(name = "update", description = "Update a registered collection or all registered collections.")
+    public void update(
+            @Option(names = {"--name"}, description = "The alias of a specific collection to update. If omitted, updates all registered collections.") @Nullable String collectionName,
+            @Mixin OutputOptions outputOptions
+    ) throws IOException {
+        Registry ociRegistry = ArtifactRegistry.create();
+        ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
 
-    private static List<List<String>> toProjectRows(List<ProjectCollectionSummary> summaries) {
-        return summaries.stream()
-                .map(s -> List.of(s.name(), s.description(), s.type(), String.join(", ", s.labels())))
-                .toList();
+        if (StringUtils.hasText(collectionName)) {
+            collectionService.updateCollection(collectionName);
+        } else {
+            var registry = ProjectCollectionRegistry.load();
+            if (registry.collections().isEmpty()) {
+                outputOptions.info("No project collections registered. Run 'arconia project collection add' to register one.");
+                return;
+            }
+            for (var entry : registry.collections()) {
+                outputOptions.newLine();
+                collectionService.updateCollection(entry.name());
+            }
+        }
     }
 
     @Command(name = "push", description = "Publish a project collection as an OCI artifact.")
