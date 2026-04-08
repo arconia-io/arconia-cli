@@ -222,6 +222,8 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("rewriteDiscover");
 
+        command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);
         }
