@@ -73,7 +73,7 @@ public final class ProjectCreator {
             Files.writeString(recipeTemplate, content);
 
             OpenRewriteRunner openRewriteRunner = new OpenRewriteRunner(projectDirectory, outputOptions, List.of());
-            openRewriteRunner.rewrite(RewriteArguments.builder()
+            openRewriteRunner.rewriteRun(RewriteArguments.builder()
                     .rewriteRecipeName("io.arconia.rewrite.CustomizeProjectTemplate")
                     .rewriteConfigFile(recipeTemplate)
                     .build());

@@ -62,9 +62,14 @@ public class MavenRunner implements BuildToolRunner {
     }
 
     @Override
-    public void rewrite(RewriteArguments rewriteArguments) {
+    public void rewriteRun(RewriteArguments rewriteArguments) {
         Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
-        call(constructRewriteCommand(rewriteArguments));
+        call(constructRewriteRunCommand(rewriteArguments));
+    }
+
+    @Override
+    public void rewriteDiscover() {
+        call(constructRewriteDiscoverCommand());
     }
 
     @Override
@@ -159,7 +164,7 @@ public class MavenRunner implements BuildToolRunner {
         }
     }
 
-    List<String> constructRewriteCommand(RewriteArguments rewriteArguments) {
+    List<String> constructRewriteRunCommand(RewriteArguments rewriteArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -201,6 +206,37 @@ public class MavenRunner implements BuildToolRunner {
         }
 
         command.add("-Drewrite.exportDatatables=true");
+
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
+        }
+
+        return command;
+    }
+
+    List<String> constructRewriteDiscoverCommand() {
+        List<String> command = new ArrayList<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("-U");
+
+        command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:discover".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+
+        List<String> coordinates = new ArrayList<>();
+
+        String arconiaVersion = "LATEST";
+        String coreRewriteVersion = OPEN_REWRITE_DEFAULT_VERSION;
+
+        coordinates.add("io.arconia.migrations:rewrite-arconia:" + arconiaVersion);
+        coordinates.add("io.arconia.migrations:rewrite-docling:" + arconiaVersion);
+        coordinates.add("io.arconia.migrations:rewrite-spring:" + arconiaVersion);
+        coordinates.add("io.arconia.migrations:rewrite-test:" + arconiaVersion);
+
+        coordinates.add("org.openrewrite:rewrite-java:" + coreRewriteVersion);
+        coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + coreRewriteVersion);
+
+        command.add("-Drewrite.recipeArtifactCoordinates=" + String.join(",", coordinates));
 
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);

@@ -130,11 +130,11 @@ class MavenRunnerTests {
     // -- constructRewriteCommand tests --
 
     @Test
-    void rewriteCommandRun() {
+    void rewriteRunCommandRun() {
         var options = RewriteArguments.builder()
             .rewriteRecipeName("org.example.MyRecipe")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("-U");
         assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
@@ -143,24 +143,24 @@ class MavenRunnerTests {
     }
 
     @Test
-    void rewriteCommandDryRun() {
+    void rewriteRunCommandDryRun() {
         var options = RewriteArguments.builder()
             .dryRun(true)
             .rewriteRecipeName("org.example.MyRecipe")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
     }
 
     @Test
-    void rewriteCommandWithRecipeLibrary() {
+    void rewriteRunCommandWithRecipeLibrary() {
         var options = RewriteArguments.builder()
             .rewriteRecipeName("org.example.MyRecipe")
             .rewriteRecipeLibrary("org.example:my-recipes")
             .rewriteRecipeVersion("2.0.0")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).anySatisfy(arg -> assertThat(arg).contains("org.example:my-recipes:2.0.0"));    }
 

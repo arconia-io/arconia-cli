@@ -30,9 +30,13 @@ public class OpenRewriteRunner {
         buildToolRunner.update(updateArguments);
     }
 
-    public void rewrite(RewriteArguments rewriteArguments) {
+    public void rewriteRun(RewriteArguments rewriteArguments) {
         Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
-        buildToolRunner.rewrite(rewriteArguments);
+        buildToolRunner.rewriteRun(rewriteArguments);
+    }
+
+    public void rewriteDiscover() {
+        buildToolRunner.rewriteDiscover();
     }
 
 }

@@ -8,20 +8,24 @@ The xref:update/spring-boot.adoc[`arconia update`] commands are curated shortcut
 
 The `arconia rewrite` command gives you full control: you can run *any* OpenRewrite recipe, including recipes from the https://docs.openrewrite.org/recipes[OpenRewrite OSS catalog], from the https://github.com/arconia-io/arconia-migrations[Arconia Migrations] project, or from any other library.
 
-== Usage
+== Commands
+
+=== `run`
+
+Run an OpenRewrite recipe to migrate or refactor your project.
 
 Run a recipe from the OpenRewrite OSS core library:
 
 [source,shell]
 ----
-arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports
+arconia rewrite run --recipe-name org.openrewrite.java.RemoveUnusedImports
 ----
 
 Preview changes without applying them:
 
 [source,shell]
 ----
-arconia rewrite \
+arconia rewrite run \
     --recipe-name org.openrewrite.java.RemoveUnusedImports \
     --dry-run
 ----
@@ -30,7 +34,7 @@ Run a recipe from a specific library:
 
 [source,shell]
 ----
-arconia rewrite \
+arconia rewrite run \
     --recipe-name io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0 \
     --recipe-library io.arconia.migrations:rewrite-spring
 ----
@@ -39,7 +43,7 @@ Run a recipe pinned to a specific library version:
 
 [source,shell]
 ----
-arconia rewrite \
+arconia rewrite run \
     --recipe-name io.arconia.rewrite.spring.ai.UpgradeSpringAi_1_0 \
     --recipe-library io.arconia.migrations:rewrite-spring \
     --recipe-version 1.2.0
@@ -49,15 +53,13 @@ Pass extra parameters to the underlying build tool using `--`:
 
 [source,shell]
 ----
-arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports -- --stacktrace
-arconia rewrite --recipe-name org.openrewrite.java.RemoveUnusedImports -- -DmyProperty=value
+arconia rewrite run --recipe-name org.openrewrite.java.RemoveUnusedImports -- --stacktrace
+arconia rewrite run --recipe-name org.openrewrite.java.RemoveUnusedImports -- -DmyProperty=value
 ----
 
 WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
 
-== Options
-
-The following options are available:
+**Options**
 
 [cols="1,1,3"]
 |===
@@ -88,6 +90,15 @@ The following options are available:
 |Display help information for the command.
 |===
 
+=== `discover`
+
+Discover available OpenRewrite recipes.
+
+[source,shell]
+----
+arconia rewrite discover
+----
+
 == Build Tool Integration
 
 The command automatically detects whether your project uses Maven or Gradle and runs the appropriate OpenRewrite task relying on the OpenRewrite Maven and Gradle plugins without modifying the build itself.
@@ -96,7 +107,7 @@ Use `--` to pass parameters directly to the underlying build tool. The `--` sepa
 
 == Recipe Discovery
 
-To discover available recipes, visit the https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog]. Use the `--dry-run` option to preview changes before applying them.
+To discover available recipes, use the `arconia rewrite discover` command or visit the https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog]. Use the `--dry-run` option with `arconia rewrite run` to preview changes before applying them.
 
 WARNING: The OpenRewrite Recipe Catalog includes recipes with different licenses. Some are open-source (Apache 2.0); others use the Moderne Source Available License or Moderne Proprietary License. Review the license of any recipe before running it. See https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module[OpenRewrite module versions] for details.
 

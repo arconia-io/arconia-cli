@@ -33,7 +33,9 @@ public interface BuildToolRunner {
 
     void imageBuild(BuildArguments buildArguments);
 
-    void rewrite(RewriteArguments rewriteArguments);
+    void rewriteRun(RewriteArguments rewriteArguments);
+
+    void rewriteDiscover();
 
     void update(UpdateArguments updateArguments);
 

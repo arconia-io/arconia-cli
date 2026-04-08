@@ -69,9 +69,14 @@ public class GradleRunner implements BuildToolRunner {
     }
 
     @Override
-    public void rewrite(RewriteArguments rewriteArguments) {
+    public void rewriteRun(RewriteArguments rewriteArguments) {
         Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
-        call(constructRewriteCommand(rewriteArguments));
+        call(constructRewriteRunCommand(rewriteArguments));
+    }
+
+    @Override
+    public void rewriteDiscover() {
+        call(constructRewriteDiscoverCommand());
     }
 
     @Override
@@ -160,7 +165,7 @@ public class GradleRunner implements BuildToolRunner {
         }
     }
 
-    List<String> constructRewriteCommand(RewriteArguments rewriteArguments) {
+    List<String> constructRewriteRunCommand(RewriteArguments rewriteArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());
@@ -194,6 +199,28 @@ public class GradleRunner implements BuildToolRunner {
         if (rewriteArguments.rewriteConfigFile() != null) {
             command.add("-DrewriteConfigFile=" + rewriteArguments.rewriteConfigFile().toAbsolutePath());
         }
+
+        if (!CollectionUtils.isEmpty(additionalParameters)) {
+            command.addAll(additionalParameters);
+        }
+
+        return command;
+    }
+
+    List<String> constructRewriteDiscoverCommand() {
+        List<String> command = new ArrayList<>();
+
+        command.add(getBuildToolMainCommand());
+
+        command.add("--init-script");
+
+        try {
+            command.add(IoUtils.copyFileToTemp("openrewrite/init-rewrite.gradle").toFile().getAbsolutePath());
+        } catch (IOException ex) {
+            throw new CliException("Failed to copy OpenRewrite init script", ex);
+        }
+
+        command.add("rewriteDiscover");
 
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);

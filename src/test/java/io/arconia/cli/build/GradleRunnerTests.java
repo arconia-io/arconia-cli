@@ -12,11 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
+
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.openrewrite.RewriteArguments;
 import io.arconia.cli.openrewrite.UpdateArguments;
-import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -121,11 +122,11 @@ class GradleRunnerTests {
     // -- constructRewriteCommand tests --
 
     @Test
-    void rewriteCommandRun() {
+    void rewriteRunCommandRun() {
         var options = RewriteArguments.builder()
             .rewriteRecipeName("org.example.MyRecipe")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("--init-script", "rewriteRun");
         assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_DEFAULT_VERSION);
@@ -134,25 +135,25 @@ class GradleRunnerTests {
     }
 
     @Test
-    void rewriteCommandDryRun() {
+    void rewriteRunCommandDryRun() {
         var options = RewriteArguments.builder()
             .dryRun(true)
             .rewriteRecipeName("org.example.MyRecipe")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("rewriteDryRun");
         assertThat(command).doesNotContain("rewriteRun");
     }
 
     @Test
-    void rewriteCommandWithRecipeLibrary() {
+    void rewriteRunCommandWithRecipeLibrary() {
         var options = RewriteArguments.builder()
             .rewriteRecipeName("org.example.MyRecipe")
             .rewriteRecipeLibrary("org.example:my-recipes")
             .rewriteRecipeVersion("1.0.0")
             .build();
-        var command = runner.constructRewriteCommand(options);
+        var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("-DrecipeLibrary=org.example:my-recipes");
         assertThat(command).contains("-DrecipeVersion=1.0.0");
