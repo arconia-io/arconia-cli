@@ -30,7 +30,7 @@ public interface BuildToolRunner {
         Assert.notEmpty(command, "command cannot be null or empty");
         Assert.notNull(environmentVariables, "environmentVariables cannot be null");
         int exitCode = ProcessExecutor.execute(ProcessExecutionRequest.builder()
-                        .command(command.toArray(new String[0]))
+                        .command(command)
                         .targetDirectory(getProjectPath().toFile())
                         .environmentVariables(environmentVariables)
                         .outputOptions(getOutputOptions())

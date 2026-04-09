@@ -1,6 +1,7 @@
 package io.arconia.cli.core;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.Assert;
@@ -11,7 +12,7 @@ import io.arconia.cli.commands.options.OutputOptions;
  * Represents a request to execute a process.
  */
 public record ProcessExecutionRequest(
-        String[] command,
+        List<String> command,
         File targetDirectory,
         Map<String, String> environmentVariables,
         OutputOptions outputOptions
@@ -31,14 +32,14 @@ public record ProcessExecutionRequest(
 
     public static class Builder {
 
-        private String[] command;
+        private List<String> command;
         private File targetDirectory;
         private Map<String, String> environmentVariables = Map.of();
         private OutputOptions outputOptions;
 
         private Builder() {}
 
-        public Builder command(String[] command) {
+        public Builder command(List<String> command) {
             this.command = command;
             return this;
         }

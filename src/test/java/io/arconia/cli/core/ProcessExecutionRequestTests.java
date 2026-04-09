@@ -3,6 +3,7 @@ package io.arconia.cli.core;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class ProcessExecutionRequestTests {
     @Test
     void buildsSuccessfullyWithRequiredFields() {
         var request = ProcessExecutionRequest.builder()
-                .command(new String[]{"echo", "hello"})
+                .command(List.of("echo", "hello"))
                 .targetDirectory(tempDir)
                 .outputOptions(createOutputOptions())
                 .build();
@@ -53,7 +54,7 @@ class ProcessExecutionRequestTests {
     @Test
     void buildsSuccessfullyWithAllFields() {
         var request = ProcessExecutionRequest.builder()
-                .command(new String[]{"echo", "hello"})
+                .command(List.of("echo", "hello"))
                 .targetDirectory(tempDir)
                 .environmentVariables(Map.of("MY_VAR", "my_value"))
                 .outputOptions(createOutputOptions())
@@ -76,7 +77,7 @@ class ProcessExecutionRequestTests {
     @Test
     void whenCommandIsEmptyThenThrow() {
         assertThatThrownBy(() -> ProcessExecutionRequest.builder()
-                .command(new String[]{})
+                .command(List.of())
                 .targetDirectory(tempDir)
                 .outputOptions(createOutputOptions())
                 .build())
@@ -87,7 +88,7 @@ class ProcessExecutionRequestTests {
     @Test
     void whenTargetDirectoryIsNullThenThrow() {
         assertThatThrownBy(() -> ProcessExecutionRequest.builder()
-                .command(new String[]{"true"})
+                .command(List.of("true"))
                 .outputOptions(createOutputOptions())
                 .build())
                 .isInstanceOf(IllegalArgumentException.class)
@@ -98,7 +99,7 @@ class ProcessExecutionRequestTests {
     void whenTargetDirectoryDoesNotExistThenThrow() {
         var nonExistentDir = new File(tempDir, "does-not-exist");
         assertThatThrownBy(() -> ProcessExecutionRequest.builder()
-                .command(new String[]{"true"})
+                .command(List.of("true"))
                 .targetDirectory(nonExistentDir)
                 .outputOptions(createOutputOptions())
                 .build())
@@ -109,7 +110,7 @@ class ProcessExecutionRequestTests {
     @Test
     void whenEnvironmentVariablesIsNullThenThrow() {
         assertThatThrownBy(() -> ProcessExecutionRequest.builder()
-                .command(new String[]{"true"})
+                .command(List.of("true"))
                 .targetDirectory(tempDir)
                 .environmentVariables(null)
                 .outputOptions(createOutputOptions())
@@ -121,7 +122,7 @@ class ProcessExecutionRequestTests {
     @Test
     void whenOutputOptionsIsNullThenThrow() {
         assertThatThrownBy(() -> ProcessExecutionRequest.builder()
-                .command(new String[]{"true"})
+                .command(List.of("true"))
                 .targetDirectory(tempDir)
                 .build())
                 .isInstanceOf(IllegalArgumentException.class)
@@ -131,7 +132,7 @@ class ProcessExecutionRequestTests {
     @Test
     void environmentVariablesDefaultsToEmpty() {
         var request = ProcessExecutionRequest.builder()
-                .command(new String[]{"true"})
+                .command(List.of("true"))
                 .targetDirectory(tempDir)
                 .outputOptions(createOutputOptions())
                 .build();

@@ -3,6 +3,7 @@ package io.arconia.cli.core;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class ProcessExecutorTests {
     @Test
     void executeSuccessfulCommand() {
         int exitCode = ProcessExecutor.execute(requestBuilder()
-            .command(new String[]{"true"})
+            .command(List.of("true"))
             .build());
         assertThat(exitCode).isZero();
     }
@@ -54,7 +55,7 @@ class ProcessExecutorTests {
     @Test
     void executeFailingCommand() {
         int exitCode = ProcessExecutor.execute(requestBuilder()
-            .command(new String[]{"false"})
+            .command(List.of("false"))
             .build());
         assertThat(exitCode).isEqualTo(1);
     }
@@ -62,7 +63,7 @@ class ProcessExecutorTests {
     @Test
     void executeNonExistentCommandThrowsCliException() {
         assertThatThrownBy(() -> ProcessExecutor.execute(requestBuilder()
-                .command(new String[]{"nonexistent-command-xyz"})
+                .command(List.of("nonexistent-command-xyz"))
                 .build()))
             .isInstanceOf(CliException.class);
     }
@@ -70,7 +71,7 @@ class ProcessExecutorTests {
     @Test
     void executeWithEnvironmentVariables() {
         int exitCode = ProcessExecutor.execute(requestBuilder()
-            .command(new String[]{"true"})
+            .command(List.of("true"))
             .environmentVariables(Map.of("MY_VAR", "my_value"))
             .build());
         assertThat(exitCode).isZero();

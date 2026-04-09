@@ -40,7 +40,7 @@ public class DockerfileRunner implements ImageToolRunner {
     public void call(List<String> command) {
         Assert.notEmpty(command, "command cannot be null or empty");
         ProcessExecutor.execute(ProcessExecutionRequest.builder()
-                        .command(command.toArray(new String[0]))
+                        .command(command)
                         .targetDirectory(projectPath.toFile())
                         .outputOptions(outputOptions)
                         .build());
