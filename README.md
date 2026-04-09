@@ -6,9 +6,11 @@
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Bluesky](https://img.shields.io/static/v1?label=Bluesky&message=Follow&color=1DA1F2)](https://bsky.app/profile/arconia.io)
 
-Arconia CLI is a versatile tool designed to enhance the development experience with Spring Boot applications, providing intuitive commands for building, testing, and running projects. It streamlines common tasks, including upgrading Spring Boot applications to the latest version with a single command, and simplifies containerization using both Cloud Native Buildpacks and Dockerfiles.
+<p align="center">
+  <img src="arconia-logo.png" alt="The Arconia logo" width="600" />
+</p>
 
-<img src="arconia-logo.png" alt="The Arconia logo" height="250px" />
+Arconia CLI is a versatile tool designed to enhance the development experience with Spring Boot applications, providing intuitive commands for building, testing, and running projects. It streamlines common tasks, including upgrading Spring Boot applications to the latest version with a single command, and simplifies containerization using both Cloud Native Buildpacks and Dockerfiles.
 
 > [!NOTE]
 > The Arconia CLI is currently in active development. We're working hard to improve it and appreciate your patience as we refine the tool. Feel free to try it out and share your feedback!
