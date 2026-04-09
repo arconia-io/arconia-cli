@@ -17,11 +17,12 @@ import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.commands.options.ParametersOption;
 import io.arconia.cli.image.BuildpacksRunner;
 import io.arconia.cli.image.DockerfileRunner;
+import io.arconia.cli.image.OciRuntime;
 
 @Component
 @Command(
     name = "build",
-    description = "Build a container image."
+    description = "Package a Spring Boot application as a container image."
 )
 public class ImageBuildCommands implements Runnable {
 
@@ -33,14 +34,14 @@ public class ImageBuildCommands implements Runnable {
         spec.commandLine().usage(spec.commandLine().getOut());
     }
 
-    @Command(name = "buildpacks", description = "Build a container image using Buildpacks.")
+    @Command(name = "buildpacks", description = "Package a Spring Boot application as a container image using Buildpacks.")
     public void buildpacks(
-        @Option(names = "--image-name", description = "Name for the image to build.") @Nullable String imageName,
-        @Option(names = "--builder-image", description = "Name of the Builder image to use.") @Nullable String builderImage,
-        @Option(names = "--run-image", description = "Name of the Run image to use.") @Nullable String runImage,
+        @Option(names = "--image-name", description = "Name of the image to build (e.g. ghcr.io/arconia-io/configuration-service).") @Nullable String imageName,
+        @Option(names = "--builder-image", description = "Name of the Buildpacks Builder image to use (e.g. docker.io/paketobuildpacks/builder-noble-java-tiny).") @Nullable String builderImage,
+        @Option(names = "--run-image", description = "Name of the Buildpacks Run image to use (e.g. docker.io/paketobuildpacks/ubuntu-noble-run-tiny).") @Nullable String runImage,
         @Option(names = "--clean-cache", description = "Whether to clean the cache before building.") boolean cleanCache,
         @Option(names = "--publish-image", description = "Whether to publish the generated image to an OCI registry.") boolean publishImage,
-        @Option(names = "--image-platform", arity = "0..*", description = "Platform(s) for the image to build (e.g. linux/amd64, linux/arm64). Specify multiple for multi-arch builds.") @Nullable List<String> imagePlatforms,
+        @Option(names = "--image-platform", arity = "0..*", description = "Platform(s) for the image to build (e.g. linux/amd64, linux/arm64). Specify multiple for multi-arch builds. If not specified, the platform of the host machine is used.") @Nullable List<String> imagePlatforms,
         @Option(names = "--clean", description = "Perform a clean build.") boolean clean,
         @Option(names = "--skip-tests", description = "Skip tests.") boolean skipTests,
         @Mixin OutputOptions outputOptions,
@@ -63,13 +64,16 @@ public class ImageBuildCommands implements Runnable {
         buildpacksRunner.build(buildArguments);
     }
 
-    @Command(name = "dockerfile", description = "Build a container image using Dockerfile.")
+    @Command(name = "dockerfile", aliases = "containerfile", description = "Package a Spring Boot application as a container image using a Dockerfile or Containerfile.")
     public void dockerfile(
-        @Option(names = {"-t", "--image-name"}, required = true, description = "Name for the image to build.") String imageName,
-        @Option(names = {"-f", "--dockerfile"}, description = "The path to the Dockerfile to use for building the container image.") String dockerfile,
+        @Option(names = {"-t", "--image-name"}, required = true, description = "Name of the image to build (e.g. ghcr.io/arconia-io/configuration-service).") String imageName,
+        @Option(names = {"-f", "--dockerfile", "--containerfile"}, description = "The path to the Dockerfile or Containerfile to use for building the container image.") String dockerfile,
+        @Option(names = "--oci-runtime", description = "The OCI runtime to use for building the container image. If unspecified, Podman is preferred when available, otherwise Docker is used.") @Nullable OciRuntime ociRuntime,
         @Mixin OutputOptions outputOptions
     ) {
-        var dockerfileRunner = new DockerfileRunner(outputOptions, List.of());
+        var resolvedRuntime = ociRuntime != null ? ociRuntime : OciRuntime.detect();
+        outputOptions.verbose("OCI runtime: %s".formatted(resolvedRuntime.getExecutableName()));
+        var dockerfileRunner = new DockerfileRunner(outputOptions, List.of(), resolvedRuntime);
         dockerfileRunner.build(imageName, dockerfile);
     }
 

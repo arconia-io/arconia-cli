@@ -25,13 +25,16 @@ public class DockerfileRunner implements ImageToolRunner {
     private final OutputOptions outputOptions;
     private final BuildToolRunner buildToolRunner;
     private final Path projectPath;
+    private final OciRuntime ociRuntime;
 
-    public DockerfileRunner(OutputOptions outputOptions, List<String> additionalParameters) {
+    public DockerfileRunner(OutputOptions outputOptions, List<String> additionalParameters, OciRuntime ociRuntime) {
         Assert.notNull(outputOptions, "outputOptions cannot be null");
         Assert.notNull(additionalParameters, "additionalParameters cannot be null");
+        Assert.notNull(ociRuntime, "ociRuntime cannot be null");
         this.outputOptions = outputOptions;
         this.buildToolRunner = BuildToolRunner.create(outputOptions, additionalParameters);
         this.projectPath = IoUtils.getProjectPath();
+        this.ociRuntime = ociRuntime;
     }
 
     public void call(List<String> command) {
@@ -46,12 +49,16 @@ public class DockerfileRunner implements ImageToolRunner {
     public void build(String imageName, @Nullable String dockerfile) {
         Assert.hasText(imageName, "imageName cannot be null");
 
-        outputOptions.verbose("Building application");
+        outputOptions.info("Building application...");
+        outputOptions.newLine();
         buildToolRunner.build(BuildArguments.builder().skipTests(true).build());
 
         outputOptions.newLine();
+        outputOptions.info("====================================");
+        outputOptions.newLine();
 
-        outputOptions.verbose("Building container image");
+        outputOptions.info("Building container image...");
+        outputOptions.newLine();
         var dockerfilePath = getDockerfilePath(dockerfile);
         var command = constructImageCommand("build", imageName, dockerfilePath);
         call(command);
@@ -64,32 +71,37 @@ public class DockerfileRunner implements ImageToolRunner {
 
     @Override
     public File getImageToolExecutable() {
-        return IoUtils.getExecutable("docker");
+        return IoUtils.getExecutable(ociRuntime.getExecutableName());
     }
 
     private Path getDockerfilePath(String dockerfile) {
-        Path dockerfilePath;
         if (StringUtils.hasText(dockerfile)) {
-            dockerfilePath = Path.of(dockerfile).toAbsolutePath();
+            Path dockerfilePath = Path.of(dockerfile).toAbsolutePath();
             if (dockerfilePath.toFile().isFile()) {
-                outputOptions.verbose("Dockerfile: %s".formatted(dockerfilePath));
+                outputOptions.verbose("Dockerfile/Containerfile: %s".formatted(dockerfilePath));
                 return dockerfilePath;
             }
-            throw new CliException("Cannot find Dockerfile at the specified path: %s".formatted(dockerfile));
-        } else {
-            dockerfilePath = projectPath.resolve("src/main/docker/Dockerfile");
-
-            if (!dockerfilePath.toFile().isFile()) {
-                dockerfilePath = projectPath.resolve("Dockerfile");
-            }
-
-            if (dockerfilePath.toFile().isFile()) {
-                outputOptions.verbose("Dockerfile: %s".formatted(dockerfilePath));
-                return dockerfilePath;
-            }
-
-            throw new CliException("Cannot find Dockerfile at any of the supported locations");
+            throw new CliException("Cannot find Dockerfile or Containerfile at the specified path: %s".formatted(dockerfile));
         }
+
+        // Search for Dockerfile or Containerfile in supported locations
+        List<Path> candidates = List.of(
+            projectPath.resolve("src/main/docker/Dockerfile"),
+            projectPath.resolve("src/main/docker/Containerfile"),
+            projectPath.resolve("src/main/podman/Dockerfile"),
+            projectPath.resolve("src/main/podman/Containerfile"),
+            projectPath.resolve("Dockerfile"),
+            projectPath.resolve("Containerfile")
+        );
+
+        for (Path candidate : candidates) {
+            if (candidate.toFile().isFile()) {
+                outputOptions.verbose("Dockerfile/Containerfile: %s".formatted(candidate));
+                return candidate;
+            }
+        }
+
+        throw new CliException("Cannot find Dockerfile or Containerfile at any of the supported locations");
     }
 
     private List<String> constructImageCommand(String action, String imageName, Path dockerfilePath) {
@@ -106,8 +118,6 @@ public class DockerfileRunner implements ImageToolRunner {
         command.add(dockerfilePath.toFile().getAbsolutePath());
 
         command.add(projectPath.toFile().getAbsolutePath());
-
-        command.add("--load");
 
         return command;
     }

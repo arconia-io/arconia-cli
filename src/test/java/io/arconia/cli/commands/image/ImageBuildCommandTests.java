@@ -50,7 +50,9 @@ class ImageBuildCommandTests {
         int exitCode = commandLine.execute("image", "build", "dockerfile", "--help");
 
         assertThat(exitCode).isZero();
-        assertThat(output.toString()).contains("Usage: arconia image build dockerfile");
+        assertThat(output.toString())
+            .contains("Usage: arconia image build dockerfile")
+            .contains("--oci-runtime");
     }
 
 }

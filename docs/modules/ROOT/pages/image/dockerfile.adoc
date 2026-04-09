@@ -4,11 +4,11 @@ The `arconia image build dockerfile` command builds a container image for your S
 
 == Prerequisites
 
-* A container runtime (Docker, Podman, or compatible) must be running on your machine.
+* An OCI container runtime (https://www.docker.com[Docker] or https://podman.io[Podman]) must be installed and running on your machine.
 
 == Usage
 
-Basic usage (Dockerfile must be located at `src/main/docker/Dockerfile` or `Dockerfile` in the project root):
+Basic usage (a `Dockerfile` or `Containerfile` must be located at `src/main/docker/`, `src/main/podman/`, or in the project root):
 
 [source,shell]
 ----
@@ -20,6 +20,20 @@ With a custom Dockerfile path:
 [source,shell]
 ----
 arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --dockerfile config/Dockerfile
+----
+
+Explicitly use Podman as the OCI runtime:
+
+[source,shell]
+----
+arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --oci-runtime podman
+----
+
+Explicitly use Docker as the OCI runtime:
+
+[source,shell]
+----
+arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --oci-runtime docker
 ----
 
 == Options
@@ -34,12 +48,20 @@ The following options are available:
 |
 |*(Required)* Name (and optionally tag) for the image to build. For example: `ghcr.io/my-org/my-app:1.0.0`.
 
-|`--dockerfile` or `-f`
+|`--dockerfile`, `--containerfile`, or `-f`
 |
-a|The path to the Dockerfile to use for building the container image. If not specified, the command looks for a Dockerfile in these locations (in order):
+a|The path to the Dockerfile or Containerfile to use for building the container image. If not specified, the command looks in these locations (in order):
 
 1. `src/main/docker/Dockerfile`
-2. `Dockerfile` (project root)
+2. `src/main/docker/Containerfile`
+3. `src/main/podman/Dockerfile`
+4. `src/main/podman/Containerfile`
+5. `Dockerfile` (project root)
+6. `Containerfile` (project root)
+
+|`--oci-runtime`
+|_(auto-detected)_
+|The OCI runtime to use for building the container image. Supported values: `docker`, `podman`. If not specified, the CLI checks for Podman first, then falls back to Docker.
 
 |`--verbose` or `-v`
 |`false`

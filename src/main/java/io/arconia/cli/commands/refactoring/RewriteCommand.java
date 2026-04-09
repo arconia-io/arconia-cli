@@ -17,7 +17,7 @@ import io.arconia.cli.openrewrite.RewriteArguments;
 @Component
 @Command(
     name = "rewrite",
-    description = "Run OpenRewrite recipes to migrate or refactor your project."
+    description = "Discover and run OpenRewrite recipes to migrate or refactor a Java application."
 )
 public class RewriteCommand implements Runnable {
 
@@ -29,7 +29,7 @@ public class RewriteCommand implements Runnable {
         spec.commandLine().usage(spec.commandLine().getOut());
     }
 
-    @Command(name = "run", description = "Run an OpenRewrite recipe to migrate or refactor your project.")
+    @Command(name = "run", description = "Run an OpenRewrite recipe to migrate or refactor your Java application.")
     public void run(
         @Option(names = "--dry-run", description = "Run in dry-run mode.") boolean dryRun,
         @Option(names = "--recipe-name", required = true,
@@ -37,7 +37,7 @@ public class RewriteCommand implements Runnable {
         @Option(names = "--recipe-library",
             description = """
                 Maven coordinates of the library containing the OpenRewrite recipe to run.
-                If not provided, the OpenRewrite OSS core recipe library will be used.
+                If not provided, the OpenRewrite OSS and Arconia recipe libraries will be used.
                 Example: 'io.arconia.migrations:rewrite-arconia'.""") String recipeLibrary,
         @Option(names = "--recipe-version",
             description = """

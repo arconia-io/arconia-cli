@@ -2,6 +2,12 @@ package io.arconia.cli.commands.refactoring;
 
 import org.springframework.stereotype.Component;
 
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
+
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.commands.options.ParametersOption;
 import io.arconia.cli.openrewrite.OpenRewriteRunner;
@@ -11,11 +17,6 @@ import io.arconia.cli.openrewrite.recipes.GradleRecipe;
 import io.arconia.cli.openrewrite.recipes.MavenRecipe;
 import io.arconia.cli.openrewrite.recipes.SpringAiRecipe;
 import io.arconia.cli.openrewrite.recipes.SpringBootRecipe;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Spec;
-import picocli.CommandLine.Model.CommandSpec;
 
 @Component
 @Command(
@@ -33,7 +34,7 @@ public class UpdateCommands implements Runnable {
         spec.commandLine().usage(spec.commandLine().getOut());
     }
 
-    @Command(name = "gradle", description = "Update project to new Gradle version.")
+    @Command(name = "gradle", description = "Update a Java project to the latest Gradle version.")
     public void gradle(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
         @Mixin OutputOptions outputOptions,
@@ -49,7 +50,7 @@ public class UpdateCommands implements Runnable {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(name = "maven", description = "Update project to new Maven version.")
+    @Command(name = "maven", description = "Update a Java project to the latest Maven version.")
     public void maven(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
         @Mixin OutputOptions outputOptions,
@@ -65,7 +66,7 @@ public class UpdateCommands implements Runnable {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(name = "framework", description = "Update project to new Arconia Framework version.")
+    @Command(name = "framework", description = "Update a Java project to a new Arconia Framework version.")
     public void framework(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
         @Option(names = "--to-version", defaultValue = "0.20", description = "Arconia target version.") String toVersion,
@@ -82,7 +83,7 @@ public class UpdateCommands implements Runnable {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(name = "spring-ai", description = "Update project to new Spring AI version.")
+    @Command(name = "spring-ai", description = "Update a Java project to a new Spring AI version.")
     public void springAi(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
         @Option(names = "--to-version", defaultValue = "1.1", description = "Spring AI target version.") String toVersion,
@@ -99,7 +100,7 @@ public class UpdateCommands implements Runnable {
         openRewriteRunner.update(updateOptions);
     }
 
-    @Command(name = "spring-boot", description = "Update project to a new Spring Boot version.")
+    @Command(name = "spring-boot", description = "Update a Java project to a new Spring Boot version.")
     public void springBoot(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
         @Option(names = "--to-version", defaultValue = "3.5", description = "Spring Boot target version.") String toVersion,

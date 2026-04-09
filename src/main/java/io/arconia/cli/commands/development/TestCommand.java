@@ -2,18 +2,19 @@ package io.arconia.cli.commands.development;
 
 import org.springframework.stereotype.Component;
 
-import io.arconia.cli.build.BuildArguments;
-import io.arconia.cli.commands.options.OutputOptions;
-import io.arconia.cli.commands.options.ParametersOption;
-import io.arconia.cli.build.BuildToolRunner;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
+import io.arconia.cli.build.BuildArguments;
+import io.arconia.cli.build.BuildToolRunner;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.commands.options.ParametersOption;
+
 @Component
 @Command(
     name = "test",
-    description = "Run tests for the current project."
+    description = "Run tests for a Java application."
 )
 public class TestCommand implements Runnable {
 
