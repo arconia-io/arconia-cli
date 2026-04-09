@@ -31,6 +31,20 @@ Publish the image to a registry after building:
 arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0 --publish-image
 ----
 
+Build for a specific platform:
+
+[source,shell]
+----
+arconia image build buildpacks --image-platform linux/amd64
+----
+
+Build a multi-arch image for multiple platforms:
+
+[source,shell]
+----
+arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0 --image-platform linux/amd64 linux/arm64 --publish-image
+----
+
 Build without running tests and clean cache:
 
 [source,shell]
@@ -73,6 +87,10 @@ The following options are available:
 |`--publish-image`
 |`false`
 |Whether to publish the generated image to an OCI registry after building. Make sure you are authenticated with the target registry (e.g., `podman login ghcr.io`) before using this option.
+
+|`--image-platform`
+|
+|Platform(s) for the image to build (e.g., `linux/amd64`, `linux/arm64`). When a single platform is specified, it is passed to the build tool. When multiple platforms are specified, a separate image is built for each platform and a multi-arch OCI image index (manifest list) is assembled and pushed to the registry. Requires `--publish-image` when using multiple platforms.
 
 |`--clean`
 |`false`
@@ -120,6 +138,26 @@ a|
 |===
 
 Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
+
+== Multi-Architecture Images
+
+When you specify multiple platforms with `--image-platform`, the CLI orchestrates a multi-arch image build:
+
+1. For each platform, it builds a platform-specific image (tagged with a `-<os>-<arch>` suffix, e.g., `my-app:1.0.0-linux-amd64`).
+2. Each platform-specific image is published to the registry.
+3. An OCI image index (manifest list) is created that references all platform-specific images, and is pushed to the registry under the original tag.
+
+This means consumers can pull the image by its base tag (e.g., `my-app:1.0.0`) and their container runtime will automatically select the correct platform-specific image.
+
+[source,shell]
+----
+arconia image build buildpacks \
+  --image-name ghcr.io/my-org/my-app:1.0.0 \
+  --image-platform linux/amd64 linux/arm64 \
+  --publish-image
+----
+
+NOTE: Multi-arch builds require `--publish-image` because the OCI image index must be assembled from manifests already present in a registry.
 
 == See Also
 

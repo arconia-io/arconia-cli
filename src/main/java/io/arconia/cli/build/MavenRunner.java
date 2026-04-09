@@ -170,6 +170,9 @@ public class MavenRunner implements BuildToolRunner {
         if (imageArguments.publishImage()) {
             command.add("-Dspring-boot.build-image.publish=true");
         }
+        if (!CollectionUtils.isEmpty(imageArguments.imagePlatforms()) && imageArguments.imagePlatforms().size() == 1) {
+            command.add("-Dspring-boot.build-image.imagePlatform=%s".formatted(imageArguments.imagePlatforms().getFirst()));
+        }
     }
 
     List<String> constructRewriteRunCommand(RewriteArguments rewriteArguments) {

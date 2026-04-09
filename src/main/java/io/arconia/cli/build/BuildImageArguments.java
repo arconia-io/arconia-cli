@@ -1,11 +1,16 @@
 package io.arconia.cli.build;
 
+import java.util.List;
+
+import org.jspecify.annotations.Nullable;
+
 public record BuildImageArguments(
-    String imageName,
-    String builderImage,
-    String runImage,
-    boolean cleanCache,
-    boolean publishImage
+        @Nullable String imageName,
+        @Nullable String builderImage,
+        @Nullable String runImage,
+        boolean cleanCache,
+        boolean publishImage,
+        @Nullable List<String> imagePlatforms
 ) {
 
     public static Builder builder() {
@@ -13,26 +18,27 @@ public record BuildImageArguments(
     }
 
     public static class Builder {
-        
-        private String imageName;
-        private String builderImage;
-        private String runImage;
+
+        @Nullable private String imageName;
+        @Nullable private String builderImage;
+        @Nullable private String runImage;
         private boolean cleanCache = false;
         private boolean publishImage = false;
+        @Nullable private List<String> imagePlatforms;
 
         private Builder() {}
-  
-        public Builder imageName(String imageName) {
+
+        public Builder imageName(@Nullable String imageName) {
             this.imageName = imageName;
             return this;
         }
 
-        public Builder builderImage(String builderImage) {
+        public Builder builderImage(@Nullable String builderImage) {
             this.builderImage = builderImage;
             return this;
         }
 
-        public Builder runImage(String runImage) {
+        public Builder runImage(@Nullable String runImage) {
             this.runImage = runImage;
             return this;
         }
@@ -47,8 +53,13 @@ public record BuildImageArguments(
             return this;
         }
 
+        public Builder imagePlatforms(@Nullable List<String> imagePlatforms) {
+            this.imagePlatforms = imagePlatforms;
+            return this;
+        }
+
         public BuildImageArguments build() {
-            return new BuildImageArguments(imageName, builderImage, runImage, cleanCache, publishImage);
+            return new BuildImageArguments(imageName, builderImage, runImage, cleanCache, publishImage, imagePlatforms);
         }
 
     }

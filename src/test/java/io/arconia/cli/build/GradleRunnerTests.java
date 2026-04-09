@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -109,6 +110,54 @@ class GradleRunnerTests {
             "--runImage=paketobuildpacks/run",
             "--cleanCache",
             "--publishImage");
+    }
+
+    @Test
+    void buildCommandWithSingleImagePlatform() {
+        var imageArguments = BuildImageArguments.builder()
+            .imageName("my-image")
+            .imagePlatforms(List.of("linux/amd64"))
+            .build();
+        var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
+        var command = runner.constructGradleCommand("bootBuildImage", arguments);
+
+        assertThat(command).contains("--imagePlatform=linux/amd64");
+    }
+
+    @Test
+    void buildCommandWithMultipleImagePlatformsDoesNotAddFlag() {
+        var imageArguments = BuildImageArguments.builder()
+            .imageName("my-image")
+            .imagePlatforms(List.of("linux/amd64", "linux/arm64"))
+            .build();
+        var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
+        var command = runner.constructGradleCommand("bootBuildImage", arguments);
+
+        assertThat(command).noneMatch(arg -> arg.contains("--imagePlatform"));
+    }
+
+    @Test
+    void buildCommandWithNullImagePlatforms() {
+        var imageArguments = BuildImageArguments.builder()
+            .imageName("my-image")
+            .imagePlatforms(null)
+            .build();
+        var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
+        var command = runner.constructGradleCommand("bootBuildImage", arguments);
+
+        assertThat(command).noneMatch(arg -> arg.contains("--imagePlatform"));
+    }
+
+    @Test
+    void buildCommandWithEmptyImagePlatforms() {
+        var imageArguments = BuildImageArguments.builder()
+            .imageName("my-image")
+            .imagePlatforms(Collections.emptyList())
+            .build();
+        var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
+        var command = runner.constructGradleCommand("bootBuildImage", arguments);
+
+        assertThat(command).noneMatch(arg -> arg.contains("--imagePlatform"));
     }
 
     @Test

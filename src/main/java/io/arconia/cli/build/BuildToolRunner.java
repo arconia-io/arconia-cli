@@ -29,12 +29,15 @@ public interface BuildToolRunner {
     default void call(List<String> command, Map<String, String> environmentVariables) {
         Assert.notEmpty(command, "command cannot be null or empty");
         Assert.notNull(environmentVariables, "environmentVariables cannot be null");
-        ProcessExecutor.execute(ProcessExecutionRequest.builder()
+        int exitCode = ProcessExecutor.execute(ProcessExecutionRequest.builder()
                         .command(command.toArray(new String[0]))
                         .targetDirectory(getProjectPath().toFile())
                         .environmentVariables(environmentVariables)
                         .outputOptions(getOutputOptions())
                         .build());
+        if (exitCode != 0) {
+            throw new CliException("Build process failed with exit code %d".formatted(exitCode));
+        }
     }
 
     void build(BuildArguments buildArguments);

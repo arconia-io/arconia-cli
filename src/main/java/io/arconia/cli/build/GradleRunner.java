@@ -171,6 +171,9 @@ public class GradleRunner implements BuildToolRunner {
         if (imageArguments.publishImage()) {
             command.add("--publishImage");
         }
+        if (!CollectionUtils.isEmpty(imageArguments.imagePlatforms()) && imageArguments.imagePlatforms().size() == 1) {
+            command.add("--imagePlatform=%s".formatted(imageArguments.imagePlatforms().getFirst()));
+        }
     }
 
     List<String> constructRewriteRunCommand(RewriteArguments rewriteArguments) {
