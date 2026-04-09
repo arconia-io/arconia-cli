@@ -12,7 +12,6 @@ public record ProjectCreateArguments(
         String name,
         String description,
         String group,
-        String version,
         String packageName
 ) {
 
@@ -20,7 +19,6 @@ public record ProjectCreateArguments(
         Assert.hasText(name, "name cannot be null or empty");
         Assert.hasText(description, "description cannot be null or empty");
         Assert.hasText(group, "group cannot be null or empty");
-        Assert.hasText(version, "version cannot be null or empty");
         Assert.hasText(packageName, "packageName cannot be null or empty");
     }
 
@@ -32,7 +30,6 @@ public record ProjectCreateArguments(
         @Nullable private String name;
         @Nullable private String description;
         @Nullable private String group;
-        @Nullable private String version;
         @Nullable private String packageName;
 
         private Builder() {}
@@ -52,11 +49,6 @@ public record ProjectCreateArguments(
             return this;
         }
 
-        public Builder version(String version) {
-            this.version = version;
-            return this;
-        }
-
         public Builder packageName(String packageName) {
             this.packageName = packageName;
             return this;
@@ -71,7 +63,7 @@ public record ProjectCreateArguments(
                 packageName = group + "." + name;
             }
 
-            return new ProjectCreateArguments(name, description, group, version, packageName);
+            return new ProjectCreateArguments(name, description, group, packageName);
         }
 
     }

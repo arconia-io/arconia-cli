@@ -54,7 +54,6 @@ class ProjectCreatorTests {
         ProjectCreateArguments arguments = ProjectCreateArguments.builder()
                 .name("my-app")
                 .group("io.example")
-                .version("0.0.1-SNAPSHOT")
                 .build();
 
         assertThatThrownBy(() -> creator.create(arguments, null, Path.of("/projects")))
@@ -67,7 +66,6 @@ class ProjectCreatorTests {
         ProjectCreateArguments arguments = ProjectCreateArguments.builder()
                 .name("my-app")
                 .group("io.example")
-                .version("0.0.1-SNAPSHOT")
                 .build();
 
         assertThatThrownBy(() -> creator.create(arguments, "", Path.of("/projects")))
@@ -80,7 +78,6 @@ class ProjectCreatorTests {
         ProjectCreateArguments arguments = ProjectCreateArguments.builder()
                 .name("my-app")
                 .group("io.example")
-                .version("0.0.1-SNAPSHOT")
                 .build();
 
         assertThatThrownBy(() -> creator.create(arguments, "ghcr.io/org/templates/my-template:1.0.0", null))
