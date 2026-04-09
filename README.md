@@ -23,7 +23,7 @@
 - **🚀&nbsp; Dev mode**. Run your application with features improving your development experience.
 - **🔨&nbsp; Build & test**. Compile, test, and package as JVM JARs or GraalVM native executables.
 - **📦&nbsp; Container images**. Build images using Cloud Native Buildpacks or Dockerfiles with Podman/Docker.
-- **⬆️&nbsp; Automated upgrades**. Upgrade Spring Boot, Spring AI, Arconia Framework, Gradle, and Maven with a single command.
+- **⬆️&nbsp; Automated upgrades**. Upgrade Spring Boot, Spring AI, Arconia, Gradle, and Maven with a single command.
 - **🔄&nbsp; OpenRewrite recipes**. Run any OpenRewrite recipe to migrate or refactor your codebase.
 - **📁&nbsp; Project templates**. Create new projects from templates distributed as OCI artifacts.
 - **🧠&nbsp; Agent skills**. Install and manage AI agent skills for your applications.
