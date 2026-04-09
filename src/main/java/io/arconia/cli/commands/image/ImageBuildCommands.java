@@ -39,7 +39,7 @@ public class ImageBuildCommands implements Runnable {
         @Option(names = "--image-name", description = "Name of the image to build (e.g. ghcr.io/arconia-io/configuration-service).") @Nullable String imageName,
         @Option(names = "--builder-image", description = "Name of the Buildpacks Builder image to use (e.g. docker.io/paketobuildpacks/builder-noble-java-tiny).") @Nullable String builderImage,
         @Option(names = "--run-image", description = "Name of the Buildpacks Run image to use (e.g. docker.io/paketobuildpacks/ubuntu-noble-run-tiny).") @Nullable String runImage,
-        @Option(names = "--clean-cache", description = "Whether to clean the cache before building.") boolean cleanCache,
+        @Option(names = "--clean-cache", description = "Whether to clean the Buildpacks local cache before building.") boolean cleanCache,
         @Option(names = "--publish-image", description = "Whether to publish the generated image to an OCI registry.") boolean publishImage,
         @Option(names = "--image-platform", arity = "0..*", description = "Platform(s) for the image to build (e.g. linux/amd64, linux/arm64). Specify multiple for multi-arch builds. If not specified, the platform of the host machine is used.") @Nullable List<String> imagePlatforms,
         @Option(names = "--clean", description = "Perform a clean build.") boolean clean,

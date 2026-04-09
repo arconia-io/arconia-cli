@@ -28,7 +28,7 @@ sudo cp build/native/nativeCompile/arconia /usr/local/bin/arconia
 
 This command copies the executable to a directory typically included in the system PATH, making it accessible from anywhere in the terminal.
 
-### Running the CLI
+=== Running the CLI
 
 If you've installed the CLI globally, you can run it by simply typing:
 

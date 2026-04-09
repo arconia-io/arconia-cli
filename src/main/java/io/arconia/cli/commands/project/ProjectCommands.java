@@ -27,7 +27,7 @@ import io.arconia.cli.project.ProjectPushArguments;
 import io.arconia.cli.project.ProjectPushReport;
 import io.arconia.cli.utils.IoUtils;
 
-@Command(name = "project", description = "Manage projects", subcommands = {ProjectCollectionCommands.class})
+@Command(name = "project", description = "Create and manage Java projects", subcommands = {ProjectCollectionCommands.class})
 @Component
 public class ProjectCommands implements Runnable {
 
@@ -39,10 +39,10 @@ public class ProjectCommands implements Runnable {
         spec.commandLine().usage(spec.commandLine().getOut());
     }
 
-    @Command(name = "create", description = "Create a new project")
+    @Command(name = "create", description = "Create a new Java project")
     public void create(
-            @Option(names = {"--name"}, description = "The project name.") String name,
-            @Option(names = {"--template"}, description = "The project template to use.") String template,
+            @Option(names = {"--name"}, description = "The name of the project to create.") String name,
+            @Option(names = {"--template"}, description = "The project to use as a template (e.g. 'ghcr.io/arconia-io/arconia-project-templates/server-http').") String template,
             @Option(names = {"--group"}, defaultValue = "com.example", description = "The group ID for the project. If not provided, defaults to 'com.example'.") String group,
             @Option(names = {"--description"}, description = "The description for the project") String description,
             @Option(names = {"--package-name"}, description = "The package name for the project") String packageName,
@@ -62,14 +62,14 @@ public class ProjectCommands implements Runnable {
         projectCreator.create(arguments, template, IoUtils.getProjectPath(path));
     }
 
-    @Command(name = "push", description = "Publish a project as an OCI artifact")
+    @Command(name = "push", description = "Publish a Java project as an OCI artifact")
     public void push(
-            @Option(names = {"--ref"}, description = "The full OCI artifact reference for a single project (e.g. ghcr.io/org/projects/my-project). Mutually exclusive with --prefix.") @Nullable String ref,
-            @Option(names = {"--base-ref"}, description = "The base OCI reference for all discovered projects (e.g. ghcr.io/org/projects). Discovers and pushes all projects found as direct subdirectories of --path. Mutually exclusive with --ref.") @Nullable String baseRef,
+            @Option(names = {"--ref"}, description = "The full OCI artifact reference for a single Java project (e.g. ghcr.io/arconia-io/arconia-project-templates/web). Mutually exclusive with --base-ref.") @Nullable String ref,
+            @Option(names = {"--base-ref"}, description = "The base OCI reference for all discovered projects (e.g. ghcr.io/arconia-io/arconia-project-templates). Discovers and pushes all projects found as direct subdirectories of --path. Mutually exclusive with --ref.") @Nullable String baseRef,
             @Option(names = {"--path"}, description = "Path to the project directory, or with --base-ref: the parent directory to discover projects in. Defaults to the current working directory.") @Nullable String path,
             @Option(names = {"--tag"}, defaultValue = "latest", description = "The version tag (e.g. 'latest', semantic version number, commit sha). Defaults to 'latest'.") String tag,
-            @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") @Nullable List<String> annotations,
-            @Option(names = {"--report"}, arity = "0..1", fallbackValue = ProjectPushReport.DEFAULT_FILENAME, description = "Write a publish report file. Defaults to '" + ProjectPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
+            @Option(names = {"--annotation"}, arity = "0..*", description = "Additional annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") @Nullable List<String> annotations,
+            @Option(names = {"--output-report"}, arity = "0..1", fallbackValue = ProjectPushReport.DEFAULT_FILENAME, description = "Write a publish report file. Defaults to '" + ProjectPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
             @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
             ) throws IOException {

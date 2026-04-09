@@ -77,4 +77,4 @@ After installing, verify the Arconia CLI is correctly installed and available on
 arconia version
 ----
 
-You should see the installed version printed to the terminal.
+You should see the installed version printed in the terminal.

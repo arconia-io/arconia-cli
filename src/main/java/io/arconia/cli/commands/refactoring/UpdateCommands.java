@@ -69,7 +69,7 @@ public class UpdateCommands implements Runnable {
     @Command(name = "framework", description = "Update a Java project to a new Arconia Framework version.")
     public void framework(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
-        @Option(names = "--to-version", defaultValue = "0.20", description = "Arconia target version.") String toVersion,
+        @Option(names = "--to-version", defaultValue = "0.24", description = "Arconia target version.") String toVersion,
         @Mixin OutputOptions outputOptions,
         @Mixin ParametersOption parametersOption
     ) {
@@ -103,7 +103,7 @@ public class UpdateCommands implements Runnable {
     @Command(name = "spring-boot", description = "Update a Java project to a new Spring Boot version.")
     public void springBoot(
         @Option(names = "--dry-run", description = "Update in dry-run mode.") boolean dryRun,
-        @Option(names = "--to-version", defaultValue = "3.5", description = "Spring Boot target version.") String toVersion,
+        @Option(names = "--to-version", defaultValue = "4.0", description = "Spring Boot target version.") String toVersion,
         @Mixin OutputOptions outputOptions,
         @Mixin ParametersOption parametersOption
     ) {

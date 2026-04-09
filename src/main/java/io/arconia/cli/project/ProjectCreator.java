@@ -117,6 +117,7 @@ public final class ProjectCreator {
             }
             for (ProjectCollectionSummary summary : ProjectCollectionCache.toProjectSummaries(index)) {
                 if (templateName.equals(summary.name())) {
+                    outputOptions.info("Template '%s' resolved to '%s'".formatted(templateName, summary.ref()));
                     return summary.ref();
                 }
             }

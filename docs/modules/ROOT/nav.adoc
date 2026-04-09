@@ -8,7 +8,8 @@
 ** xref:image/buildpacks.adoc[arconia image build buildpacks]
 ** xref:image/dockerfile.adoc[arconia image build dockerfile]
 * Migration
-** xref:migration/rewrite.adoc[arconia rewrite]
+** xref:migration/rewrite-run.adoc[arconia rewrite run]
+** xref:migration/rewrite-discover.adoc[arconia rewrite discover]
 * Update
 ** xref:update/framework.adoc[arconia update framework]
 ** xref:update/gradle.adoc[arconia update gradle]

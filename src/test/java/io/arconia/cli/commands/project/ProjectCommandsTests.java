@@ -81,7 +81,7 @@ class ProjectCommandsTests {
         assertThat(out).contains("--path");
         assertThat(out).contains("--tag");
         assertThat(out).contains("--annotation");
-        assertThat(out).contains("--report");
+        assertThat(out).contains("--output-report");
         assertThat(out).contains("--registry-insecure");
         assertThat(out).contains("--registry-skip-tls-verify");
     }

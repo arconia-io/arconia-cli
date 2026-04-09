@@ -1,0 +1,85 @@
+= `arconia rewrite discover`
+
+The `arconia rewrite discover` command lists available https://docs.openrewrite.org/[OpenRewrite] recipes that can be used with the xref:migration/rewrite-run.adoc[`arconia rewrite run`] command to migrate or refactor your codebase.
+
+== Usage
+
+Discover available recipes:
+
+[source,shell]
+----
+arconia rewrite discover
+----
+
+Pass extra parameters to the underlying build tool using `--`:
+
+[source,shell]
+----
+arconia rewrite discover -- --stacktrace
+----
+
+== Options
+
+The following options are available:
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+== Build Tool Integration
+
+The command automatically detects whether your project uses Maven or Gradle and runs the appropriate OpenRewrite discovery task relying on the OpenRewrite Maven and Gradle plugins without modifying the build itself.
+
+Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
+
+== Default Recipe Libraries
+
+The Arconia CLI is configured with the following recipe libraries out of the box. All recipes from these libraries are available to `arconia rewrite discover` and xref:migration/rewrite-run.adoc[`arconia rewrite run`] without needing to specify `--recipe-library`:
+
+[cols="1,3"]
+|===
+|Library |Description
+
+|`io.arconia.migrations:rewrite-arconia`
+|Recipes for migrating between https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] versions.
+
+|`io.arconia.migrations:rewrite-spring`
+|Recipes for migrating between https://spring.io/projects/spring-boot[Spring Boot] and https://spring.io/projects/spring-ai[Spring AI] versions.
+
+|`io.arconia.migrations:rewrite-docling`
+|Recipes for https://github.com/docling-project/docling[Docling]-related migrations.
+
+|`io.arconia.migrations:rewrite-test`
+|Recipes for test framework migrations and improvements, including JUnit and Testcontainers.
+
+|`org.openrewrite:rewrite-java`
+|Core OpenRewrite recipes for Java code (e.g., removing unused imports, updating Java versions).
+
+|`org.openrewrite.recipe:rewrite-java-dependencies`
+|Recipes for managing and updating Java dependencies.
+|===
+
+All Arconia Migrations recipes are open-source and released under the Apache 2.0 license.
+
+== Additional Recipe Sources
+
+Beyond the bundled libraries, you can find more recipes in these catalogs:
+
+* https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog] — The comprehensive catalog of all available OpenRewrite recipes. Use `--recipe-library` with xref:migration/rewrite-run.adoc[`arconia rewrite run`] to include recipes from additional libraries.
+* https://github.com/arconia-io/arconia-migrations[Arconia Migrations] — The full set of Arconia migration recipes.
+
+WARNING: The OpenRewrite Recipe Catalog includes recipes with different licenses. Some are open-source (Apache 2.0); others use the Moderne Source Available License or Moderne Proprietary License. Review the license of any recipe before running it. See https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module[OpenRewrite module versions] for details.
+
+== See Also
+
+* xref:migration/rewrite-run.adoc[arconia rewrite run]
+* https://docs.openrewrite.org/[OpenRewrite Documentation]

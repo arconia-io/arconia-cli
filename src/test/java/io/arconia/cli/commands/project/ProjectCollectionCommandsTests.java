@@ -146,7 +146,7 @@ class ProjectCollectionCommandsTests {
         assertThat(out).contains("--from-report");
         assertThat(out).contains("--project");
         assertThat(out).contains("--annotation");
-        assertThat(out).contains("--report");
+        assertThat(out).contains("--output-report");
         assertThat(out).contains("--registry-insecure");
         assertThat(out).contains("--registry-skip-tls-verify");
     }

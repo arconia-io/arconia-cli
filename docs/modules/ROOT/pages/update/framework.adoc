@@ -8,14 +8,14 @@ Preview what changes will be made without applying them:
 
 [source,shell]
 ----
-arconia update framework --to-version=0.23 --dry-run
+arconia update framework --to-version=0.24 --dry-run
 ----
 
 Apply the update:
 
 [source,shell]
 ----
-arconia update framework --to-version=0.23
+arconia update framework --to-version=0.24
 ----
 
 Pass extra parameters to the underlying build tool using `--`:
@@ -25,10 +25,6 @@ Pass extra parameters to the underlying build tool using `--`:
 arconia update framework --to-version=0.23 -- --stacktrace
 arconia update framework --to-version=0.23 -- -DmyProperty=value
 ----
-
-WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
-
-TIP: Consider using `--dry-run` first to inspect what the migration recipe will change before applying it.
 
 == Options
 
@@ -43,7 +39,7 @@ The following options are available:
 |Preview the changes that would be made without modifying any files. Recommended before applying the update.
 
 |`--to-version`
-|`0.20`
+|`0.24`
 |Arconia Framework target version to upgrade to.
 
 |`--verbose` or `-v`
@@ -57,12 +53,12 @@ The following options are available:
 
 == Build Tool Integration
 
-The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite.adoc[`arconia rewrite`] command.
+The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite-run.adoc[`arconia rewrite run`] command.
 
 Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 
-* xref:migration/rewrite.adoc[arconia rewrite]
+* xref:migration/rewrite-run.adoc[arconia rewrite run]
 * https://github.com/arconia-io/arconia-migrations/tree/main[Arconia Migrations]
 * https://docs.arconia.io/arconia/latest/index.html[Arconia Framework documentation]

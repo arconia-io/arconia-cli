@@ -1,8 +1,10 @@
 = `arconia test`
 
-The `arconia test` command runs tests for your Spring Boot application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both JVM and native modes.
+The `arconia test` command runs tests for your Java application. It delegates to your build tool's (Maven/Gradle) test tasks with support for both JVM and GraalVM native modes.
 
-When using the https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] with https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services], any declared external services are automatically provisioned as containers during the test run. No test configuration classes or `@Import` annotations needed.
+== How It Works
+
+When you run `arconia test`, the Arconia Framework detects that the application is running in test mode and activates a series of test-only features, such as enabling a `test` Spring profile and provisioning any declared https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services] during the test run. No test configuration classes or `@Import` annotations needed.
 
 == Usage
 
@@ -51,6 +53,10 @@ The following options are available:
 |`false`
 |Run tests in native mode using GraalVM Native Image.
 
+|`--offline`
+|`false`
+|Perform the build offline.
+
 |`--verbose` or `-v`
 |`false`
 |Include verbose output.
@@ -60,7 +66,7 @@ The following options are available:
 |Display help information for the command.
 |===
 
-NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM] with the Native Image component installed. Native tests compile the application to a native binary before executing, which takes significantly longer than JVM tests.
+NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM]. Native tests compile the application to a native binary before executing, which might take longer than JVM tests.
 
 == Build Tool Integration
 

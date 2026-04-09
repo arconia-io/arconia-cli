@@ -86,12 +86,12 @@ public class DockerfileRunner implements ImageToolRunner {
 
         // Search for Dockerfile or Containerfile in supported locations
         List<Path> candidates = List.of(
-            projectPath.resolve("src/main/docker/Dockerfile"),
-            projectPath.resolve("src/main/docker/Containerfile"),
-            projectPath.resolve("src/main/podman/Dockerfile"),
-            projectPath.resolve("src/main/podman/Containerfile"),
+            projectPath.resolve("Containerfile"),
             projectPath.resolve("Dockerfile"),
-            projectPath.resolve("Containerfile")
+            projectPath.resolve("src/main/podman/Containerfile"),
+            projectPath.resolve("src/main/podman/Dockerfile"),
+            projectPath.resolve("src/main/docker/Containerfile"),
+            projectPath.resolve("src/main/docker/Dockerfile")
         );
 
         for (Path candidate : candidates) {

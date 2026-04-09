@@ -2,11 +2,13 @@
 
 The `arconia image build buildpacks` command builds a container image for your Spring Boot application using https://buildpacks.io/[Cloud Native Buildpacks]. It delegates to your build tool's (Maven/Gradle) image build tasks to package your application as a container image, relying on the Spring Boot integration with https://paketo.io[Paketo Buildpacks].
 
-This approach does not require a Dockerfile: the buildpack automatically detects the application type, installs the appropriate runtime, and assembles the image following best practices for security and size.
+== How It Works
+
+This approach does not require a Dockerfile: the buildpack automatically detects the application type, installs the appropriate runtime, and assembles the image following best practices for security and performance.
 
 == Prerequisites
 
-* An OCI container runtime (Docker, Podman, or compatible) must be running on your machine.
+* An OCI container runtime (https://podman.io[Podman] or https://www.docker.com[Docker]) must be installed and running on your machine.
 
 == Usage
 
@@ -21,14 +23,14 @@ With a custom image name:
 
 [source,shell]
 ----
-arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0
+arconia image build buildpacks --image-name ghcr.io/arconia-io/configuration-service:1.0.0
 ----
 
 Publish the image to a registry after building:
 
 [source,shell]
 ----
-arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0 --publish-image
+arconia image build buildpacks --image-name ghcr.io/arconia-io/configuration-service --publish-image
 ----
 
 Build for a specific platform:
@@ -42,14 +44,18 @@ Build a multi-arch image for multiple platforms:
 
 [source,shell]
 ----
-arconia image build buildpacks --image-name ghcr.io/my-org/my-app:1.0.0 --image-platform linux/amd64 linux/arm64 --publish-image
+arconia image build buildpacks \
+  --image-name ghcr.io/arconia-io/configuration-service:1.0.0 \
+  --image-platform linux/amd64 \
+  --image-platform linux/arm64 \
+  --publish-image
 ----
 
-Build without running tests and clean cache:
+Build with a clean Buildpacks cache:
 
 [source,shell]
 ----
-arconia image build buildpacks --skip-tests --clean-cache
+arconia image build buildpacks --clean-cache
 ----
 
 Pass extra parameters to the underlying build tool using `--`:
@@ -70,19 +76,19 @@ The following options are available:
 
 |`--image-name`
 |
-|Name (and optionally tag) for the image to build. For example: `ghcr.io/my-org/my-app:1.0.0`.
+|Name (and optionally tag) for the image to build. For example: `ghcr.io/arconia-io/configuration-service:1.0.0`.
 
 |`--builder-image`
 |
-|Name of the Paketo builder image to use. Defaults to the builder configured in your Spring Boot build plugin. Override this to use a different builder, for example a custom corporate builder.
+|Name of the Buildpacks Builder image to use (e.g. `docker.io/paketobuildpacks/builder-noble-java-tiny`). Defaults to the builder configured in your Spring Boot build plugin.
 
 |`--run-image`
 |
-|Name of the Paketo run image to use. Override this to change the base image of the produced container, for example to use a distroless or hardened run image.
+|Name of the Buildpacks Run image to use (e.g. `docker.io/paketobuildpacks/ubuntu-noble-run-tiny`). Defaults to the Run image configured in the Builder image. Override this to change the base image of the produced container image, for example, to use a distroless or hardened Run image.
 
 |`--clean-cache`
 |`false`
-|Whether to clean the local buildpack cache before building. Useful when troubleshooting caching issues.
+|Whether to clean the Buildpacks local cache before building. Useful when troubleshooting caching issues.
 
 |`--publish-image`
 |`false`
@@ -90,7 +96,7 @@ The following options are available:
 
 |`--image-platform`
 |
-|Platform(s) for the image to build (e.g., `linux/amd64`, `linux/arm64`). When a single platform is specified, it is passed to the build tool. When multiple platforms are specified, a separate image is built for each platform and a multi-arch OCI image index (manifest list) is assembled and pushed to the registry. Requires `--publish-image` when using multiple platforms.
+|Platform(s) for the image to build (e.g., `linux/amd64`, `linux/arm64`). When a single platform is specified, it is passed to the build tool. When multiple platforms are specified, a separate image is built for each platform, and a multi-arch OCI image index (manifest list) is assembled and pushed to the registry. Requires `--publish-image` when using multiple platforms.
 
 |`--clean`
 |`false`
@@ -145,14 +151,14 @@ When you specify multiple platforms with `--image-platform`, the CLI orchestrate
 
 1. For each platform, it builds a platform-specific image (tagged with a `-<os>-<arch>` suffix, e.g., `my-app:1.0.0-linux-amd64`).
 2. Each platform-specific image is published to the registry.
-3. An OCI image index (manifest list) is created that references all platform-specific images, and is pushed to the registry under the original tag.
+3. An OCI image index (manifest list) is created that references all platform-specific images and is pushed to the registry under the original tag.
 
 This means consumers can pull the image by its base tag (e.g., `my-app:1.0.0`) and their container runtime will automatically select the correct platform-specific image.
 
 [source,shell]
 ----
 arconia image build buildpacks \
-  --image-name ghcr.io/my-org/my-app:1.0.0 \
+  --image-name ghcr.io/arconia-io/configuration-service:1.0.0 \
   --image-platform linux/amd64 linux/arm64 \
   --publish-image
 ----

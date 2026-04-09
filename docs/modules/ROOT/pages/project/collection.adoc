@@ -10,15 +10,41 @@ Register a project collection with the Arconia CLI configuration and fetch its c
 
 [source,shell]
 ----
-arconia project collection add --name my-collection --ref ghcr.io/org/project-collection:1.0.0
+arconia project collection add \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-project-templates/collection
 ----
 
 **Options**
 
-* `--name`: (Required) A short alias for the collection (e.g. `arconia-project-collection`).
-* `--ref`: (Required) The OCI artifact reference for the collection (e.g. `ghcr.io/org/project-collection:4.2.0`).
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The name of the Java project collection (e.g. `arconia-project-templates`).
+
+|`--ref` (required)
+|
+|The OCI artifact reference for the collection (e.g. `ghcr.io/arconia-io/arconia-project-templates/collection`).
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
 
 === `list`
 
@@ -27,30 +53,72 @@ List available projects in a collection. Displays each project's name, descripti
 [source,shell]
 ----
 arconia project collection list
-arconia project collection list --name my-collection
+arconia project collection list --name arconia-project-templates
 ----
 
 **Options**
 
-* `--name`: The alias of a registered collection for which to list the projects. If omitted, lists projects from all registered collections.
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name`
+|
+|The name of the registered collection for which to list the projects. If omitted, lists projects from all registered collections.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
 
 === `update`
 
-Update a registered collection or all registered collections. For each collection, checks whether a newer semver tag is available in the OCI registry. If a newer version is found, the stored ref is updated to the latest tag and the cache is refreshed. Otherwise, the existing ref is re-fetched to refresh the cache and digest.
+Update a registered collection or all registered collections. For each collection, checks whether a newer semver tag is available in the OCI registry. If a newer version is found, the stored reference is updated to the latest tag and the cache is refreshed. Otherwise, the existing reference is re-fetched to refresh the cache and digest.
 
 [source,shell]
 ----
 arconia project collection update
-arconia project collection update --name my-collection
+arconia project collection update --name arconia-project-templates
 ----
 
 **Options**
 
-* `--name`: The alias of a specific collection to update. If omitted, updates all registered collections.
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name`
+|
+|The name of a specific Java project collection to update. If omitted, updates all registered collections.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
 
 === `remove`
 
@@ -58,14 +126,35 @@ Remove a collection from the Arconia CLI configuration and local cache.
 
 [source,shell]
 ----
-arconia project collection remove --name my-collection
+arconia project collection remove --name arconia-project-templates
 ----
 
 **Options**
 
-* `--name`: (Required) The alias of the collection to remove.
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The name of the collection to remove.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
 
 === `push`
 
@@ -73,23 +162,73 @@ Publish a project collection as an OCI artifact. At least one of `--from-report`
 
 [source,shell]
 ----
-arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --project ghcr.io/org/projects/my-project:1.0.0
-arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --from-report project-push-report.json
-arconia project collection push --ref ghcr.io/org/projects/collection --name arconia-project-collection --tag 1.0.0 --from-report --report
+arconia project collection push \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-project-templates/collection \
+  --tag 1.2.3 \
+  --project ghcr.io/arconia-io/arconia-project-templates/my-project:1.0.0 \
+  --project ghcr.io/arconia-io/arconia-project-templates/other-project:1.4.2
+
+arconia project collection push \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-project-templates/collection \
+  --from-report project-push-report.json
 ----
 
 **Options**
 
-* `--ref`: (Required) The full OCI artifact reference for a project collection (e.g. `ghcr.io/org/projects/collection`).
-* `--name`: (Required) The collection identifier (e.g. `arconia-project-collection`).
-* `--description`: A short description of the collection. Defaults to `A collection of projects published as OCI Artifacts and managed by the Arconia CLI.`
-* `--tag`: The version tag (e.g. `latest`, semantic version number, commit sha). Defaults to `latest`.
-* `--from-report`: Path to a push report file (from `arconia project push --report`). Defaults to `project-push-report.json` when specified without a path.
-* `--project`: Explicit project OCI references to include (e.g. `--project ghcr.io/org/projects/project:1.0.0`). Can be specified multiple times.
-* `--annotation`: Extra annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
-* `--report`: Write a publish report file. Defaults to `project-collection-push-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--ref` (required)
+|
+|The full OCI artifact reference for the project collection (e.g. `ghcr.io/arconia-io/arconia-project-templates/collection`).
+
+|`--name` (required)
+|
+|The collection identifier (e.g. `arconia-project-templates`).
+
+|`--description`
+|`A collection of Java projects published as OCI Artifacts and managed by the Arconia CLI.`
+|A short description of the collection.
+
+|`--tag`
+|`latest`
+|The version tag (e.g. `latest`, semantic version number, commit sha).
+
+|`--from-report`
+|`project-push-report.json`
+|Path to a push report file (from `arconia project push --output-report`). Defaults to `project-push-report.json` when specified without a path.
+
+|`--project`
+|
+|Explicit project OCI references to include (e.g. `--project ghcr.io/arconia-io/arconia-project-templates/project:1.0.0`). Can be specified multiple times.
+
+|`--annotation`
+|
+|Additional annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
+
+|`--output-report`
+|`project-collection-push-report.json`
+|Write a publish report file. Defaults to `project-collection-push-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
 
 == See Also
 

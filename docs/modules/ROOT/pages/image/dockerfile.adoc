@@ -1,10 +1,10 @@
 = `arconia image build dockerfile`
 
-The `arconia image build dockerfile` command builds a container image for your Spring Boot application using a https://docs.docker.com/reference/dockerfile/[Dockerfile]. Unlike the xref:image/buildpacks.adoc[buildpacks] approach, this command gives you full control over the image build process through a custom Dockerfile.
+The `arconia image build dockerfile` command packages your Spring Boot application as a container image using a https://docs.docker.com/reference/dockerfile/[Dockerfile] or a https://github.com/containers/container-libs/blob/main/common/docs/Containerfile.5.md[Containerfile]. Unlike the xref:image/buildpacks.adoc[buildpacks] approach, this command gives you full control over the image build process through a custom Dockerfile/Containerfile.
 
 == Prerequisites
 
-* An OCI container runtime (https://www.docker.com[Docker] or https://podman.io[Podman]) must be installed and running on your machine.
+* An OCI container runtime (https://podman.io[Podman] or https://www.docker.com[Docker]) must be installed and running on your machine.
 
 == Usage
 
@@ -12,28 +12,28 @@ Basic usage (a `Dockerfile` or `Containerfile` must be located at `src/main/dock
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0
+arconia image build dockerfile --image-name ghcr.io/arconia-io/configuration-service
 ----
 
-With a custom Dockerfile path:
+With a custom Dockerfile/Containerfile path:
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --dockerfile config/Dockerfile
+arconia image build dockerfile --image-name ghcr.io/arconia-io/configuration-service --dockerfile config/Dockerfile
 ----
 
 Explicitly use Podman as the OCI runtime:
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --oci-runtime podman
+arconia image build dockerfile --image-name ghcr.io/arconia-io/configuration-service --oci-runtime podman
 ----
 
 Explicitly use Docker as the OCI runtime:
 
 [source,shell]
 ----
-arconia image build dockerfile --image-name ghcr.io/my-org/my-app:1.0.0 --oci-runtime docker
+arconia image build dockerfile --image-name ghcr.io/arconia-io/configuration-service --oci-runtime docker
 ----
 
 == Options
@@ -46,18 +46,18 @@ The following options are available:
 
 |`--image-name` or `-t`
 |
-|*(Required)* Name (and optionally tag) for the image to build. For example: `ghcr.io/my-org/my-app:1.0.0`.
+|*(Required)* Name (and optionally tag) for the image to build. For example: `ghcr.io/arconia-io/configuration-service:1.0.0`.
 
 |`--dockerfile`, `--containerfile`, or `-f`
 |
 a|The path to the Dockerfile or Containerfile to use for building the container image. If not specified, the command looks in these locations (in order):
 
-1. `src/main/docker/Dockerfile`
-2. `src/main/docker/Containerfile`
-3. `src/main/podman/Dockerfile`
-4. `src/main/podman/Containerfile`
-5. `Dockerfile` (project root)
-6. `Containerfile` (project root)
+1. `Containerfile` (project root)
+2. `Dockerfile` (project root)
+3. `src/main/podman/Containerfile`
+4. `src/main/podman/Dockerfile`
+5. `src/main/docker/Containerfile`
+6. `src/main/docker/Dockerfile`
 
 |`--oci-runtime`
 |_(auto-detected)_
@@ -72,15 +72,16 @@ a|The path to the Dockerfile or Containerfile to use for building the container 
 |Display help information for the command.
 |===
 
-== Example Dockerfile
+== Example Dockerfile/Containerfile
 
-The following is a minimal multi-stage Dockerfile suitable for a Spring Boot application. It uses Spring Boot's layered JAR support to separate dependencies (which change rarely) from application code (which changes often), resulting in better OCI image layer caching and faster incremental builds:
+The following is a minimal multi-stage Dockerfile/Containerfile suitable for a Spring Boot application. It uses Spring Boot's layered JAR support to separate dependencies (which change rarely) from application code (which often changes), resulting in better OCI image layer caching and faster incremental builds:
 
 [source,dockerfile]
 ----
 FROM docker.io/library/eclipse-temurin:25-noble AS builder
 WORKDIR /builder
-ARG JAR_FILE=target/*.jar
+# Adjust this to 'target/*.jar' if you're using Maven
+ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 

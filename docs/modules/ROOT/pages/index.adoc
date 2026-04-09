@@ -17,7 +17,7 @@ To get started, view the available commands and options by running:
 
 [source,shell]
 ----
-arconia help
+arconia
 ----
 
 You'll see a summary of the main commands and options available in the CLI.
@@ -30,12 +30,14 @@ Options:
   -V, --version   Print version information and exit.
 
 Commands:
-  dev, run         Run the application in development mode.
-  build            Build the current project.
-  test             Run tests for the current project.
-  image            Build and manage container images.
+  dev              Run a Spring Boot application in dev mode.
+  build            Build a Java application.
+  test             Run tests for a Java application.
+  image            Build and manage container images for Spring Boot applications.
   update, upgrade  Update project dependencies and build tool versions.
-  rewrite          Run an OpenRewrite recipe to migrate or refactor your project.
+  rewrite          Discover and run OpenRewrite recipes to migrate or refactor a Java application.
+  project          Create and manage Java projects
+  skills           Install and manage agent skills.
   help             Display help information about the specified command.
   version          Display version information about the Arconia CLI.
 ----
@@ -67,7 +69,8 @@ These commands use https://docs.openrewrite.org/[OpenRewrite] recipes to automat
 
 === Migration
 
-* **xref:migration/rewrite.adoc[arconia rewrite]** — Runs any OpenRewrite recipe for custom migration or refactoring tasks beyond the built-in `update` commands.
+* **xref:migration/rewrite-run.adoc[arconia rewrite run]** — Runs any OpenRewrite recipe for custom migration or refactoring tasks beyond the built-in `update` commands.
+* **xref:migration/rewrite-discover.adoc[arconia rewrite discover]** — Discovers available OpenRewrite recipes.
 
 === Projects
 
@@ -77,4 +80,4 @@ These commands use https://docs.openrewrite.org/[OpenRewrite] recipes to automat
 
 == Authors
 
-The Arconia CLI is maintained by https://thomasvitale.com[Thomas Vitale].
+The Arconia CLI was created and is maintained by https://thomasvitale.com[Thomas Vitale].

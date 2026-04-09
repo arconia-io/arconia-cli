@@ -1,6 +1,6 @@
 = `arconia build`
 
-The `arconia build` command builds your Spring Boot application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or a GraalVM native executable.
+The `arconia build` command builds your Java application. It delegates to your build tool's (Maven/Gradle) build tasks to compile, test, and package your application as a JAR artifact or a GraalVM native executable.
 
 == Usage
 
@@ -32,13 +32,6 @@ Build a GraalVM native executable:
 arconia build --native
 ----
 
-Clean build of a native executable, skipping tests:
-
-[source,shell]
-----
-arconia build --clean --native --skip-tests
-----
-
 Pass extra parameters to the underlying build tool using `--`:
 
 [source,shell]
@@ -67,6 +60,10 @@ The following options are available:
 |`false`
 |Perform a native build using GraalVM Native Image, producing a standalone native executable.
 
+|`--offline`
+|`false`
+|Perform the build offline.
+
 |`--verbose` or `-v`
 |`false`
 |Include verbose output.
@@ -76,12 +73,12 @@ The following options are available:
 |Display help information for the command.
 |===
 
-NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM] with the Native Image component installed. Native builds take a little bit longer than JVM builds but produce a standalone binary with fast startup time and low memory footprint.
+NOTE: The `--native` option requires https://www.graalvm.org/[GraalVM]. Native builds take a little bit longer than JVM builds but produce a standalone binary with a fast startup time and low memory footprint.
 
 == Build Output
 
-* **JVM build**: produces a fat JAR in `build/libs/` (Gradle) or `target/` (Maven).
-* **Native build**: produces a standalone native executable in `build/native/nativeCompile/` (Gradle) or `target/` (Maven).
+* JVM build: produces a fat JAR in `build/libs/` (Gradle) or `target/` (Maven).
+* Native build: produces a standalone native executable in `build/native/nativeCompile/` (Gradle) or `target/` (Maven).
 
 == Build Tool Integration
 

@@ -53,12 +53,12 @@ The following options are available:
 
 == Build Tool Integration
 
-The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite.adoc[`arconia rewrite`] command.
+The command runs the appropriate OpenRewrite task based on your build tool, following the same approach used by the xref:migration/rewrite-run.adoc[`arconia rewrite run`] command.
 
 Use `--` to pass parameters directly to the underlying build tool. The `--` separator is required to distinguish Arconia CLI options from build tool parameters.
 
 == See Also
 
 * xref:update/gradle.adoc[arconia update gradle]
-* xref:migration/rewrite.adoc[arconia rewrite]
+* xref:migration/rewrite-run.adoc[arconia rewrite run]
 * https://docs.openrewrite.org/recipes/maven/updatemavenwrapper[OpenRewrite's UpdateMavenWrapper Recipe]
