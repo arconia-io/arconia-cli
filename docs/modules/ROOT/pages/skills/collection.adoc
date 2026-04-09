@@ -19,6 +19,8 @@ arconia skills collection add --name my-collection --ref ghcr.io/org/repo/collec
 
 * `--name`: (Required) The alias to assign to the collection.
 * `--ref`: (Required) The OCI artifact reference for the collection index.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `list`
 
@@ -35,6 +37,8 @@ arconia skills collection list --ref ghcr.io/org/repo/collection:1.0.0
 
 * `--name`: The alias of a registered collection to list.
 * `--ref`: The OCI artifact reference for the collection to list.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `update`
 
@@ -49,6 +53,8 @@ arconia skills collection update --name my-collection
 **Options**
 
 * `--name`: The alias of a specific collection to update. If omitted, updates all registered collections.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `remove`
 
@@ -62,6 +68,8 @@ arconia skills collection remove --name my-collection
 **Options**
 
 * `--name`: (Required) The alias of the collection to remove.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `push`
 
@@ -85,6 +93,8 @@ arconia skills collection push --ref ghcr.io/org/skills-collection --name arconi
 * `--description`: A short description of the collection.
 * `--annotation`: Extra annotations in key=value format.
 * `--output-report`: Write a publish report file recording the published collection artifact including its immutable digest. Defaults to `publish-skills-collection-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 == See Also
 

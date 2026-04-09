@@ -18,6 +18,7 @@ import picocli.CommandLine.Spec;
 import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.commands.options.RegistryOptions;
 import io.arconia.cli.project.ProjectBatchPushArguments;
 import io.arconia.cli.project.ProjectCreateArguments;
 import io.arconia.cli.project.ProjectCreator;
@@ -46,9 +47,10 @@ public class ProjectCommands implements Runnable {
             @Option(names = {"--description"}, description = "The description for the project") String description,
             @Option(names = {"--package-name"}, description = "The package name for the project") String packageName,
             @Option(names = {"--path"}, description = "The path where the project will be created. Defaults to the current working directory.") String path,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
-        ProjectCreator projectCreator = new ProjectCreator(ArtifactRegistry.create(), outputOptions);
+        ProjectCreator projectCreator = new ProjectCreator(ArtifactRegistry.create(registryOptions), outputOptions);
 
         ProjectCreateArguments arguments = ProjectCreateArguments.builder()
                 .name(name)
@@ -68,6 +70,7 @@ public class ProjectCommands implements Runnable {
             @Option(names = {"--tag"}, defaultValue = "latest", description = "The version tag (e.g. 'latest', semantic version number, commit sha). Defaults to 'latest'.") String tag,
             @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") @Nullable List<String> annotations,
             @Option(names = {"--report"}, arity = "0..1", fallbackValue = ProjectPushReport.DEFAULT_FILENAME, description = "Write a publish report file. Defaults to '" + ProjectPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
             ) throws IOException {
         if (StringUtils.hasText(ref) == StringUtils.hasText(baseRef)) {
@@ -75,7 +78,7 @@ public class ProjectCommands implements Runnable {
         }
 
         Path projectPath = IoUtils.getProjectPath(path);
-        ProjectPublisher projectPublisher = new ProjectPublisher(ArtifactRegistry.create(), outputOptions);
+        ProjectPublisher projectPublisher = new ProjectPublisher(ArtifactRegistry.create(registryOptions), outputOptions);
 
         if (StringUtils.hasText(ref)) {
             projectPublisher.publish(ProjectPushArguments.builder()

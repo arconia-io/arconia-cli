@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import io.arconia.cli.commands.options.RegistryOptions;
+
 import org.springframework.stereotype.Component;
 
 import land.oras.ContainerRef;
@@ -57,6 +59,7 @@ public class SkillsCollectionCommands implements Runnable {
         @Option(names = {"--description"}, description = "A short description of the collection. Defaults to 'Agent Skills Collection'.") String collectionDescription,
         @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia-io).") List<String> annotations,
         @Option(names = {"--output-report"}, arity = "0..1", fallbackValue = ArtifactPublishReport.DEFAULT_COLLECTION_FILENAME, description = "Write a publish report file recording the published collection artifact. Defaults to '" + ArtifactPublishReport.DEFAULT_COLLECTION_FILENAME + "' when specified without a path.") String outputReport,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         boolean hasReport = fromReport != null && !fromReport.isBlank();
@@ -80,7 +83,7 @@ public class SkillsCollectionCommands implements Runnable {
                 extraAnnotations.put("org.opencontainers.image.description", collectionDescription);
             }
 
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillCollectionPublisher publisher = new SkillCollectionPublisher(ociRegistry);
 
             String fullRef = "%s:%s".formatted(collectionRef, tag);
@@ -146,6 +149,7 @@ public class SkillsCollectionCommands implements Runnable {
     public void add(
         @Option(names = {"--name"}, required = true, description = "A short alias for the collection (e.g. arconia).") String collectionName,
         @Option(names = {"--ref"}, required = true, description = "The OCI artifact reference for the collection (e.g. ghcr.io/org/skills-collection:latest).") String collectionRef,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         outputOptions.newLine();
@@ -153,7 +157,7 @@ public class SkillsCollectionCommands implements Runnable {
         outputOptions.newLine();
 
         try {
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             boolean existed = collectionService.addCollection(collectionName, collectionRef);
@@ -173,10 +177,11 @@ public class SkillsCollectionCommands implements Runnable {
     @Command(name = "remove", description = "Remove a collection from the local Arconia CLI configuration.")
     public void remove(
         @Option(names = {"--name"}, required = true, description = "The alias of the collection to remove.") String collectionName,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         try {
-            SkillCollectionService collectionService = new SkillCollectionService(ArtifactRegistry.create());
+            SkillCollectionService collectionService = new SkillCollectionService(ArtifactRegistry.create(registryOptions));
             RegisteredCollection removed = collectionService.removeCollection(collectionName);
 
             if (removed == null) {
@@ -194,10 +199,11 @@ public class SkillsCollectionCommands implements Runnable {
     @Command(name = "update", description = "Check for newer versions of registered collections and update them.")
     public void update(
         @Option(names = {"--name"}, description = "The alias of a specific collection to update. If omitted, updates all registered collections.") String collectionName,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         try {
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             // Determine which collection names to update
@@ -263,12 +269,13 @@ public class SkillsCollectionCommands implements Runnable {
     public void list(
         @Option(names = {"--ref"}, required = false, description = "The OCI artifact reference for the collection.") String collectionRef,
         @Option(names = {"--name"}, required = false, description = "The alias of a registered collection to list.") String collectionName,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         outputOptions.newLine();
 
         try {
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillCollectionService collectionService = new SkillCollectionService(ociRegistry);
 
             if (collectionRef != null && !collectionRef.isBlank()) {

@@ -59,6 +59,8 @@ arconia skills add --name my-skill --agent claude --agent vibe
 * `--agent`: Additional agent vendors to also install the skill for. Can be specified multiple times. See <<Multi-Agent Vendor Support>> for supported values.
 * `--collection`: The registered collection alias to search. If omitted, searches all registered collections.
 * `--project-dir`: The project root directory (defaults to the current working directory).
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `install`
 
@@ -72,6 +74,8 @@ arconia skills install
 **Options**
 
 * `--project-dir`: The project root directory (defaults to the current working directory).
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `list`
 
@@ -116,6 +120,8 @@ arconia skills update --name some-skill
 * `--name`: Update a specific skill by name. Can be specified multiple times. If omitted, updates all installed skills.
 * `--all`: Update all agent skills in the project.
 * `--project-dir`: The project root directory (defaults to the current working directory).
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `push`
 
@@ -137,6 +143,8 @@ arconia skills push --all --ref ghcr.io/org/repo/skills --path skills/ --tag 1.0
 * `--annotation`: Extra annotations in key=value format.
 * `--all`: Discover and push all skills found as direct subdirectories of `--path`.
 * `--output-report`: Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as collection pushing (`skills collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 == See Also
 

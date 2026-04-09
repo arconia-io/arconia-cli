@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.arconia.cli.commands.options.RegistryOptions;
+
 import org.jline.terminal.Terminal;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
@@ -71,6 +73,7 @@ public class SkillsCommands implements Runnable {
         @Option(names = {"--agent"}, arity = "1..*", description = "Additional agent vendors to also install the skill for (e.g. claude, vibe, continue, bob).") List<String> agents,
         @Option(names = {"--collection"}, description = "The registered collection alias to search. If omitted, searches all registered collections.") String collectionAlias,
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         boolean hasRefs = skillRefs != null && !skillRefs.isEmpty();
@@ -84,7 +87,7 @@ public class SkillsCommands implements Runnable {
         List<String> additionalBasePaths = resolveAgentBasePaths(agents);
 
         Path projectRoot = IoUtils.getProjectPath(projectDir);
-        Registry ociRegistry = ArtifactRegistry.create();
+        Registry ociRegistry = ArtifactRegistry.create(registryOptions);
         SkillInstaller installer = new SkillInstaller(ociRegistry);
 
         // 1. Install by direct OCI reference
@@ -178,6 +181,7 @@ public class SkillsCommands implements Runnable {
     @Command(name = "install", description = "Install all agent skills declared in skills.json.")
     public void install(
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         Path projectRoot = IoUtils.getProjectPath(projectDir);
@@ -192,7 +196,7 @@ public class SkillsCommands implements Runnable {
 
             outputOptions.info("Installing %d skill(s) from %s...".formatted(manifest.skills().size(), SkillsManifest.FILENAME));
 
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillInstaller installer = new SkillInstaller(ociRegistry);
 
             for (SkillsManifest.SkillEntry entry : manifest.skills()) {
@@ -324,6 +328,7 @@ public class SkillsCommands implements Runnable {
         @Option(names = {"--name"}, arity = "1..*", description = "The name of the agent skill to update.") List<String> skillNames,
         @Option(names = {"--all"}, description = "Update all agent skills in the project.") boolean updateAll,
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         Path projectRoot = IoUtils.getProjectPath(projectDir);
@@ -355,7 +360,7 @@ public class SkillsCommands implements Runnable {
                 }
             }
 
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillInstaller installer = new SkillInstaller(ociRegistry);
             SkillUpdater updater = new SkillUpdater(ociRegistry, installer);
             int updatedCount = 0;
@@ -415,13 +420,14 @@ public class SkillsCommands implements Runnable {
         @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") List<String> annotations,
         @Option(names = {"--all"}, description = "Discover and push all skills found as direct subdirectories of --path.") boolean pushAll,
         @Option(names = {"--output-report"}, arity = "0..1", fallbackValue = ArtifactPublishReport.DEFAULT_SKILLS_FILENAME, description = "Write a publish report file. Defaults to '" + ArtifactPublishReport.DEFAULT_SKILLS_FILENAME + "' when specified without a path.") String outputReport,
+        @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
         try {
             Path basePath = Path.of(skillPath).toAbsolutePath();
             Map<String, String> extraAnnotations = ArtifactAnnotations.parseAnnotations(annotations);
 
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             SkillPublisher publisher = new SkillPublisher(ociRegistry);
             SkillBatchPublisher batchPublisher = new SkillBatchPublisher(publisher);
 

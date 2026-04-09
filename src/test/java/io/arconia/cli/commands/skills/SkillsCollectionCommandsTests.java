@@ -34,6 +34,7 @@ class SkillsCollectionCommandsTests {
         assertThat(out).contains("list");
         assertThat(out).contains("add");
         assertThat(out).contains("remove");
+        assertThat(out).contains("update");
     }
 
     @Test
@@ -65,6 +66,9 @@ class SkillsCollectionCommandsTests {
         assertThat(out).contains("--additional-tag");
         assertThat(out).contains("--description");
         assertThat(out).contains("--annotation");
+        assertThat(out).contains("--output-report");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -92,6 +96,8 @@ class SkillsCollectionCommandsTests {
         assertThat(out).contains("Usage: arconia skills collection list");
         assertThat(out).contains("--ref");
         assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -106,6 +112,8 @@ class SkillsCollectionCommandsTests {
         assertThat(out).contains("Usage: arconia skills collection add");
         assertThat(out).contains("--name");
         assertThat(out).contains("--ref");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -129,6 +137,8 @@ class SkillsCollectionCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia skills collection remove");
         assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -139,6 +149,21 @@ class SkillsCollectionCommandsTests {
         int exitCode = commandLine.execute("skills", "collection", "remove");
 
         assertThat(exitCode).isNotZero();
+    }
+
+    @Test
+    void collectionUpdateHelpOption() {
+        var output = new StringWriter();
+        commandLine.setOut(new PrintWriter(output));
+
+        int exitCode = commandLine.execute("skills", "collection", "update", "--help");
+
+        assertThat(exitCode).isZero();
+        String out = output.toString();
+        assertThat(out).contains("Usage: arconia skills collection update");
+        assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
 }

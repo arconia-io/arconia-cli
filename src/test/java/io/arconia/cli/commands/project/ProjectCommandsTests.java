@@ -28,7 +28,11 @@ class ProjectCommandsTests {
         int exitCode = commandLine.execute("project", "--help");
 
         assertThat(exitCode).isZero();
-        assertThat(output.toString()).contains("Usage: arconia project");
+        String out = output.toString();
+        assertThat(out).contains("Usage: arconia project");
+        assertThat(out).contains("create");
+        assertThat(out).contains("push");
+        assertThat(out).contains("collection");
     }
 
     @Test
@@ -55,10 +59,11 @@ class ProjectCommandsTests {
         assertThat(out).contains("--name");
         assertThat(out).contains("--template");
         assertThat(out).contains("--group");
-        assertThat(out).contains("--version");
         assertThat(out).contains("--description");
         assertThat(out).contains("--package-name");
         assertThat(out).contains("--path");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -77,6 +82,8 @@ class ProjectCommandsTests {
         assertThat(out).contains("--tag");
         assertThat(out).contains("--annotation");
         assertThat(out).contains("--report");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test

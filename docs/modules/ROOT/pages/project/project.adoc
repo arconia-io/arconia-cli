@@ -23,6 +23,8 @@ arconia project create --name my-project --template my-template --path /path/to/
 * `--description`: The description for the project.
 * `--package-name`: The package name for the project.
 * `--path`: The path where the project will be created. Defaults to the current working directory.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `push`
 
@@ -44,6 +46,8 @@ arconia project push --base-ref ghcr.io/org/projects --path /path/to/projects --
 * `--tag`: The version tag (e.g. `latest`, semantic version number, commit sha). Defaults to `latest`.
 * `--annotation`: Extra annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
 * `--report`: Write a publish report file. Defaults to `project-push-report.json` when specified without a path. The report can be used for downstream operations such as collection pushing (`arconia project collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 == See Also
 

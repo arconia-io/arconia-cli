@@ -28,7 +28,15 @@ class SkillsCommandsTests {
         int exitCode = commandLine.execute("skills", "--help");
 
         assertThat(exitCode).isZero();
-        assertThat(output.toString()).contains("Usage: arconia skills");
+        String out = output.toString();
+        assertThat(out).contains("Usage: arconia skills");
+        assertThat(out).contains("add");
+        assertThat(out).contains("install");
+        assertThat(out).contains("list");
+        assertThat(out).contains("remove");
+        assertThat(out).contains("update");
+        assertThat(out).contains("push");
+        assertThat(out).contains("collection");
     }
 
     @Test
@@ -53,7 +61,12 @@ class SkillsCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia skills add");
         assertThat(out).contains("--ref");
+        assertThat(out).contains("--name");
+        assertThat(out).contains("--agent");
+        assertThat(out).contains("--collection");
         assertThat(out).contains("--project-dir");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -67,6 +80,8 @@ class SkillsCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia skills install");
         assertThat(out).contains("--project-dir");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -79,6 +94,7 @@ class SkillsCommandsTests {
         assertThat(exitCode).isZero();
         String out = output.toString();
         assertThat(out).contains("Usage: arconia skills list");
+        assertThat(out).contains("--project-dir");
     }
 
     @Test
@@ -94,6 +110,7 @@ class SkillsCommandsTests {
         assertThat(out).contains("--name");
         assertThat(out).contains("--yes");
         assertThat(out).contains("-y");
+        assertThat(out).contains("--project-dir");
     }
 
     @Test
@@ -108,6 +125,9 @@ class SkillsCommandsTests {
         assertThat(out).contains("Usage: arconia skills update");
         assertThat(out).contains("--name");
         assertThat(out).contains("--all");
+        assertThat(out).contains("--project-dir");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -127,10 +147,12 @@ class SkillsCommandsTests {
         assertThat(out).contains("--output-report");
         assertThat(out).contains("--additional-tag");
         assertThat(out).contains("--annotation");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
-    void addRequiresRefOption() {
+    void addRequiresRefOrNameOption() {
         var output = new StringWriter();
         var error = new StringWriter();
         commandLine.setOut(new PrintWriter(output));

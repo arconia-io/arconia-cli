@@ -17,6 +17,8 @@ arconia project collection add --name my-collection --ref ghcr.io/org/project-co
 
 * `--name`: (Required) A short alias for the collection (e.g. `arconia-project-collection`).
 * `--ref`: (Required) The OCI artifact reference for the collection (e.g. `ghcr.io/org/project-collection:4.2.0`).
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `list`
 
@@ -31,6 +33,8 @@ arconia project collection list --name my-collection
 **Options**
 
 * `--name`: The alias of a registered collection for which to list the projects. If omitted, lists projects from all registered collections.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `update`
 
@@ -45,6 +49,8 @@ arconia project collection update --name my-collection
 **Options**
 
 * `--name`: The alias of a specific collection to update. If omitted, updates all registered collections.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `remove`
 
@@ -58,6 +64,8 @@ arconia project collection remove --name my-collection
 **Options**
 
 * `--name`: (Required) The alias of the collection to remove.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 === `push`
 
@@ -80,6 +88,8 @@ arconia project collection push --ref ghcr.io/org/projects/collection --name arc
 * `--project`: Explicit project OCI references to include (e.g. `--project ghcr.io/org/projects/project:1.0.0`). Can be specified multiple times.
 * `--annotation`: Extra annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
 * `--report`: Write a publish report file. Defaults to `project-collection-push-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
+* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
 
 == See Also
 

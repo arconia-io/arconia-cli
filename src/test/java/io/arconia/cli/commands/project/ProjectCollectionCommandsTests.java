@@ -60,6 +60,8 @@ class ProjectCollectionCommandsTests {
         assertThat(out).contains("Usage: arconia project collection add");
         assertThat(out).contains("--name");
         assertThat(out).contains("--ref");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -83,6 +85,8 @@ class ProjectCollectionCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia project collection remove");
         assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -106,6 +110,8 @@ class ProjectCollectionCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia project collection list");
         assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -119,6 +125,8 @@ class ProjectCollectionCommandsTests {
         String out = output.toString();
         assertThat(out).contains("Usage: arconia project collection update");
         assertThat(out).contains("--name");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test
@@ -139,6 +147,8 @@ class ProjectCollectionCommandsTests {
         assertThat(out).contains("--project");
         assertThat(out).contains("--annotation");
         assertThat(out).contains("--report");
+        assertThat(out).contains("--registry-insecure");
+        assertThat(out).contains("--registry-skip-tls-verify");
     }
 
     @Test

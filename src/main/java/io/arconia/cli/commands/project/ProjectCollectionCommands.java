@@ -18,6 +18,7 @@ import picocli.CommandLine.Spec;
 import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.commands.options.RegistryOptions;
 import io.arconia.cli.core.CliException;
 import io.arconia.cli.project.ProjectPushReport;
 import io.arconia.cli.project.collection.ProjectCollectionPublisher;
@@ -45,10 +46,11 @@ public class ProjectCollectionCommands implements Runnable {
     public void add(
             @Option(names = {"--name"}, required = true, description = "A short alias for the collection (e.g. arconia-project-collection).") String collectionName,
             @Option(names = {"--ref"}, required = true, description = "The OCI artifact reference for the collection (e.g. ghcr.io/org/project-collection:4.2.0).") String collectionRef,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) {
         try {
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
             collectionService.addCollection(collectionName, collectionRef);
         }
@@ -60,10 +62,11 @@ public class ProjectCollectionCommands implements Runnable {
     @Command(name = "remove", description = "Remove a collection from the Arconia CLI configuration.")
     public void remove(
             @Option(names = {"--name"}, required = true, description = "The alias of the collection to remove.") String collectionName,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) {
         try {
-            Registry ociRegistry = ArtifactRegistry.create();
+            Registry ociRegistry = ArtifactRegistry.create(registryOptions);
             ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
             collectionService.removeCollection(collectionName);
         }
@@ -75,9 +78,10 @@ public class ProjectCollectionCommands implements Runnable {
     @Command(name = "list", description = "List available projects in a collection. Uses --name for a specific collection or lists all projects from all registered collections.")
     public void list(
             @Option(names = {"--name"}, description = "The alias of a registered collection for which to list the projects.") @Nullable String collectionName,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
-        Registry ociRegistry = ArtifactRegistry.create();
+        Registry ociRegistry = ArtifactRegistry.create(registryOptions);
         ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
 
         if (StringUtils.hasText(collectionName)) {
@@ -99,9 +103,10 @@ public class ProjectCollectionCommands implements Runnable {
     @Command(name = "update", description = "Update a registered collection or all registered collections.")
     public void update(
             @Option(names = {"--name"}, description = "The alias of a specific collection to update. If omitted, updates all registered collections.") @Nullable String collectionName,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
-        Registry ociRegistry = ArtifactRegistry.create();
+        Registry ociRegistry = ArtifactRegistry.create(registryOptions);
         ProjectCollectionService collectionService = new ProjectCollectionService(ociRegistry, outputOptions);
 
         if (StringUtils.hasText(collectionName)) {
@@ -129,13 +134,14 @@ public class ProjectCollectionCommands implements Runnable {
             @Option(names = {"--project"}, arity = "0..*", description = "Explicit project OCI references to include (e.g. --project ghcr.io/org/projects/project:1.0.0).") List<String> projectRefs,
             @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") @Nullable List<String> annotations,
             @Option(names = {"--report"}, arity = "0..1", fallbackValue = ProjectCollectionPushReport.DEFAULT_FILENAME, description = "Write a publish report file. Defaults to '" + ProjectCollectionPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
+            @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
         if (!StringUtils.hasText(fromReport) && CollectionUtils.isEmpty(projectRefs)) {
             throw new CliException("At least one of --from-report or --project must be provided.");
         }
 
-        ProjectCollectionPublisher publisher = new ProjectCollectionPublisher(ArtifactRegistry.create(), outputOptions);
+        ProjectCollectionPublisher publisher = new ProjectCollectionPublisher(ArtifactRegistry.create(registryOptions), outputOptions);
 
         publisher.publish(ProjectCollectionPushArguments.builder()
             .ref(ref)
