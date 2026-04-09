@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -45,44 +46,51 @@ public class GradleRunner implements BuildToolRunner {
     public void build(BuildArguments buildArguments) {
         Assert.notNull(buildArguments, "buildArguments cannot be null");
         var action = buildArguments.nativeBuild() ? "nativeBuild" : "build";
-        call(constructGradleCommand(action, buildArguments, BootstrapMode.PROD));
+        var command = constructGradleCommand(action, buildArguments);
+        call(command);
     }
 
     @Override
     public void test(BuildArguments buildArguments) {
         Assert.notNull(buildArguments, "buildArguments cannot be null");
         var action = buildArguments.nativeBuild() ? "nativeTest" : "test";
-        call(constructGradleCommand(action, buildArguments, BootstrapMode.TEST));
+        var command = constructGradleCommand(action, buildArguments);
+        call(command, Map.of(BootstrapMode.ENV_VAR_KEY, BootstrapMode.TEST.toString()));
     }
 
     @Override
     public void dev(BuildArguments buildArguments) {
         Assert.notNull(buildArguments, "buildArguments cannot be null");
         var action = buildArguments.testClasspath() ? "bootTestRun" : "bootRun";
-        call(constructGradleCommand(action, buildArguments, BootstrapMode.DEV));
+        var command = constructGradleCommand(action, buildArguments);
+        call(command, Map.of(BootstrapMode.ENV_VAR_KEY, BootstrapMode.DEV.toString()));
     }
 
     @Override
     public void imageBuild(BuildArguments buildArguments) {
         Assert.notNull(buildArguments, "buildArguments cannot be null");
-        call(constructGradleCommand("bootBuildImage", buildArguments, BootstrapMode.PROD));
+        var command = constructGradleCommand("bootBuildImage", buildArguments);
+        call(command);
     }
 
     @Override
     public void rewriteRun(RewriteArguments rewriteArguments) {
         Assert.notNull(rewriteArguments, "rewriteArguments cannot be null");
-        call(constructRewriteRunCommand(rewriteArguments));
+        var command = constructRewriteRunCommand(rewriteArguments);
+        call(command);
     }
 
     @Override
     public void rewriteDiscover() {
-        call(constructRewriteDiscoverCommand());
+        var command = constructRewriteDiscoverCommand();
+        call(command);
     }
 
     @Override
     public void update(UpdateArguments updateArguments) {
         Assert.notNull(updateArguments, "updateArguments cannot be null");
-        call(constructUpdateCommand(updateArguments));
+        var command = constructUpdateCommand(updateArguments);
+        call(command);
     }
 
     @Override
@@ -114,7 +122,7 @@ public class GradleRunner implements BuildToolRunner {
 
     // Package-private for testability
 
-    List<String> constructGradleCommand(String action, BuildArguments buildArguments, BootstrapMode bootstrapMode) {
+    List<String> constructGradleCommand(String action, BuildArguments buildArguments) {
         List<String> command = new ArrayList<>();
 
         command.add(getBuildToolMainCommand());

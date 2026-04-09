@@ -61,7 +61,7 @@ class MavenRunnerTests {
     @Test
     void buildCommandDefault() {
         var arguments = BuildArguments.builder().build();
-        var command = runner.constructMavenCommand("package", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("package", arguments);
 
         assertThat(command).contains("package");
         assertThat(command).doesNotContain("clean", "-Pnative", "-DskipTests");
@@ -70,7 +70,7 @@ class MavenRunnerTests {
     @Test
     void buildCommandWithClean() {
         var arguments = BuildArguments.builder().clean(true).build();
-        var command = runner.constructMavenCommand("package", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("package", arguments);
 
         assertThat(command).containsSubsequence("clean", "package");
     }
@@ -78,7 +78,7 @@ class MavenRunnerTests {
     @Test
     void buildCommandWithSkipTests() {
         var arguments = BuildArguments.builder().skipTests(true).build();
-        var command = runner.constructMavenCommand("package", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("package", arguments);
 
         assertThat(command).contains("-DskipTests", "-Dmaven.test.skip=true");
     }
@@ -86,7 +86,7 @@ class MavenRunnerTests {
     @Test
     void buildCommandWithNativeTrait() {
         var arguments = BuildArguments.builder().nativeBuild(true).build();
-        var command = runner.constructMavenCommand("package", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("package", arguments);
 
         assertThat(command).contains("-Pnative");
     }
@@ -94,7 +94,7 @@ class MavenRunnerTests {
     @Test
     void buildCommandWithParams() {
         var runner = new MavenRunner(createOutputOptions(), List.of("-X", "-e"), tempDir);
-        var command = runner.constructMavenCommand("package", BuildArguments.builder().build(), BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("package", BuildArguments.builder().build());
 
         assertThat(command).contains("-X", "-e");
     }
@@ -102,7 +102,7 @@ class MavenRunnerTests {
     @Test
     void imageBuildCommandSkipsTestsAutomatically() {
         var arguments = BuildArguments.builder().build();
-        var command = runner.constructMavenCommand("spring-boot:build-image", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("spring-boot:build-image", arguments);
 
         assertThat(command).contains("-DskipTests", "-Dmaven.test.skip=true");
     }
@@ -117,7 +117,7 @@ class MavenRunnerTests {
             .publishImage(true)
             .build();
         var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
-        var command = runner.constructMavenCommand("spring-boot:build-image", arguments, BootstrapMode.PROD);
+        var command = runner.constructMavenCommand("spring-boot:build-image", arguments);
 
         assertThat(command).contains(
             "-Dspring-boot.build-image.imageName=my-image",

@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Utilities for working with date and time.
+ */
 public final class DateTimeUtils {
 
     private DateTimeUtils() {}

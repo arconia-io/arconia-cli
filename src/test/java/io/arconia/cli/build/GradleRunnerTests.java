@@ -61,7 +61,7 @@ class GradleRunnerTests {
     @Test
     void buildCommandDefault() {
         var arguments = BuildArguments.builder().build();
-        var command = runner.constructGradleCommand("build", arguments, BootstrapMode.PROD);
+        var command = runner.constructGradleCommand("build", arguments);
 
         assertThat(command).contains("build", "--console=rich");
         assertThat(command).doesNotContain("clean", "-x", "test");
@@ -70,7 +70,7 @@ class GradleRunnerTests {
     @Test
     void buildCommandWithClean() {
         var arguments = BuildArguments.builder().clean(true).build();
-        var command = runner.constructGradleCommand("build", arguments, BootstrapMode.PROD);
+        var command = runner.constructGradleCommand("build", arguments);
 
         assertThat(command).containsSubsequence("clean", "build");
     }
@@ -78,7 +78,7 @@ class GradleRunnerTests {
     @Test
     void buildCommandWithSkipTests() {
         var arguments = BuildArguments.builder().skipTests(true).build();
-        var command = runner.constructGradleCommand("build", arguments, BootstrapMode.TEST);
+        var command = runner.constructGradleCommand("build", arguments);
 
         assertThat(command).containsSubsequence("-x", "test");
     }
@@ -86,7 +86,7 @@ class GradleRunnerTests {
     @Test
     void buildCommandWithParams() {
         var runner = new GradleRunner(createOutputOptions(), List.of("--info", "--stacktrace"), tempDir, BuildTool.GRADLE);
-        var command = runner.constructGradleCommand("build", BuildArguments.builder().build(), BootstrapMode.PROD);
+        var command = runner.constructGradleCommand("build", BuildArguments.builder().build());
 
         assertThat(command).contains("--info", "--stacktrace");
     }
@@ -101,7 +101,7 @@ class GradleRunnerTests {
             .publishImage(true)
             .build();
         var arguments = BuildArguments.builder().buildImageArguments(imageArguments).build();
-        var command = runner.constructGradleCommand("bootBuildImage", arguments, BootstrapMode.PROD);
+        var command = runner.constructGradleCommand("bootBuildImage", arguments);
 
         assertThat(command).contains(
             "--imageName=my-image",
@@ -114,7 +114,7 @@ class GradleRunnerTests {
     @Test
     void buildCommandNativeCompile() {
         var arguments = BuildArguments.builder().nativeBuild(true).build();
-        var command = runner.constructGradleCommand("nativeCompile", arguments, BootstrapMode.PROD);
+        var command = runner.constructGradleCommand("nativeCompile", arguments);
 
         assertThat(command).contains("nativeCompile");
     }

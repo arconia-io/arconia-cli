@@ -3,6 +3,7 @@ package io.arconia.cli.core;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,99 +37,50 @@ class ProcessExecutorTests {
         return outputOptions;
     }
 
+    private ProcessExecutionRequest.Builder requestBuilder() {
+        return ProcessExecutionRequest.builder()
+            .targetDirectory(tempDir)
+            .outputOptions(createOutputOptions());
+    }
+
     @Test
     void executeSuccessfulCommand() {
-        int exitCode = ProcessExecutor.execute(createOutputOptions(), new String[]{"true"}, tempDir);
+        int exitCode = ProcessExecutor.execute(requestBuilder()
+            .command(new String[]{"true"})
+            .build());
         assertThat(exitCode).isZero();
     }
 
     @Test
     void executeFailingCommand() {
-        int exitCode = ProcessExecutor.execute(createOutputOptions(), new String[]{"false"}, tempDir);
+        int exitCode = ProcessExecutor.execute(requestBuilder()
+            .command(new String[]{"false"})
+            .build());
         assertThat(exitCode).isEqualTo(1);
     }
 
     @Test
-    void executeNonExistentCommandThrowsArconiaCliException() {
-        assertThatThrownBy(() -> ProcessExecutor.execute(
-                createOutputOptions(), new String[]{"nonexistent-command-xyz"}, tempDir))
+    void executeNonExistentCommandThrowsCliException() {
+        assertThatThrownBy(() -> ProcessExecutor.execute(requestBuilder()
+                .command(new String[]{"nonexistent-command-xyz"})
+                .build()))
             .isInstanceOf(CliException.class);
     }
 
     @Test
-    void executeRejectsNullOutputOptions() {
+    void executeWithEnvironmentVariables() {
+        int exitCode = ProcessExecutor.execute(requestBuilder()
+            .command(new String[]{"true"})
+            .environmentVariables(Map.of("MY_VAR", "my_value"))
+            .build());
+        assertThat(exitCode).isZero();
+    }
+
+    @Test
+    void executeRejectsNullRequest() {
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.execute(null, new String[]{"true"}, tempDir))
-            .withMessage("outputOptions cannot be null");
-    }
-
-    @Test
-    void executeRejectsNullCommand() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.execute(createOutputOptions(), null, tempDir))
-            .withMessage("command cannot be null or empty");
-    }
-
-    @Test
-    void executeRejectsEmptyCommand() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.execute(createOutputOptions(), new String[]{}, tempDir))
-            .withMessage("command cannot be null or empty");
-    }
-
-    @Test
-    void executeRejectsNullTargetDirectory() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.execute(createOutputOptions(), new String[]{"true"}, null))
-            .withMessage("targetDirectory cannot be null");
-    }
-
-    @Test
-    void executeRejectsNonExistentTargetDirectory() {
-        var nonExistentDir = new File(tempDir, "does-not-exist");
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.execute(createOutputOptions(), new String[]{"true"}, nonExistentDir))
-            .withMessage("targetDirectory must be an existing directory");
-    }
-
-    // --- executeAndGetOutput ---
-
-    @Test
-    void executeAndGetOutput() {
-        String result = ProcessExecutor.executeAndGetOutput(new String[]{"echo", "hello world"}, tempDir);
-        assertThat(result).isEqualTo("hello world");
-    }
-
-    @Test
-    void executeAndGetOutputReturnsOnlyFirstLine() {
-        String result = ProcessExecutor.executeAndGetOutput(new String[]{"printf", "line1\nline2\nline3"}, tempDir);
-        assertThat(result).isEqualTo("line1");
-    }
-
-    @Test
-    void executeAndGetOutputReturnsNullForFailingCommand() {
-        String result = ProcessExecutor.executeAndGetOutput(new String[]{"false"}, tempDir);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void executeAndGetOutputReturnsNullForNonExistentCommand() {
-        String result = ProcessExecutor.executeAndGetOutput(new String[]{"nonexistent-command-xyz"}, tempDir);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void executeAndGetOutputRejectsNullCommand() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.executeAndGetOutput(null, tempDir))
-            .withMessage("command cannot be null or empty");
-    }
-
-    @Test
-    void executeAndGetOutputRejectsNullTargetDirectory() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> ProcessExecutor.executeAndGetOutput(new String[]{"echo", "test"}, null))
-            .withMessage("targetDirectory cannot be null");
+            .isThrownBy(() -> ProcessExecutor.execute(null))
+            .withMessage("processExecutionRequest cannot be null");
     }
 
 }

@@ -3,12 +3,14 @@ package io.arconia.cli.build;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
+import io.arconia.cli.core.ProcessExecutionRequest;
 import io.arconia.cli.core.ProcessExecutor;
 import io.arconia.cli.openrewrite.RewriteArguments;
 import io.arconia.cli.openrewrite.UpdateArguments;
@@ -21,8 +23,18 @@ import io.arconia.cli.utils.IoUtils;
 public interface BuildToolRunner {
 
     default void call(List<String> command) {
+        call(command, Map.of());
+    }
+
+    default void call(List<String> command, Map<String, String> environmentVariables) {
         Assert.notEmpty(command, "command cannot be null or empty");
-        ProcessExecutor.execute(getOutputOptions(), command.toArray(new String[0]), getProjectPath().toFile());
+        Assert.notNull(environmentVariables, "environmentVariables cannot be null");
+        ProcessExecutor.execute(ProcessExecutionRequest.builder()
+                        .command(command.toArray(new String[0]))
+                        .targetDirectory(getProjectPath().toFile())
+                        .environmentVariables(environmentVariables)
+                        .outputOptions(getOutputOptions())
+                        .build());
     }
 
     void build(BuildArguments buildArguments);

@@ -1,11 +1,15 @@
 package io.arconia.cli.utils;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.IOException;
 
 import org.jspecify.annotations.Nullable;
 
-import io.arconia.cli.core.ProcessExecutor;
+import java.nio.file.Path;
 
+/**
+ * Utility methods for interacting with Git.
+ */
 public final class GitUtils {
 
     private GitUtils() {}
@@ -16,10 +20,7 @@ public final class GitUtils {
      */
     @Nullable
     public static String getRevision(@Nullable Path workingDir) {
-        return ProcessExecutor.executeAndGetOutput(
-            new String[]{ "git", "rev-parse", "--short", "HEAD" },
-            resolveDir(workingDir)
-        );
+        return executeGitCommand(resolveDir(workingDir), "rev-parse", "--short", "HEAD");
     }
 
     /**
@@ -28,14 +29,38 @@ public final class GitUtils {
      */
     @Nullable
     public static String getRemoteUrl(@Nullable Path workingDir) {
-        return ProcessExecutor.executeAndGetOutput(
-            new String[]{ "git", "remote", "get-url", "origin" },
-            resolveDir(workingDir)
-        );
+        return executeGitCommand(resolveDir(workingDir), "remote", "get-url", "origin");
     }
 
-    private static java.io.File resolveDir(@Nullable Path workingDir) {
-        return workingDir != null ? workingDir.toFile() : Path.of(".").toAbsolutePath().toFile();
+    @Nullable
+    private static String executeGitCommand(File workingDir, String... args) {
+        String[] command = new String[args.length + 1];
+        command[0] = "git";
+        System.arraycopy(args, 0, command, 1, args.length);
+
+        try {
+            Process process = new ProcessBuilder()
+                    .command(command)
+                    .directory(workingDir)
+                    .redirectErrorStream(true)
+                    .start();
+            String output = new String(process.getInputStream().readAllBytes()).trim();
+            int exitCode = process.waitFor();
+            if (exitCode != 0 || output.isEmpty()) {
+                return null;
+            }
+            int newline = output.indexOf('\n');
+            return newline >= 0 ? output.substring(0, newline).trim() : output;
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
+    private static File resolveDir(@Nullable Path workingDir) {
+        return workingDir != null ? workingDir.toFile() : IoUtils.getWorkingDirectory().toFile();
     }
 
 }

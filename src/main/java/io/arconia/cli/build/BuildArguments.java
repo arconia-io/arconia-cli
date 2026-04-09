@@ -1,12 +1,14 @@
 package io.arconia.cli.build;
 
+import org.jspecify.annotations.Nullable;
+
 public record BuildArguments(
     boolean clean,
     boolean skipTests,
     boolean nativeBuild,
     boolean offline,
     boolean testClasspath,
-    BuildImageArguments buildImageArguments
+    @Nullable BuildImageArguments buildImageArguments
 ) {
 
     public static Builder builder() {
@@ -14,14 +16,14 @@ public record BuildArguments(
     }
 
     public static class Builder {
-        
+
         private boolean clean = false;
         private boolean skipTests = false;
         private boolean nativeBuild = false;
         private boolean offline = false;
         private boolean testClasspath = false;
-        private BuildImageArguments buildImageArguments;
-        
+        @Nullable private BuildImageArguments buildImageArguments;
+
         private Builder() {}
 
         public Builder clean(boolean clean) {
@@ -53,7 +55,7 @@ public record BuildArguments(
             this.buildImageArguments = buildImageArguments;
             return this;
         }
-    
+
         public BuildArguments build() {
             return new BuildArguments(clean, skipTests, nativeBuild, offline, testClasspath, buildImageArguments);
         }

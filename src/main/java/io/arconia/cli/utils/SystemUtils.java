@@ -1,5 +1,8 @@
 package io.arconia.cli.utils;
 
+/**
+ * Utility methods for working with operating systems.
+ */
 public final class SystemUtils {
 
     private SystemUtils() {}

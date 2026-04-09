@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -12,6 +13,7 @@ import io.arconia.cli.build.BuildArguments;
 import io.arconia.cli.build.BuildToolRunner;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
+import io.arconia.cli.core.ProcessExecutionRequest;
 import io.arconia.cli.core.ProcessExecutor;
 import io.arconia.cli.utils.IoUtils;
 
@@ -34,7 +36,11 @@ public class DockerfileRunner implements ImageToolRunner {
 
     public void call(List<String> command) {
         Assert.notEmpty(command, "command cannot be null or empty");
-        ProcessExecutor.execute(outputOptions, command.toArray(new String[0]), projectPath.toFile());
+        ProcessExecutor.execute(ProcessExecutionRequest.builder()
+                        .command(command.toArray(new String[0]))
+                        .targetDirectory(projectPath.toFile())
+                        .outputOptions(outputOptions)
+                        .build());
     }
 
     public void build(String imageName, @Nullable String dockerfile) {

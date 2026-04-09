@@ -31,6 +31,14 @@ class GitUtilsTests {
     }
 
     @Test
+    void getRevisionWithNullDefaultsToWorkingDirectory() {
+        String revision = GitUtils.getRevision(null);
+        assertThat(revision)
+            .isNotNull()
+            .matches("[0-9a-f]{7,12}");
+    }
+
+    @Test
     void getRemoteUrlReturnsUrlInGitRepo() {
         Path projectRoot = Path.of(System.getProperty("user.dir"));
         String remoteUrl = GitUtils.getRemoteUrl(projectRoot);
@@ -43,6 +51,14 @@ class GitUtilsTests {
     void getRemoteUrlReturnsNullForNonGitDirectory() {
         String remoteUrl = GitUtils.getRemoteUrl(tempDir);
         assertThat(remoteUrl).isNull();
+    }
+
+    @Test
+    void getRemoteUrlWithNullDefaultsToWorkingDirectory() {
+        String remoteUrl = GitUtils.getRemoteUrl(null);
+        assertThat(remoteUrl)
+            .isNotNull()
+            .contains("arconia-cli");
     }
 
 }
