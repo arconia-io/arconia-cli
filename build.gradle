@@ -25,6 +25,7 @@ ext {
     set('orasJavaVersion', "0.5.1")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.9")
+    set('jackson.version', "3.1.1")
 }
 
 dependencies {
@@ -45,6 +46,12 @@ dependencies {
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation "io.arconia:arconia-spring-boot-starter:${arconiaVersion}"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+
+    constraints {
+        implementation("org.codehaus.plexus:plexus-utils:3.6.1") {
+            because "CVE-2025-67030: Upgrade transitive dependency from CycloneDX Gradle plugin"
+        }
+    }
 }
 
 springBoot {
