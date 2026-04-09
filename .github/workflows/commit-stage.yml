@@ -62,7 +62,7 @@ jobs:
       - name: Set VERSION environment variable
         id: set_version
         run: |
-          VERSION=$(./gradlew properties | grep 'version:' | awk '{print $2}')
+          VERSION=$(./gradlew properties | grep '^version:' | awk '{print $2}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
