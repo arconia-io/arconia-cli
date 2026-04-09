@@ -114,12 +114,14 @@ public final class ProjectCollectionService {
         Assert.hasText(collectionName, "collectionName cannot be null or empty");
 
         var collection = ProjectCollectionRegistry.findCollection(collectionName);
+        outputOptions.verbose("Collection '%s' found in registry: %s".formatted(collectionName, collection));
         if (collection == null) {
             outputOptions.error("Collection '%s' is not registered. Run 'arconia project collection add' to register it first.".formatted(collectionName));
             return;
         }
 
         var index = ProjectCollectionCache.load(collectionName);
+        outputOptions.verbose("Collection '%s' cache loaded: %s".formatted(collectionName, index != null));
         if (index == null) {
             outputOptions.error("No cached data found for collection '%s'. Run 'arconia project collection add' to register it first.".formatted(collectionName));
             return;
