@@ -47,6 +47,8 @@ class ArconiaCliRuntimeHintsTests {
         assertThat(RuntimeHintsPredicates.reflection()
             .onType(TypeReference.of("land.oras.auth.AuthStore$ConfigFile")).test(hints)).isTrue();
         assertThat(RuntimeHintsPredicates.reflection()
+                .onType(TypeReference.of("land.oras.auth.AuthStore$CredentialHelperResponse")).test(hints)).isTrue();
+        assertThat(RuntimeHintsPredicates.reflection()
             .onType(TypeReference.of("land.oras.exception.Error")).test(hints)).isTrue();
     }
 

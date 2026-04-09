@@ -17,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import land.oras.OrasModel;
+import land.oras.auth.AuthStore;
 
 /**
  * Hints for the GraalVM compiler to ensure proper runtime behavior of the Arconia CLI.
@@ -65,9 +66,11 @@ public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
         scanner.addIncludeFilter(new AnnotationTypeFilter(JsonIgnoreProperties.class));
         var candidateComponents = scanner.findCandidateComponents("io.arconia.cli.project");
         candidateComponents.addAll(scanner.findCandidateComponents("io.arconia.cli.skills"));
-        return candidateComponents.stream()
+        var candidateTypeReferences = candidateComponents.stream()
                 .map(bd -> TypeReference.of(Objects.requireNonNull(bd.getBeanClassName())))
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toSet());
+        candidateTypeReferences.add(TypeReference.of(AuthStore.CredentialHelperResponse.class));
+        return candidateTypeReferences;
     }
 
     /**
