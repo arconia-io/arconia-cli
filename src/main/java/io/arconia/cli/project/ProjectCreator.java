@@ -17,6 +17,7 @@ import io.arconia.cli.openrewrite.OpenRewriteRunner;
 import io.arconia.cli.openrewrite.RewriteArguments;
 import io.arconia.cli.project.collection.service.ProjectCollectionCache;
 import io.arconia.cli.project.collection.service.ProjectCollectionRegistry;
+import io.arconia.cli.project.collection.service.ProjectCollectionService;
 import io.arconia.cli.project.collection.service.ProjectCollectionSummary;
 import io.arconia.cli.project.oci.ProjectConfigParser;
 import io.arconia.cli.utils.IoUtils;
@@ -109,6 +110,10 @@ public final class ProjectCreator {
         if (templateName.contains("/")) {
             return templateName;
         }
+
+        ProjectCollectionService collectionService = new ProjectCollectionService(registry, outputOptions);
+        collectionService.ensureDefaultCollectionRegistered();
+
         ProjectCollectionRegistry collectionRegistry = ProjectCollectionRegistry.load();
         for (ProjectCollectionRegistry.CollectionEntry collection : collectionRegistry.collections()) {
             Index index = ProjectCollectionCache.load(collection.name());

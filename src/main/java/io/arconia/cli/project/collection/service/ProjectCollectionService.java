@@ -21,6 +21,10 @@ import io.arconia.cli.commands.options.OutputOptions;
  */
 public final class ProjectCollectionService {
 
+    public static final String BUILT_IN_COLLECTION_NAME = "arconia-project-templates";
+
+    public static final String BUILT_IN_COLLECTION_REF = "ghcr.io/arconia-io/arconia-project-templates/collection";
+
     private static final List<String> PROJECT_TABLE_HEADERS = List.of("NAME", "DESCRIPTION", "TYPE", "LABELS");
 
     private final Registry registry;
@@ -31,6 +35,37 @@ public final class ProjectCollectionService {
         Assert.notNull(outputOptions, "outputOptions cannot be null");
         this.registry = registry;
         this.outputOptions = outputOptions;
+    }
+
+    /**
+     * Ensures the built-in Arconia project collection is registered.
+     * <p>
+     * Auto-registers the built-in collection if:
+     * <ol>
+     *   <li>The built-in collection is not found in the registry</li>
+     *   <li>The "builtInCollectionDismissed" flag is {@code false} or absent</li>
+     * </ol>
+     * Network failures are logged but do not block the caller.
+     */
+    public void ensureDefaultCollectionRegistered() {
+        try {
+            ProjectCollectionRegistry.CollectionEntry existing =
+                    ProjectCollectionRegistry.findCollection(BUILT_IN_COLLECTION_NAME);
+            if (existing != null) {
+                return;
+            }
+
+            ProjectCollectionRegistry registry = ProjectCollectionRegistry.load();
+            if (registry.builtInCollectionDismissed()) {
+                return;
+            }
+
+            outputOptions.info("Registering built-in project collection '%s'...".formatted(BUILT_IN_COLLECTION_NAME));
+            addCollection(BUILT_IN_COLLECTION_NAME, BUILT_IN_COLLECTION_REF);
+        }
+        catch (Exception e) {
+            outputOptions.verbose("Could not register built-in collection: %s".formatted(e.getMessage()));
+        }
     }
 
     /**
@@ -50,6 +85,16 @@ public final class ProjectCollectionService {
                         .digest(index.getDescriptor().getDigest())
                         .lastFetchedAt(Instant.now())
                         .build());
+
+        if (BUILT_IN_COLLECTION_NAME.equals(collectionName)) {
+            ProjectCollectionRegistry currentRegistry = ProjectCollectionRegistry.load();
+            if (currentRegistry.builtInCollectionDismissed()) {
+                ProjectCollectionRegistry.save(currentRegistry.mutate()
+                        .builtInCollectionDismissed(false)
+                        .build());
+            }
+        }
+
         outputOptions.verbose("Collection '%s' added to registry: %s.".formatted(collectionName, ProjectCollectionRegistry.registryPath()));
         outputOptions.info("Collection '%s' added.".formatted(collectionName));
         outputOptions.info("OCI Artifact: %s".formatted(collectionRef));
@@ -104,6 +149,14 @@ public final class ProjectCollectionService {
         outputOptions.info("Removing collection '%s'...".formatted(collectionName));
         ProjectCollectionCache.delete(collectionName);
         ProjectCollectionRegistry.removeCollection(collectionName);
+
+        if (BUILT_IN_COLLECTION_NAME.equals(collectionName)) {
+            ProjectCollectionRegistry currentRegistry = ProjectCollectionRegistry.load();
+            ProjectCollectionRegistry.save(currentRegistry.mutate()
+                    .builtInCollectionDismissed(true)
+                    .build());
+        }
+
         outputOptions.info("Collection '%s' removed.".formatted(collectionName));
     }
 

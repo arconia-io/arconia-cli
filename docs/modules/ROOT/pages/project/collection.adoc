@@ -2,11 +2,17 @@
 
 The `arconia project collection` command manages collections of projects. Collections are OCI indexes that group available projects and their locations, making them easy to discover and share.
 
+== Built-in Project Collection
+
+The Arconia CLI includes a built-in project collection (`arconia-project-templates`) at `ghcr.io/arconia-io/arconia-project-templates/collection`. The source templates are maintained in the https://github.com/arconia-io/arconia-project-templates[arconia-project-templates] repository. This collection is automatically registered on first use when running `list` (without `--name`), `update` (without `--name`), or when resolving a short template name with `arconia project create`. No manual setup is required.
+
+If you explicitly remove the built-in collection with `remove`, it will not be auto-registered again. You can always re-add it manually with `add`, which also resets the dismissal so future auto-registration resumes normally.
+
 == Commands
 
 === `add`
 
-Register a project collection with the Arconia CLI configuration and fetch its contents into the local cache.
+Register a project collection with the Arconia CLI configuration and fetch its contents into the local cache. If the collection being added is the xref:project/project.adoc#_built_in_project_collection[built-in collection] and it was previously removed, the dismissal is reset and auto-registration resumes.
 
 [source,shell]
 ----
@@ -122,7 +128,7 @@ arconia project collection update --name arconia-project-templates
 
 === `remove`
 
-Remove a collection from the Arconia CLI configuration and local cache.
+Remove a collection from the Arconia CLI configuration and local cache. If the collection being removed is the xref:project/project.adoc#_built_in_project_collection[built-in collection], it will not be auto-registered again on subsequent commands.
 
 [source,shell]
 ----

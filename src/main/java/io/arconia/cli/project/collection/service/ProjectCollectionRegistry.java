@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -20,7 +22,8 @@ import io.arconia.cli.utils.SystemUtils;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ProjectCollectionRegistry(
-    List<CollectionEntry> collections
+    List<CollectionEntry> collections,
+    @JsonSetter(nulls = Nulls.AS_EMPTY) boolean builtInCollectionDismissed
 ) {
 
     public static final String CONFIG_SUBDIR = ".config/arconia/projects";
@@ -33,6 +36,12 @@ public record ProjectCollectionRegistry(
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Builder mutate() {
+        return new Builder()
+                .collections(new ArrayList<>(collections))
+                .builtInCollectionDismissed(builtInCollectionDismissed);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -117,7 +126,7 @@ public record ProjectCollectionRegistry(
                 .toList());
         updatedEntries.add(entry);
 
-        save(ProjectCollectionRegistry.builder().collections(updatedEntries).build());
+        save(registry.mutate().collections(updatedEntries).build());
     }
 
     public static void removeCollection(String name) throws IOException {
@@ -127,7 +136,7 @@ public record ProjectCollectionRegistry(
         List<CollectionEntry> updatedEntries = new ArrayList<>(registry.collections().stream()
                 .filter(c -> !c.name().equals(name))
                 .toList());
-        save(ProjectCollectionRegistry.builder().collections(updatedEntries).build());
+        save(registry.mutate().collections(updatedEntries).build());
     }
 
 
@@ -175,6 +184,7 @@ public record ProjectCollectionRegistry(
     public static class Builder {
 
         private List<CollectionEntry> collections = new ArrayList<>();
+        private boolean builtInCollectionDismissed = false;
 
         private Builder() {}
 
@@ -183,8 +193,13 @@ public record ProjectCollectionRegistry(
             return this;
         }
 
+        public Builder builtInCollectionDismissed(boolean builtInCollectionDismissed) {
+            this.builtInCollectionDismissed = builtInCollectionDismissed;
+            return this;
+        }
+
         public ProjectCollectionRegistry build() {
-            return new ProjectCollectionRegistry(collections);
+            return new ProjectCollectionRegistry(collections, builtInCollectionDismissed);
         }
 
     }

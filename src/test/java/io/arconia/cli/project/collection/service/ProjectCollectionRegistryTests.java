@@ -1,6 +1,7 @@
 package io.arconia.cli.project.collection.service;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
@@ -51,7 +52,7 @@ class ProjectCollectionRegistryTests {
 
     @Test
     void whenCollectionsIsNullThenThrow() {
-        assertThatThrownBy(() -> new ProjectCollectionRegistry(null))
+        assertThatThrownBy(() -> ProjectCollectionRegistry.builder().collections(null).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("collections cannot be null");
     }
@@ -240,6 +241,104 @@ class ProjectCollectionRegistryTests {
         assertThatThrownBy(() -> ProjectCollectionRegistry.findCollection(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("name cannot be null or empty");
+    }
+
+    @Test
+    void builtInCollectionDismissedDefaultsToFalse() {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder().build();
+
+        assertThat(registry.builtInCollectionDismissed()).isFalse();
+    }
+
+    @Test
+    void builtInCollectionDismissedCanBeSetToTrue() {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder()
+                .builtInCollectionDismissed(true)
+                .build();
+
+        assertThat(registry.builtInCollectionDismissed()).isTrue();
+    }
+
+    @Test
+    void saveAndLoadRoundTripPreservesBuiltInCollectionDismissed() throws IOException {
+        ProjectCollectionRegistry original = ProjectCollectionRegistry.builder()
+                .builtInCollectionDismissed(true)
+                .build();
+
+        ProjectCollectionRegistry.save(original);
+        ProjectCollectionRegistry loaded = ProjectCollectionRegistry.load();
+
+        assertThat(loaded.builtInCollectionDismissed()).isTrue();
+    }
+
+    @Test
+    void mutateCreatesBuilderWithCopiedFields() {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder()
+                .collections(List.of(minimalEntry("my-collection").build()))
+                .builtInCollectionDismissed(true)
+                .build();
+
+        ProjectCollectionRegistry mutated = registry.mutate().build();
+
+        assertThat(mutated.collections()).hasSize(1);
+        assertThat(mutated.collections().getFirst().name()).isEqualTo("my-collection");
+        assertThat(mutated.builtInCollectionDismissed()).isTrue();
+    }
+
+    @Test
+    void mutateAllowsOverridingFields() {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder()
+                .builtInCollectionDismissed(true)
+                .build();
+
+        ProjectCollectionRegistry mutated = registry.mutate()
+                .builtInCollectionDismissed(false)
+                .build();
+
+        assertThat(mutated.builtInCollectionDismissed()).isFalse();
+    }
+
+    @Test
+    void addCollectionPreservesBuiltInCollectionDismissedFlag() throws IOException {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder()
+                .builtInCollectionDismissed(true)
+                .build();
+        ProjectCollectionRegistry.save(registry);
+
+        ProjectCollectionRegistry.addCollection(minimalEntry("my-collection").build());
+
+        ProjectCollectionRegistry loaded = ProjectCollectionRegistry.load();
+        assertThat(loaded.collections()).hasSize(1);
+        assertThat(loaded.builtInCollectionDismissed()).isTrue();
+    }
+
+    @Test
+    void loadDefaultsBuiltInCollectionDismissedToFalseWhenMissingFromJson() throws IOException {
+        String json = """
+                {
+                  "collections": []
+                }
+                """;
+        Files.writeString(ProjectCollectionRegistry.registryPath(), json);
+
+        ProjectCollectionRegistry loaded = ProjectCollectionRegistry.load();
+
+        assertThat(loaded.builtInCollectionDismissed()).isFalse();
+    }
+
+    @Test
+    void removeCollectionPreservesBuiltInCollectionDismissedFlag() throws IOException {
+        ProjectCollectionRegistry registry = ProjectCollectionRegistry.builder()
+                .collections(List.of(minimalEntry("my-collection").build()))
+                .builtInCollectionDismissed(true)
+                .build();
+        ProjectCollectionRegistry.save(registry);
+
+        ProjectCollectionRegistry.removeCollection("my-collection");
+
+        ProjectCollectionRegistry loaded = ProjectCollectionRegistry.load();
+        assertThat(loaded.collections()).isEmpty();
+        assertThat(loaded.builtInCollectionDismissed()).isTrue();
     }
 
     private static CollectionEntry.Builder minimalEntry(String name) {

@@ -72,6 +72,7 @@ public class ProjectCollectionCommands implements Runnable {
             collectionService.listCollection(collectionName);
         }
         else {
+            collectionService.ensureDefaultCollectionRegistered();
             var registry = ProjectCollectionRegistry.load();
             if (registry.collections().isEmpty()) {
                 outputOptions.info("No project collections registered. Run 'arconia project collection add' to register one.");
@@ -96,6 +97,7 @@ public class ProjectCollectionCommands implements Runnable {
         if (StringUtils.hasText(collectionName)) {
             collectionService.updateCollection(collectionName);
         } else {
+            collectionService.ensureDefaultCollectionRegistered();
             var registry = ProjectCollectionRegistry.load();
             if (registry.collections().isEmpty()) {
                 outputOptions.info("No project collections registered. Run 'arconia project collection add' to register one.");

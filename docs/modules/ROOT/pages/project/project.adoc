@@ -2,11 +2,17 @@
 
 The `arconia project` command allows you to create new Java projects from templates and publish them as OCI artifacts. Published projects can be organized into collections for discovery and sharing.
 
+== Built-in Project Collection
+
+The Arconia CLI ships with a built-in project collection (`arconia-project-templates`) available at `ghcr.io/arconia-io/arconia-project-templates/collection`. The source templates are maintained in the https://github.com/arconia-io/arconia-project-templates[arconia-project-templates] repository. This collection is automatically registered the first time you run any `arconia project` command that needs it (e.g. `create`, `collection list`, `collection update`), so you can use short template names out of the box without any setup.
+
+If you explicitly remove the built-in collection via `arconia project collection remove --name arconia-project-templates`, it will not be re-registered automatically. You can always re-add it manually with `arconia project collection add`.
+
 == Commands
 
 === `create`
 
-Create a new Java project from a template.
+Create a new Java project from a template. The `--template` option accepts either a full OCI artifact reference or a short template name. Short names are automatically resolved from registered project collections (including the <<Built-in Project Collection,built-in project collection>>).
 
 [source,shell]
 ----
@@ -16,7 +22,7 @@ arconia project create \
 
 arconia project create \
   --name my-app \
-  --template server-http # Automatically resolved from a registered project collection
+  --template server-http # Automatically resolved from the built-in project collection
 
 arconia project create \
   --name my-app \
