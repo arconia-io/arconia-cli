@@ -62,7 +62,7 @@ class ProjectCatalogPublisherTests {
 
         assertThatThrownBy(() -> publisher.publish(args))
                 .isInstanceOf(CliException.class)
-                .hasMessageContaining("No projects specified");
+                .hasMessageContaining("No templates specified");
     }
 
     private static OutputOptions createOutputOptions() {
