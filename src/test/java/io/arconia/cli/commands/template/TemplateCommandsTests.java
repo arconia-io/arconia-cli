@@ -30,6 +30,7 @@ class TemplateCommandsTests {
         assertThat(exitCode).isZero();
         String out = output.toString();
         assertThat(out).contains("Usage: arconia template");
+        assertThat(out).contains("init");
         assertThat(out).contains("list");
         assertThat(out).contains("push");
         assertThat(out).contains("catalog");
@@ -44,6 +45,36 @@ class TemplateCommandsTests {
 
         assertThat(exitCode).isZero();
         assertThat(output.toString()).contains("Usage: arconia template");
+    }
+
+    @Test
+    void initHelpOption() {
+        var output = new StringWriter();
+        commandLine.setOut(new PrintWriter(output));
+
+        int exitCode = commandLine.execute("template", "init", "--help");
+
+        assertThat(exitCode).isZero();
+        String out = output.toString();
+        assertThat(out).contains("Usage: arconia template init");
+        assertThat(out).contains("--name");
+        assertThat(out).contains("--description");
+        assertThat(out).contains("--type");
+        assertThat(out).contains("--license");
+        assertThat(out).contains("--package-name");
+        assertThat(out).contains("--label");
+        assertThat(out).contains("--path");
+        assertThat(out).contains("--force");
+    }
+
+    @Test
+    void initRequiresNameAndDescription() {
+        var error = new StringWriter();
+        commandLine.setErr(new PrintWriter(error));
+
+        int exitCode = commandLine.execute("template", "init");
+
+        assertThat(exitCode).isNotZero();
     }
 
     @Test

@@ -30,13 +30,14 @@ Options:
   -V, --version   Print version information and exit.
 
 Commands:
+  create           Create a new Java project from a template.
   dev              Run a Spring Boot application in dev mode.
   build            Build a Java application.
   test             Run tests for a Java application.
   image            Build and manage container images for Spring Boot applications.
   update, upgrade  Update project dependencies and build tool versions.
   rewrite          Discover and run OpenRewrite recipes to migrate or refactor a Java application.
-  project          Create and manage Java projects
+  template         Manage and publish project templates.
   skills           Install and manage agent skills.
   help             Display help information about the specified command.
   version          Display version information about the Arconia CLI.

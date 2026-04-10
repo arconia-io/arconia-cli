@@ -4,6 +4,72 @@ The `arconia template` command manages and publishes project templates. Template
 
 == Commands
 
+=== `init`
+
+Initialize a `project.yml` configuration file in a project directory to prepare it for publishing as a template via `arconia template push`.
+
+[source,shell]
+----
+arconia template init \
+  --name server-http \
+  --description "A Spring Boot HTTP server template"
+
+arconia template init \
+  --name server-http \
+  --description "A Spring Boot HTTP server template" \
+  --type service \
+  --license Apache-2.0 \
+  --package-name io.arconia.demo \
+  --label spring-boot --label http
+----
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The template name.
+
+|`--description` (required)
+|
+|The template description.
+
+|`--type`
+|`application`
+|The template type (e.g. `application`, `service`).
+
+|`--license`
+|`LicenseRef-Proprietary`
+|The SPDX license identifier.
+
+|`--package-name`
+|`com.example`
+|The default Java package name.
+
+|`--label`
+|
+|Labels for the template (e.g. `--label spring-boot --label http`). Can be specified multiple times.
+
+|`--path`
+|_(current directory)_
+|The directory to create `project.yml` in.
+
+|`--force`
+|`false`
+|Overwrite an existing `project.yml` file.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
 === `list`
 
 List available project templates from all registered catalogs.

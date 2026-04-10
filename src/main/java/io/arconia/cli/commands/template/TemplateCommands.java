@@ -20,12 +20,16 @@ import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.commands.options.RegistryOptions;
+import io.arconia.cli.core.CliException;
 import io.arconia.cli.project.ProjectBatchPushArguments;
 import io.arconia.cli.project.ProjectPublisher;
 import io.arconia.cli.project.ProjectPushArguments;
 import io.arconia.cli.project.ProjectPushReport;
 import io.arconia.cli.project.catalog.service.ProjectCatalogRegistry;
 import io.arconia.cli.project.catalog.service.ProjectCatalogService;
+import io.arconia.cli.project.oci.ProjectConfig;
+import io.arconia.cli.project.oci.ProjectConfigParser;
+import io.arconia.cli.project.oci.ProjectConfigWriter;
 import io.arconia.cli.utils.IoUtils;
 
 @Component
@@ -42,6 +46,43 @@ public class TemplateCommands implements Runnable {
     @Override
     public void run() {
         spec.commandLine().usage(spec.commandLine().getOut());
+    }
+
+    @Command(name = "init", description = "Initialize a project.yml configuration file to prepare a project for publishing as a template.")
+    public void init(
+            @Option(names = {"--name"}, required = true, description = "The template name.") String name,
+            @Option(names = {"--description"}, required = true, description = "The template description.") String description,
+            @Option(names = {"--type"}, defaultValue = ProjectConfig.DEFAULT_TYPE, description = "The template type (e.g. 'application', 'service'). Defaults to '" + ProjectConfig.DEFAULT_TYPE + "'.") String type,
+            @Option(names = {"--license"}, defaultValue = ProjectConfig.DEFAULT_LICENSE, description = "The SPDX license identifier. Defaults to '" + ProjectConfig.DEFAULT_LICENSE + "'.") String license,
+            @Option(names = {"--package-name"}, defaultValue = ProjectConfig.DEFAULT_PACKAGE_NAME, description = "The default Java package name. Defaults to '" + ProjectConfig.DEFAULT_PACKAGE_NAME + "'.") String packageName,
+            @Option(names = {"--label"}, arity = "0..*", description = "Labels for the template (e.g. --label spring-boot --label http). Can be specified multiple times.") @Nullable List<String> labels,
+            @Option(names = {"--path"}, description = "The directory to create project.yml in. Defaults to the current working directory.") @Nullable String path,
+            @Option(names = {"--force"}, defaultValue = "false", description = "Overwrite an existing project.yml file.") boolean force,
+            @Mixin OutputOptions outputOptions
+    ) {
+        Path projectPath = IoUtils.getProjectPath(path);
+
+        ProjectConfig config = ProjectConfig.builder()
+                .name(name)
+                .description(description)
+                .type(type)
+                .license(license)
+                .packageName(packageName)
+                .labels(labels != null ? labels : List.of())
+                .build();
+
+        try {
+            ProjectConfigWriter.writeToDirectory(config, projectPath, force);
+        }
+        catch (IllegalStateException e) {
+            throw new CliException(e.getMessage(), e);
+        }
+        catch (IOException e) {
+            throw new CliException("Failed to write %s: %s".formatted(ProjectConfigParser.CONFIG_FILE_NAME, e.getMessage()), e);
+        }
+
+        outputOptions.info("Template configuration written to %s".formatted(
+                projectPath.resolve(ProjectConfigParser.CONFIG_FILE_NAME)));
     }
 
     @Command(name = "list", description = "List available project templates from the registered catalogs.")
