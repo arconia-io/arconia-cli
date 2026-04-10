@@ -103,13 +103,13 @@ public class TemplateCatalogCommands implements Runnable {
     @Command(name = "push", description = "Publish a template catalog as an OCI artifact.")
     public void push(
             @Option(names = {"--ref"}, required = true, description = "The full OCI artifact reference for a template catalog (e.g. ghcr.io/arconia-io/arconia-templates/catalog).") String ref,
-            @Option(names = {"--name"}, required = true, description = "The name of the catalog (e.g. arconia-project-templates).") String name,
+            @Option(names = {"--name"}, required = true, description = "The name of the catalog (e.g. arconia-templates).") String name,
             @Option(names = {"--description"}, defaultValue = "A catalog of Java project templates published as OCI Artifacts and managed by the Arconia CLI.", description = "A short description of the catalog.") String description,
             @Option(names = {"--tag"}, defaultValue = "latest", description = "The version tag (e.g. 'latest', semantic version number, commit sha). Defaults to 'latest'.") String tag,
             @Option(names = {"--from-report"}, arity = "0..1", fallbackValue = ProjectPushReport.DEFAULT_FILENAME, description = "Path to a push report file (from 'arconia template push --output-report'). Defaults to '" + ProjectPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String fromReport,
             @Option(names = {"--template"}, arity = "0..*", description = "Explicit template OCI references to include (e.g. --template ghcr.io/arconia-io/arconia-templates/data).") List<String> projectRefs,
             @Option(names = {"--annotation"}, arity = "0..*", description = "Additional annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia).") @Nullable List<String> annotations,
-            @Option(names = {"--output-report"}, arity = "0..1", fallbackValue = ProjectCatalogPushReport.DEFAULT_FILENAME, description = "Write a publish report file. Defaults to '" + ProjectCatalogPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
+            @Option(names = {"--output-report"}, arity = "0..1", fallbackValue = ProjectCatalogPushReport.DEFAULT_FILENAME, description = "Write a push report file. Defaults to '" + ProjectCatalogPushReport.DEFAULT_FILENAME + "' when specified without a path.") @Nullable String reportFileName,
             @Mixin RegistryOptions registryOptions,
             @Mixin OutputOptions outputOptions
     ) throws IOException {
@@ -120,15 +120,15 @@ public class TemplateCatalogCommands implements Runnable {
         ProjectCatalogPublisher publisher = new ProjectCatalogPublisher(ArtifactRegistry.create(registryOptions), outputOptions);
 
         publisher.publish(ProjectCatalogPushArguments.builder()
-            .ref(ref)
-            .tag(tag)
-            .name(name)
-            .description(description)
-            .annotations(ArtifactAnnotations.parseAnnotations(annotations))
-            .fromReport(fromReport)
-            .projects(projectRefs)
-            .reportFileName(reportFileName)
-            .build());
+                .ref(ref)
+                .tag(tag)
+                .name(name)
+                .description(description)
+                .annotations(ArtifactAnnotations.parseAnnotations(annotations))
+                .fromReport(fromReport)
+                .projects(projectRefs)
+                .reportFileName(reportFileName)
+                .build());
     }
 
 }
