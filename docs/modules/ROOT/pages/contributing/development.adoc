@@ -1,47 +1,76 @@
 = Development
 
-This page describes how to develop the Arconia CLI.
+This page describes how to build, test, and run the Arconia CLI from source.
+
+For contribution guidelines (workflow, commit conventions, DCO), see the https://github.com/arconia-io/arconia-cli/blob/main/CONTRIBUTING.md[Contributing Guide].
 
 == Prerequisites
 
-* Java 25 (GraalVM)
+* Java 25 or later with https://www.graalvm.org/[GraalVM] native compilation support.
+* A container runtime compatible with https://www.testcontainers.org/[Testcontainers] (e.g., https://podman-desktop.io[Podman Desktop], https://www.docker.com/products/docker-desktop/[Docker Desktop]).
 
 == Building the CLI
 
-To package the Arconia CLI as a native executable, run:
+Build on the JVM (compile, test, and package):
 
 [source,shell]
 ----
-./gradlew nativeCompile
+./gradlew build
 ----
 
-This command compiles the project and generates a standalone native executable. The resulting file will be located at `build/native/nativeCompile/arconia`.
+Build as a GraalVM native executable:
+
+[source,shell]
+----
+./gradlew nativeBuild
+----
+
+The native executable is generated at `build/native/nativeCompile/arconia`.
+
+== Running Tests
+
+Run all tests on the JVM:
+
+[source,shell]
+----
+./gradlew test
+----
+
+Run all tests in native mode:
+
+[source,shell]
+----
+./gradlew nativeTest
+----
+
+Run a specific test class:
+
+[source,shell]
+----
+./gradlew test --tests "io.arconia.cli.commands.VersionCommandTests"
+----
 
 == Installing the CLI
 
-You can run the CLI directly from its build location or install it system-wide for easier access. To install it globally on macOS or Linux:
+You can run the CLI directly from its build location or install it system-wide. To install globally on macOS or Linux:
 
 [source,shell]
 ----
 sudo cp build/native/nativeCompile/arconia /usr/local/bin/arconia
 ----
 
-This command copies the executable to a directory typically included in the system PATH, making it accessible from anywhere in the terminal.
+== Running the CLI
 
-=== Running the CLI
-
-If you've installed the CLI globally, you can run it by simply typing:
+If installed globally:
 
 [source,shell]
 ----
 arconia help
 ----
 
-If you haven't installed it globally, you'll need to specify the full path to the executable:
+Otherwise, use the full path:
 
 [source,shell]
 ----
 ./build/native/nativeCompile/arconia help
 ----
-
-Replace `help` with any other valid command or option to use different features of the CLI.

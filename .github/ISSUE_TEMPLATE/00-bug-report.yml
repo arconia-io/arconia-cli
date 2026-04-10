@@ -1,0 +1,91 @@
+name: "Report: Bug"
+description: "Create a bug report."
+title: "BUG TITLE"
+labels: [bug, triage]
+body:
+- type: "markdown"
+  attributes:
+    value: |
+      Welcome to Arconia CLI! Please replace the **`BUG TITLE`** template above with a short title summarizing what the bug entails.
+      ---
+- type: "input"
+  id: "arconia-cli-version"
+  attributes:
+    label: "Arconia CLI version"
+    description: "The Arconia CLI version as returned by 'arconia version'."
+  validations:
+    required: true
+- type: "textarea"
+  id: "what-happened"
+  attributes:
+    label: "What happened"
+    description: "A small description of the issue."
+  validations:
+    required: true
+- type: "textarea"
+  id: "what-expected"
+  attributes:
+    label: "What did you expect"
+    description: "A description of what was expected."
+  validations:
+    required: true
+- type: "textarea"
+  id: "what-steps-taken"
+  attributes:
+    label: "What steps did you take"
+    description: "A clear and concise description steps that can be used to reproduce the problem."
+  validations:
+    required: true
+- type: "textarea"
+  id: "logs"
+  attributes:
+    label: "Relevant log output"
+    description: "Please paste any relevant log output or stack traces. This will be automatically formatted as code."
+    render: "shell"
+  validations:
+    required: false
+- type: "textarea"
+  id: "additional-context"
+  attributes:
+    label: "Anything else you would like to add"
+    description: "Additional information that will assist in solving the issue."
+  validations:
+    required: false
+- type: "dropdown"
+  id: "os"
+  attributes:
+    label: "Operating System"
+    description: "Which operating system and architecture are you using?"
+    options:
+      - "macOS (arm64)"
+      - "macOS (amd64)"
+      - "Linux (arm64)"
+      - "Linux (amd64)"
+      - "Windows (amd64)"
+      - "Windows (arm64)"
+      - "Other (please describe in additional context)"
+  validations:
+    required: true
+- type: "input"
+  id: "container-runtime"
+  attributes:
+    label: "Container runtime"
+    description: "Which container runtime are you using? (e.g. Podman, Docker)"
+  validations:
+    required: false
+- type: "checkboxes"
+  id: "sanity-check"
+  attributes:
+    label: "I assert that this issue is relevant for Arconia CLI"
+    options:
+      - label: "I assert that this is a bug and not a support request. If you need assistance, please use [GitHub Discussions](https://github.com/arconia-io/arconia-cli/discussions)."
+        required: true
+      - label: "I assert that this is not a [duplicate of an existing issue](https://github.com/arconia-io/arconia-cli/issues). "
+        required: true
+      - label: "I assert that I have read the [Arconia Code of Conduct](https://github.com/arconia-io/arconia-cli/blob/main/CODE_OF_CONDUCT.md) and agree to abide by it."
+        required: true
+- type: "markdown"
+  attributes:
+    value: |
+      Thank you for helping improve Arconia CLI!
+      ---
