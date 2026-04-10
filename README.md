@@ -20,13 +20,13 @@
 
 ## ✨&nbsp; Features
 
-- **🚀&nbsp; Dev mode**. Run your application with features improving your development experience.
-- **🔨&nbsp; Build & test**. Compile, test, and package as JVM JARs or GraalVM native executables.
-- **📦&nbsp; Container images**. Build images using Cloud Native Buildpacks or Dockerfiles with Podman/Docker.
-- **⬆️&nbsp; Automated upgrades**. Upgrade Spring Boot, Spring AI, Arconia, Gradle, and Maven with a single command.
-- **🔄&nbsp; OpenRewrite recipes**. Run any OpenRewrite recipe to migrate or refactor your codebase.
-- **📁&nbsp; Project templates**. Create new projects from templates distributed as OCI artifacts.
-- **🧠&nbsp; Agent skills**. Install and manage AI agent skills for your applications.
+- **Dev mode.** Run your application with features improving your development experience.
+- **Build & test.** Compile, test, and package as JVM JARs or GraalVM native executables.
+- **Container images.** Build images using Cloud Native Buildpacks or Dockerfiles with Podman/Docker.
+- **Automated upgrades.** Upgrade Spring Boot, Spring AI, Arconia, Gradle, and Maven with a single command.
+- **OpenRewrite recipes.** Run any OpenRewrite recipe to migrate or refactor your codebase.
+- **Project templates.** Create new projects from templates distributed as OCI artifacts.
+- **Agent skills.** Install and manage AI agent skills for your applications.
 
 ## ⚡&nbsp; Quick Start
 
@@ -43,14 +43,13 @@ scoop bucket add arconia https://github.com/arconia-io/scoop-bucket.git
 scoop install arconia-cli
 ```
 
-**Verify and explore**
+**Explore**
 
 ```shell
-arconia version
 arconia help
 ```
 
-**Try it out**
+**Try it out** (from a Spring Boot project directory)
 
 ```shell
 arconia dev                                     # Run in dev mode with Dev Services
@@ -70,7 +69,7 @@ The [Arconia CLI documentation](https://arconia.io) covers all available command
 
 ## 🤝&nbsp; Contributing
 
-Contributions are welcome! Please read the [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before getting started.
 
 ## 🛡️&nbsp; Security
 
