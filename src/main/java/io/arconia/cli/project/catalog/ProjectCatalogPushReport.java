@@ -1,4 +1,4 @@
-package io.arconia.cli.project;
+package io.arconia.cli.project.catalog;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,16 +13,16 @@ import org.springframework.util.Assert;
 import io.arconia.cli.json.JsonParser;
 
 /**
- * Model for a report generated when one or more artifacts are pushed to a registry.
+ * Model for a report generated when a project catalog is pushed to a registry.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ProjectPushReport(
+public record ProjectCatalogPushReport(
     List<ArtifactEntry> artifacts
 ) {
 
-    public static final String DEFAULT_FILENAME = "template-push-report.json";
+    public static final String DEFAULT_FILENAME = "template-catalog-push-report.json";
 
-    public ProjectPushReport {
+    public ProjectCatalogPushReport {
         Assert.notNull(artifacts, "artifacts cannot be null");
     }
 
@@ -30,9 +30,6 @@ public record ProjectPushReport(
     public record ArtifactEntry(
         String name,
         String description,
-        String type,
-        String license,
-        List<String> labels,
         String ref,
         String tag,
         String digest
@@ -41,9 +38,6 @@ public record ProjectPushReport(
         public ArtifactEntry {
             Assert.hasText(name, "name cannot be null or empty");
             Assert.hasText(description, "description cannot be null or empty");
-            Assert.hasText(type, "type cannot be null or empty");
-            Assert.hasText(license, "license cannot be null or empty");
-            Assert.notNull(labels, "labels cannot be null");
             Assert.hasText(ref, "ref cannot be null or empty");
             Assert.hasText(tag, "tag cannot be null or empty");
             Assert.hasText(digest, "digest cannot be null or empty");
@@ -56,9 +50,6 @@ public record ProjectPushReport(
         public static class Builder {
             private String name;
             private String description;
-            private String type;
-            private String license;
-            private List<String> labels;
             private String ref;
             private String tag;
             private String digest;
@@ -72,21 +63,6 @@ public record ProjectPushReport(
 
             public Builder description(String description) {
                 this.description = description;
-                return this;
-            }
-
-            public Builder type(String type) {
-                this.type = type;
-                return this;
-            }
-
-            public Builder license(String license) {
-                this.license = license;
-                return this;
-            }
-
-            public Builder labels(List<String> labels) {
-                this.labels = new ArrayList<>(labels);
                 return this;
             }
 
@@ -106,7 +82,7 @@ public record ProjectPushReport(
             }
 
             public ArtifactEntry build() {
-                return new ArtifactEntry(name, description, type, license, labels, ref, tag, digest);
+                return new ArtifactEntry(name, description, ref, tag, digest);
             }
 
         }
@@ -120,11 +96,11 @@ public record ProjectPushReport(
         Files.writeString(path, json + "\n");
     }
 
-    public static ProjectPushReport load(Path path) throws IOException {
+    public static ProjectCatalogPushReport load(Path path) throws IOException {
         Assert.notNull(path, "path cannot be null");
 
         String json = Files.readString(path);
-        return JsonParser.fromJson(json, ProjectPushReport.class);
+        return JsonParser.fromJson(json, ProjectCatalogPushReport.class);
     }
 
     public static Builder builder() {
@@ -147,8 +123,8 @@ public record ProjectPushReport(
             return this;
         }
 
-        public ProjectPushReport build() {
-            return new ProjectPushReport(artifacts);
+        public ProjectCatalogPushReport build() {
+            return new ProjectCatalogPushReport(artifacts);
         }
 
     }

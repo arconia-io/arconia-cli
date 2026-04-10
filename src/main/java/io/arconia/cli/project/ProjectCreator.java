@@ -15,10 +15,10 @@ import io.arconia.cli.commands.options.OutputOptions;
 import io.arconia.cli.core.CliException;
 import io.arconia.cli.openrewrite.OpenRewriteRunner;
 import io.arconia.cli.openrewrite.RewriteArguments;
-import io.arconia.cli.project.collection.service.ProjectCollectionCache;
-import io.arconia.cli.project.collection.service.ProjectCollectionRegistry;
-import io.arconia.cli.project.collection.service.ProjectCollectionService;
-import io.arconia.cli.project.collection.service.ProjectCollectionSummary;
+import io.arconia.cli.project.catalog.service.ProjectCatalogCache;
+import io.arconia.cli.project.catalog.service.ProjectCatalogRegistry;
+import io.arconia.cli.project.catalog.service.ProjectCatalogService;
+import io.arconia.cli.project.catalog.service.ProjectCatalogSummary;
 import io.arconia.cli.project.oci.ProjectConfigParser;
 import io.arconia.cli.utils.IoUtils;
 
@@ -59,7 +59,7 @@ public final class ProjectCreator {
         String templatePackageName = ProjectConfigParser.parseFromDirectory(projectDirectory).packageName();
 
         outputOptions.newLine();
-        outputOptions.info("Applying project customization...");
+        outputOptions.info("Applying template customization...");
 
         Path recipeTemplate = null;
         try {
@@ -99,7 +99,7 @@ public final class ProjectCreator {
         IoUtils.deleteEmptyDirectoriesRecursively(projectDirectory.resolve(oldPackageFolderTest));
         Files.deleteIfExists(projectDirectory.resolve(ProjectConfigParser.CONFIG_FILE_NAME));
 
-        outputOptions.info("Project customization applied successfully");
+        outputOptions.info("Template customization applied successfully");
         outputOptions.newLine();
 
         outputOptions.info("Project '%s' is now ready".formatted(arguments.name()));
@@ -111,16 +111,16 @@ public final class ProjectCreator {
             return templateName;
         }
 
-        ProjectCollectionService collectionService = new ProjectCollectionService(registry, outputOptions);
-        collectionService.ensureDefaultCollectionRegistered();
+        ProjectCatalogService catalogService = new ProjectCatalogService(registry, outputOptions);
+        catalogService.ensureBuiltInCatalogRegistered();
 
-        ProjectCollectionRegistry collectionRegistry = ProjectCollectionRegistry.load();
-        for (ProjectCollectionRegistry.CollectionEntry collection : collectionRegistry.collections()) {
-            Index index = ProjectCollectionCache.load(collection.name());
+        ProjectCatalogRegistry catalogRegistry = ProjectCatalogRegistry.load();
+        for (ProjectCatalogRegistry.CatalogEntry collection : catalogRegistry.catalogs()) {
+            Index index = ProjectCatalogCache.load(collection.name());
             if (index == null) {
                 continue;
             }
-            for (ProjectCollectionSummary summary : ProjectCollectionCache.toProjectSummaries(index)) {
+            for (ProjectCatalogSummary summary : ProjectCatalogCache.toProjectSummaries(index)) {
                 if (templateName.equals(summary.name())) {
                     outputOptions.info("Template '%s' resolved to '%s'".formatted(templateName, summary.ref()));
                     return summary.ref();

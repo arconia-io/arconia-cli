@@ -1,0 +1,201 @@
+= `arconia template catalog`
+
+The `arconia template catalog` command manages catalogs of project templates. Catalogs are OCI indexes that group available templates and their locations, making them easy to discover and share.
+
+== Commands
+
+=== `add`
+
+Register a template catalog with the Arconia CLI configuration and fetch its contents into the local cache.
+
+[source,shell]
+----
+arconia template catalog add \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-templates/catalog
+----
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The name of the template catalog (e.g. `arconia-project-templates`).
+
+|`--ref` (required)
+|
+|The OCI artifact reference for the catalog (e.g. `ghcr.io/arconia-io/arconia-templates/catalog`).
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+=== `update`
+
+Update a registered template catalog or all registered catalogs. For each catalog, checks whether a newer semver tag is available in the OCI registry. If a newer version is found, the stored reference is updated to the latest tag and the cache is refreshed. Otherwise, the existing reference is re-fetched to refresh the cache and digest.
+
+[source,shell]
+----
+arconia template catalog update
+arconia template catalog update --name arconia-project-templates
+----
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name`
+|
+|The name of a specific template catalog to update. If omitted, updates all registered catalogs.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+=== `remove`
+
+Remove a template catalog from the Arconia CLI configuration and local cache.
+
+[source,shell]
+----
+arconia template catalog remove --name arconia-project-templates
+----
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The name of the catalog to remove.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+=== `push`
+
+Publish a template catalog as an OCI artifact. At least one of `--from-report` or `--template` must be provided.
+
+NOTE: This command is intended for template authors who publish catalogs to OCI registries.
+
+[source,shell]
+----
+arconia template catalog push \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-templates/catalog \
+  --tag 1.2.3 \
+  --template ghcr.io/arconia-io/arconia-templates/my-project:1.0.0 \
+  --template ghcr.io/arconia-io/arconia-templates/other-project:1.4.2
+
+arconia template catalog push \
+  --name arconia-project-templates \
+  --ref ghcr.io/arconia-io/arconia-templates/catalog \
+  --from-report template-push-report.json
+----
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--ref` (required)
+|
+|The full OCI artifact reference for the template catalog (e.g. `ghcr.io/arconia-io/arconia-templates/catalog`).
+
+|`--name` (required)
+|
+|The catalog identifier (e.g. `arconia-project-templates`).
+
+|`--description`
+|`A catalog of Java project templates published as OCI Artifacts and managed by the Arconia CLI.`
+|A short description of the catalog.
+
+|`--tag`
+|`latest`
+|The version tag (e.g. `latest`, semantic version number, commit sha).
+
+|`--from-report`
+|`template-push-report.json`
+|Path to a push report file (from `arconia template push --output-report`). Defaults to `template-push-report.json` when specified without a path.
+
+|`--template`
+|
+|Explicit template OCI references to include (e.g. `--template ghcr.io/arconia-io/arconia-templates/server-http:1.0.0`). Can be specified multiple times.
+
+|`--annotation`
+|
+|Additional annotations in key=value format (e.g. `--annotation org.opencontainers.image.vendor=arconia`). Can be specified multiple times.
+
+|`--output-report`
+|`template-catalog-push-report.json`
+|Write a publish report file. Defaults to `template-catalog-push-report.json` when specified without a path. The report can be used for downstream operations such as artifact signing (e.g. cosign) or SLSA provenance attestation.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+== See Also
+
+* xref:create.adoc[arconia create]
+* xref:template/template.adoc[arconia template]

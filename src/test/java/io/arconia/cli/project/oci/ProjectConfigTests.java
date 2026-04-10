@@ -186,13 +186,35 @@ class ProjectConfigTests {
     }
 
     @Test
-    void schemaVersionIsAlwaysCurrentVersion() {
+    void schemaVersionDefaultsToCurrentVersionInBuilder() {
         ProjectConfig config = ProjectConfig.builder()
                 .name("my-app")
                 .description("A test application")
                 .build();
 
         assertThat(config.schemaVersion()).isEqualTo(ProjectConfig.CURRENT_SCHEMA_VERSION);
+    }
+
+    @Test
+    void whenSchemaVersionIsNullThenThrow() {
+        assertThatThrownBy(() -> ProjectConfig.builder()
+                .schemaVersion(null)
+                .name("my-app")
+                .description("A test application")
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("schemaVersion cannot be null or empty");
+    }
+
+    @Test
+    void whenSchemaVersionIsEmptyThenThrow() {
+        assertThatThrownBy(() -> ProjectConfig.builder()
+                .schemaVersion("")
+                .name("my-app")
+                .description("A test application")
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("schemaVersion cannot be null or empty");
     }
 
 }

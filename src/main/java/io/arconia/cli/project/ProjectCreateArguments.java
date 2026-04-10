@@ -39,17 +39,17 @@ public record ProjectCreateArguments(
             return this;
         }
 
-        public Builder description(String description) {
+        public Builder description(@Nullable String description) {
             this.description = description;
             return this;
         }
 
-        public Builder group(String group) {
+        public Builder group(@Nullable String group) {
             this.group = group;
             return this;
         }
 
-        public Builder packageName(String packageName) {
+        public Builder packageName(@Nullable String packageName) {
             this.packageName = packageName;
             return this;
         }

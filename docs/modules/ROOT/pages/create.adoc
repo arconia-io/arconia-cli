@@ -1,0 +1,74 @@
+= `arconia create`
+
+The `arconia create` command creates a new Java project from a template.
+
+[source,shell]
+----
+arconia create \
+  --name my-app \
+  --template ghcr.io/arconia-io/arconia-templates/server-http
+
+arconia create \
+  --name my-app \
+  --template server-http # <1>
+
+arconia create \
+  --name my-app \
+  --template ghcr.io/arconia-io/arconia-templates/server-http \
+  --group io.arconia \
+  --description "My web application project" \
+  --package-name io.arconia.app
+----
+<1> Automatically resolved from a registered template catalog.
+
+**Options**
+
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name`
+|
+|The name of the project to create.
+
+|`--template`
+|
+|The project template to use (e.g. `ghcr.io/arconia-io/arconia-templates/server-http` or `server-http`).
+
+|`--group`
+|`com.example`
+|The group ID for the project.
+
+|`--description`
+|
+|The description for the project.
+
+|`--package-name`
+|
+|The package name for the project.
+
+|`--path`
+|_(current directory)_
+|The path where the project will be created.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+
+|`--verbose` or `-v`
+|`false`
+|Include verbose output.
+
+|`--help` or `-h`
+|
+|Display help information for the command.
+|===
+
+== See Also
+
+* xref:template/template.adoc[arconia template]
+* xref:template/catalog.adoc[arconia template catalog]

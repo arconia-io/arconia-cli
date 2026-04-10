@@ -21,6 +21,7 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryReturnsProjectConfig() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 description: A test application
                 type: service
@@ -43,6 +44,7 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryUsesDefaultsForOptionalFields() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 description: A test application
                 """);
@@ -59,6 +61,7 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryParsesLabels() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 description: A test application
                 labels:
@@ -74,6 +77,7 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryIgnoresUnknownFields() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 description: A test application
                 unknown: ignored
@@ -103,6 +107,19 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryThrowsWhenNameIsMissing() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
+                description: A test application
+                """);
+
+        assertThatThrownBy(() -> ProjectConfigParser.parseFromDirectory(tempDir))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Failed to parse project.yml");
+    }
+
+    @Test
+    void parseFromDirectoryThrowsWhenSchemaVersionIsMissing() throws IOException {
+        Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                name: my-app
                 description: A test application
                 """);
 
@@ -114,6 +131,7 @@ class ProjectConfigParserTests {
     @Test
     void parseFromDirectoryThrowsWhenDescriptionIsMissing() throws IOException {
         Files.writeString(tempDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 """);
 

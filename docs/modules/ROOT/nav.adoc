@@ -1,6 +1,7 @@
 * xref:index.adoc[Getting Started]
 * xref:installation.adoc[Installation]
 * Development
+** xref:create.adoc[arconia create]
 ** xref:development/build.adoc[arconia build]
 ** xref:development/dev.adoc[arconia dev]
 ** xref:development/test.adoc[arconia test]
@@ -16,9 +17,9 @@
 ** xref:update/maven.adoc[arconia update maven]
 ** xref:update/spring-ai.adoc[arconia update spring-ai]
 ** xref:update/spring-boot.adoc[arconia update spring-boot]
-* Projects
-** xref:project/project.adoc[arconia project]
-** xref:project/collection.adoc[arconia project collection]
+* Templates
+** xref:template/template.adoc[arconia template]
+** xref:template/catalog.adoc[arconia template catalog]
 * Skills
 ** xref:skills/skills.adoc[arconia skills]
 ** xref:skills/collection.adoc[arconia skills collection]

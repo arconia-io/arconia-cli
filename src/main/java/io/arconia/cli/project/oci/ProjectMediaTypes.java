@@ -13,6 +13,6 @@ public final class ProjectMediaTypes {
 
     public static final String PROJECT_ARTIFACT_CONTENT_LAYER = "application/vnd.arconia.project.content.v1.tar+gzip";
 
-    public static final String PROJECT_COLLECTION_ARTIFACT_TYPE = "application/vnd.arconia.project.collection.v1";
+    public static final String PROJECT_CATALOG_ARTIFACT_TYPE = "application/vnd.arconia.project.catalog.v1";
 
 }

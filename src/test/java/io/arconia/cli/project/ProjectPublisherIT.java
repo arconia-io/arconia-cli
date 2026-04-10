@@ -51,6 +51,7 @@ class ProjectPublisherIT extends OciIntegrationTests {
 
         Files.writeString(projectDir.resolve("README.md"), "# Test project");
         Files.writeString(projectDir.resolve(ProjectConfigParser.CONFIG_FILE_NAME), """
+                schemaVersion: "1"
                 name: my-app
                 description: A test application
                 type: service

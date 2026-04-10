@@ -32,12 +32,10 @@ public record ProjectConfig(
     public static final String DEFAULT_PACKAGE_NAME = "com.example";
 
     public ProjectConfig {
+        Assert.hasText(schemaVersion, "schemaVersion cannot be null or empty");
         Assert.hasText(name, "name cannot be null or empty");
         Assert.hasText(description, "description cannot be null or empty");
 
-        if (!StringUtils.hasText(schemaVersion)) {
-            schemaVersion = CURRENT_SCHEMA_VERSION;
-        }
         if (!StringUtils.hasText(type)) {
             type = DEFAULT_TYPE;
         }
@@ -62,7 +60,7 @@ public record ProjectConfig(
 
     public static class Builder {
 
-        private String schemaVersion;
+        private String schemaVersion = CURRENT_SCHEMA_VERSION;
         private String name;
         private String description;
         private String type;
