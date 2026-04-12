@@ -3,6 +3,8 @@
 [.hero]
 Welcome to Arconia CLI! This documentation will help you get started with the tool and explore its features.
 
+image::arconia-logo.png[Arconia, width=500]
+
 == What is Arconia CLI?
 
 Arconia CLI is the companion command-line tool for the https://spring.io/projects/spring-boot[Spring Boot] and https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] projects. It provides intuitive commands that streamline the entire development lifecycle: running applications in development mode with automatic service provisioning, building and testing, packaging as container images, and upgrading to newer versions of Spring Boot, Spring AI, and the Arconia Framework.
