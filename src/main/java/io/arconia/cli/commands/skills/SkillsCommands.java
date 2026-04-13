@@ -217,7 +217,7 @@ public class SkillsCommands implements Runnable {
         }
     }
 
-    @Command(name = "list", description = "List installed agent skills.")
+    @Command(name = "list", aliases = "ls", description = "List installed agent skills.")
     public void list(
         @Option(names = {"--project-dir"}, description = "The project root directory. Defaults to the current working directory.") String projectDir,
         @Mixin OutputOptions outputOptions
@@ -245,7 +245,7 @@ public class SkillsCommands implements Runnable {
         }
     }
 
-    @Command(name = "remove", description = "Remove agent skills from the project.")
+    @Command(name = "remove", aliases = "rm", description = "Remove agent skills from the project.")
     public void remove(
         @Option(names = {"--name"}, required = true, arity = "1..*", description = "The name of the agent skill to remove.") List<String> skillNames,
         @Option(names = {"-y", "--yes"}, description = "Skip confirmation prompt.") boolean skipConfirmation,
@@ -323,7 +323,7 @@ public class SkillsCommands implements Runnable {
         }
     }
 
-    @Command(name = "update", description = "Update agent skills in the project.")
+    @Command(name = "update", aliases = "upgrade", description = "Update agent skills in the project.")
     public void update(
         @Option(names = {"--name"}, arity = "1..*", description = "The name of the agent skill to update.") List<String> skillNames,
         @Option(names = {"--all"}, description = "Update all agent skills in the project.") boolean updateAll,

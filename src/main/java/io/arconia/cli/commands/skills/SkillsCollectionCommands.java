@@ -174,7 +174,7 @@ public class SkillsCollectionCommands implements Runnable {
         }
     }
 
-    @Command(name = "remove", description = "Remove a collection from the local Arconia CLI configuration.")
+    @Command(name = "remove", aliases = "rm", description = "Remove a collection from the local Arconia CLI configuration.")
     public void remove(
         @Option(names = {"--name"}, required = true, description = "The alias of the collection to remove.") String collectionName,
         @Mixin RegistryOptions registryOptions,
@@ -196,7 +196,7 @@ public class SkillsCollectionCommands implements Runnable {
         }
     }
 
-    @Command(name = "update", description = "Check for newer versions of registered collections and update them.")
+    @Command(name = "update", aliases = "upgrade", description = "Check for newer versions of registered collections and update them.")
     public void update(
         @Option(names = {"--name"}, description = "The alias of a specific collection to update. If omitted, updates all registered collections.") String collectionName,
         @Mixin RegistryOptions registryOptions,
@@ -265,10 +265,10 @@ public class SkillsCollectionCommands implements Runnable {
         }
     }
 
-    @Command(name = "list", description = "List available skills in a collection. Uses --ref for a direct reference, or --name for a registered collection, or lists all registered collections if neither is provided.")
+    @Command(name = "list", aliases = "ls", description = "List available skills in a collection. Uses --ref for a direct reference, or --name for a registered collection, or lists all registered collections if neither is provided.")
     public void list(
-        @Option(names = {"--ref"}, required = false, description = "The OCI artifact reference for the collection.") String collectionRef,
-        @Option(names = {"--name"}, required = false, description = "The alias of a registered collection to list.") String collectionName,
+        @Option(names = {"--ref"}, description = "The OCI artifact reference for the collection.") String collectionRef,
+        @Option(names = {"--name"}, description = "The alias of a registered collection to list.") String collectionName,
         @Mixin RegistryOptions registryOptions,
         @Mixin OutputOptions outputOptions
     ) {
