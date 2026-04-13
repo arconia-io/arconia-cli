@@ -54,7 +54,7 @@ public class SkillsCollectionCommands implements Runnable {
         @Option(names = {"--name"}, required = true, description = "The collection identifier (e.g. arconia-io).") String collectionName,
         @Option(names = {"--tag"}, required = true, description = "The semver version tag for the collection (e.g. 1.0.0). Non-semver tags like 'latest' can be applied via --additional-tag.") String tag,
         @Option(names = {"--additional-tag"}, arity = "0..*", description = "Additional tags to apply to the collection (e.g. --additional-tag latest).") List<String> additionalTags,
-        @Option(names = {"--from-report"}, description = "Path to a publish report file (from 'skills push --output-report').") String fromReport,
+        @Option(names = {"--from-report"}, arity = "0..*", fallbackValue = ArtifactPublishReport.DEFAULT_SKILLS_FILENAME, description = "Path to a publish report file (from 'skills push --output-report') Defaults to '" + ArtifactPublishReport.DEFAULT_SKILLS_FILENAME + "' when specified without a path.") String fromReport,
         @Option(names = {"--skill"}, arity = "0..*", description = "Explicit skill OCI references to include (e.g. --skill ghcr.io/org/skills/pull-request:1.0.0).") List<String> skillRefs,
         @Option(names = {"--description"}, description = "A short description of the collection. Defaults to 'Agent Skills Collection'.") String collectionDescription,
         @Option(names = {"--annotation"}, arity = "0..*", description = "Extra annotations in key=value format (e.g. --annotation org.opencontainers.image.vendor=arconia-io).") List<String> annotations,
