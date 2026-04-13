@@ -59,7 +59,7 @@ public class TemplateCatalogCommands implements Runnable {
         }
     }
 
-    @Command(name = "update", description = "Update a registered template catalog or all registered catalogs.")
+    @Command(name = "update", aliases = "upgrade", description = "Update a registered template catalog or all registered catalogs.")
     public void update(
             @Option(names = {"--name"}, description = "The name of a specific template catalog to update. If omitted, updates all registered catalogs.") @Nullable String catalogName,
             @Mixin RegistryOptions registryOptions,
@@ -84,7 +84,7 @@ public class TemplateCatalogCommands implements Runnable {
         }
     }
 
-    @Command(name = "remove", description = "Remove a template catalog from the Arconia CLI configuration.")
+    @Command(name = "remove", aliases = "rm", description = "Remove a template catalog from the Arconia CLI configuration.")
     public void remove(
             @Option(names = {"--name"}, required = true, description = "The name of the catalog to remove.") String catalogName,
             @Mixin RegistryOptions registryOptions,

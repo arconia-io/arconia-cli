@@ -85,7 +85,7 @@ public class TemplateCommands implements Runnable {
                 projectPath.resolve(ProjectConfigParser.CONFIG_FILE_NAME)));
     }
 
-    @Command(name = "list", description = "List available project templates from the registered catalogs.")
+    @Command(name = "list", aliases = "ls", description = "List available project templates from the registered catalogs.")
     public void list(
             @Option(names = {"--name"}, description = "The name of the registered catalog for which to list the project templates.") @Nullable String catalogName,
             @Mixin RegistryOptions registryOptions,
