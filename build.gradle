@@ -25,7 +25,7 @@ ext {
     set('orasJavaVersion', "0.5.2")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.9")
-    set('jackson.version', "3.1.1")
+    set('jackson.version', "3.1.2")
 }
 
 dependencies {
@@ -36,7 +36,6 @@ dependencies {
     annotationProcessor "info.picocli:picocli-codegen:${picocliVersion}"
 
     implementation("land.oras:oras-java-sdk:${orasJavaVersion}") {
-        exclude group: 'org.junit.jupiter', module: 'junit-jupiter-params'
         exclude group: 'org.hdrhistogram', module: 'HdrHistogram'
         exclude group: 'org.latencyutils', module: 'LatencyUtils'
     }
