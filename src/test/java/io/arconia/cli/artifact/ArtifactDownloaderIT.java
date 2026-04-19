@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.junit.jupiter.api.io.TempDir;
 
 import land.oras.Annotations;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for {@link ArtifactDownloader}.
  */
+@DisabledInNativeImage
 class ArtifactDownloaderIT extends OciIntegrationTests {
 
     private static final String ARTIFACT_NAME = "my-artifact";
