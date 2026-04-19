@@ -21,7 +21,7 @@ repositories {
 }
 
 ext {
-    set('arconiaVersion', "0.24.0")
+    set('arconiaVersion', "0.25.0")
     set('orasJavaVersion', "0.5.2")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.9")
