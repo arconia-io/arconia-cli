@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.junit.jupiter.api.io.TempDir;
 
 import land.oras.Annotations;
@@ -26,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Integration tests for {@link ArtifactPublisher}.
  */
-@DisabledInNativeImage
 class ArtifactPublisherIT extends OciIntegrationTests {
 
     @TempDir

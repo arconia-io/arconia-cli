@@ -1,10 +1,13 @@
 package io.arconia.cli;
 
+import org.springframework.test.context.aot.DisabledInAotMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.EnabledIfDockerAvailable;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
+@DisabledInAotMode
 public class OciIntegrationTests {
 
     @Container

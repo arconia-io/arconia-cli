@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.junit.jupiter.api.io.TempDir;
 
 import land.oras.ContainerRef;
@@ -29,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for {@link ProjectPublisher}.
  */
-@DisabledInNativeImage
 class ProjectPublisherIT extends OciIntegrationTests {
 
     @TempDir
