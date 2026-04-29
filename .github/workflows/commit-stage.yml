@@ -153,7 +153,7 @@ jobs:
   provenance:
     needs: [ build, release ]
     name: Generate SLSA Provenance Attestation
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
     permissions:
       actions: read
       contents: write
