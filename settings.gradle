@@ -9,7 +9,7 @@ gradle.settingsEvaluated {
         project.configurations.configureEach {
             resolutionStrategy.dependencySubstitution {
                 // Override managed dependency in CycloneDX to fix GHSA-72hv-8253-57qq
-                substitute module('com.fasterxml.jackson.core:jackson-core') using module('com.fasterxml.jackson.core:jackson-core:2.21.2')
+                substitute module('com.fasterxml.jackson.core:jackson-core') using module('com.fasterxml.jackson.core:jackson-core:2.21.3')
                 // Override managed dependency in CycloneDX to fix CVE-2025-67030
                 substitute module('org.codehaus.plexus:plexus-utils') using module('org.codehaus.plexus:plexus-utils:3.6.1')
             }
