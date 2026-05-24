@@ -5,10 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import io.arconia.cli.commands.options.RegistryOptions;
-
-import org.springframework.stereotype.Component;
-
 import land.oras.ContainerRef;
 import land.oras.Registry;
 import picocli.CommandLine.Command;
@@ -20,6 +16,7 @@ import picocli.CommandLine.Spec;
 import io.arconia.cli.artifact.ArtifactAnnotations;
 import io.arconia.cli.artifact.ArtifactRegistry;
 import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.commands.options.RegistryOptions;
 import io.arconia.cli.core.CliException;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillCollectionPublisher;
@@ -33,7 +30,6 @@ import io.arconia.cli.skills.SkillTableFormatter;
 import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.SemverUtils;
 
-@Component
 @Command(
     name = "collection",
     description = "Manage agent skills collections."

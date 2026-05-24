@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -27,7 +26,6 @@ import io.arconia.cli.project.catalog.ProjectCatalogPushReport;
 import io.arconia.cli.project.catalog.service.ProjectCatalogRegistry;
 import io.arconia.cli.project.catalog.service.ProjectCatalogService;
 
-@Component
 @Command(
         name = "catalog",
         description = "Manage catalogs of project templates."

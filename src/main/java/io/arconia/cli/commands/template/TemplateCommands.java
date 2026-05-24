@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import land.oras.Registry;
@@ -32,7 +31,6 @@ import io.arconia.cli.project.oci.ProjectConfigParser;
 import io.arconia.cli.project.oci.ProjectConfigWriter;
 import io.arconia.cli.utils.IoUtils;
 
-@Component
 @Command(
         name = "template",
         description = "Manage and publish project templates.",

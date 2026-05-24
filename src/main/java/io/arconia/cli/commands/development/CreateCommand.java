@@ -3,7 +3,6 @@ package io.arconia.cli.commands.development;
 import java.io.IOException;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -17,7 +16,6 @@ import io.arconia.cli.project.ProjectCreateArguments;
 import io.arconia.cli.project.ProjectCreator;
 import io.arconia.cli.utils.IoUtils;
 
-@Component
 @Command(name = "create", description = "Create a new Java project from a template.")
 public class CreateCommand implements Runnable {
 

@@ -1,6 +1,5 @@
 package io.arconia.cli.commands.refactoring;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import picocli.CommandLine.Command;
@@ -14,7 +13,6 @@ import io.arconia.cli.commands.options.ParametersOption;
 import io.arconia.cli.openrewrite.OpenRewriteRunner;
 import io.arconia.cli.openrewrite.RewriteArguments;
 
-@Component
 @Command(
     name = "rewrite",
     description = "Discover and run OpenRewrite recipes to migrate or refactor a Java application."

@@ -1,7 +1,5 @@
 package io.arconia.cli.commands;
 
-import org.springframework.stereotype.Component;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Model.CommandSpec;
@@ -19,7 +17,6 @@ import io.arconia.cli.commands.skills.SkillsCommands;
 import io.arconia.cli.commands.template.TemplateCommands;
 import io.arconia.cli.core.CliVersionProvider;
 
-@Component
 @Command(
     name = "arconia",
     commandListHeading = "%nCommands:%n",

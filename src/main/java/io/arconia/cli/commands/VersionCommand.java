@@ -1,12 +1,9 @@
 package io.arconia.cli.commands;
 
-import org.springframework.stereotype.Component;
-
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Spec;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
-@Component
 @Command(
     name = "version",
     description = "Display version information about the Arconia CLI."

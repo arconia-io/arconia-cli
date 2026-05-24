@@ -1,7 +1,5 @@
 package io.arconia.cli.commands.refactoring;
 
-import org.springframework.stereotype.Component;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
@@ -18,7 +16,6 @@ import io.arconia.cli.openrewrite.recipes.MavenRecipe;
 import io.arconia.cli.openrewrite.recipes.SpringAiRecipe;
 import io.arconia.cli.openrewrite.recipes.SpringBootRecipe;
 
-@Component
 @Command(
     name = "update",
     aliases = {"upgrade"},

@@ -8,11 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.arconia.cli.commands.options.RegistryOptions;
-
 import org.jline.terminal.Terminal;
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
 
 import land.oras.Registry;
 import picocli.CommandLine.Command;
@@ -22,9 +19,10 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 import io.arconia.cli.artifact.ArtifactAnnotations;
-import io.arconia.cli.commands.options.OutputOptions;
-import io.arconia.cli.core.CliException;
 import io.arconia.cli.artifact.ArtifactRegistry;
+import io.arconia.cli.commands.options.OutputOptions;
+import io.arconia.cli.commands.options.RegistryOptions;
+import io.arconia.cli.core.CliException;
 import io.arconia.cli.skills.AgentVendor;
 import io.arconia.cli.skills.ArtifactPublishReport;
 import io.arconia.cli.skills.SkillBatchPublisher;
@@ -39,10 +37,10 @@ import io.arconia.cli.skills.SkillUpdater;
 import io.arconia.cli.skills.SkillUpdater.UpdateCheckResult;
 import io.arconia.cli.skills.SkillsLockfile;
 import io.arconia.cli.skills.SkillsManifest;
+import io.arconia.cli.terminal.TerminalProvider;
 import io.arconia.cli.utils.DateTimeUtils;
 import io.arconia.cli.utils.IoUtils;
 
-@Component
 @Command(
     name = "skills",
     description = "Install and manage agent skills.",
@@ -54,8 +52,8 @@ public class SkillsCommands implements Runnable {
 
     private final Terminal terminal;
 
-    public SkillsCommands(Terminal terminal) {
-        this.terminal = terminal;
+    public SkillsCommands() {
+        this.terminal = TerminalProvider.getTerminal();
     }
 
     @Spec

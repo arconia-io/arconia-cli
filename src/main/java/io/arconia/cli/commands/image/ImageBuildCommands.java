@@ -3,7 +3,6 @@ package io.arconia.cli.commands.image;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -19,7 +18,6 @@ import io.arconia.cli.image.BuildpacksRunner;
 import io.arconia.cli.image.DockerfileRunner;
 import io.arconia.cli.image.OciRuntime;
 
-@Component
 @Command(
     name = "build",
     description = "Package a Spring Boot application as a container image."

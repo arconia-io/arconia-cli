@@ -1,35 +1,22 @@
 package io.arconia.cli.config;
 
-import java.io.IOException;
-
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import picocli.CommandLine;
+
 import io.arconia.cli.commands.ArconiaCommand;
 import io.arconia.cli.core.CliExceptionHandler;
-import picocli.CommandLine;
+import io.arconia.cli.terminal.TerminalProvider;
 
 @Configuration(proxyBeanMethods = false)
 public final class PicocliConfiguration {
 
     @Bean
-    Terminal terminal() throws IOException {
-        return TerminalBuilder.builder()
-                    .system(true)
-                    .provider("ffm")
-                    .dumb(true)
-                    .build();
-    }
-
-    @Bean
-    CommandLine commandLine(
-            Terminal terminal,
-            ArconiaCommand topCommand,
-            PicocliSpringFactory factory
-    ) {
-        CommandLine cmd = new CommandLine(topCommand, factory);
+    CommandLine commandLine() {
+        Terminal terminal = TerminalProvider.getTerminal();
+        CommandLine cmd = new CommandLine(new ArconiaCommand());
         cmd.setExecutionExceptionHandler(new CliExceptionHandler());
         cmd.setOut(terminal.writer());
         cmd.setErr(terminal.writer());
