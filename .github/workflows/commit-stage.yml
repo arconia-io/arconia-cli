@@ -7,11 +7,13 @@ on:
     paths-ignore:
       - '.flox/**'
       - '.editorconfig'
+      - '.gitattributes'
       - '.gitignore'
       - '.sdkmanrc'
       - '*.adoc'
       - '*.png'
       - '*.md'
+      - '*.txt'
       - 'docs/**'
       - '.github/ISSUE_TEMPLATE/**'
       - '.github/*.md'
@@ -20,34 +22,26 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - '.flox/**'
-      - '.editorconfig'
-      - '.gitignore'
-      - '.sdkmanrc'
-      - '*.adoc'
-      - '*.png'
-      - '*.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/*.md'
-      - '.github/*.yml'
-      - '.github/*.yaml'
 
 permissions:
   contents: read
+
+concurrency:
+  group: commit-stage-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     outputs:
       version: ${{ steps.set_version.outputs.version }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          fetch-depth: 0
+          persist-credentials: false
       
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@6f327093bb6a42fe5eac053d21b168c46aa46f22 # v1.2.4
@@ -55,15 +49,24 @@ jobs:
           java-version: '25'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
       
       - name: Set VERSION environment variable
         id: set_version
+        shell: bash
         run: |
-          VERSION=$(./gradlew properties | grep '^version:' | awk '{print $2}')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          VERSION=$(./gradlew -q --no-daemon properties | grep '^version:' | awk '{print $2}')
+          if [ -z "$VERSION" ]; then
+            echo "::error::Failed to extract project version from Gradle"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION"
 
       - name: Compile and test
@@ -79,14 +82,13 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     with:
       version: ${{ needs.build.outputs.version }}
-    secrets:  
-      gh-token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     name: Release
     needs: [assemble, build]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     permissions:
       contents: write
       discussions: write
@@ -97,24 +99,31 @@ jobs:
       TAGNAME: ${{ steps.attestation-data.outputs.TAGNAME }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
       
       - name: Download artifacts
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: arconia-*
           path: artifacts
           merge-multiple: true
-      
+
       - name: Inspect artifacts
+        shell: bash
         run: |
+          set -euo pipefail
+          if [ ! -d artifacts ] || [ -z "$(ls -A artifacts 2>/dev/null)" ]; then
+            echo "::error::No artifacts found in artifacts/ directory"
+            exit 1
+          fi
           echo "Artifacts:"
           ls -R artifacts
-      
+
       - name: Release
-        uses: jreleaser/release-action@c4c93fd7f7ae96bfd98f5deb621c42b781455b77 # v2.4.3
+        uses: jreleaser/release-action@90ac653bb9c79d11179e65d81499f3f34527dcd5 # v2.5.0
         with:
           arguments: full-release
         env:
@@ -125,13 +134,13 @@ jobs:
           JRELEASER_HOMEBREW_GITHUB_TOKEN: ${{ secrets.JRELEASER_HOMEBREW_GITHUB_TOKEN }}
           JRELEASER_PROJECT_VERSION: ${{ needs.build.outputs.version }}
           JRELEASER_SCOOP_GITHUB_TOKEN: ${{ secrets.JRELEASER_SCOOP_GITHUB_TOKEN }}
-      
-      - name: JReleaser output
+
+      - name: Upload JReleaser output
         if: always()
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           retention-days: 1
-          name: jreleaser-release
+          name: jreleaser-output
           path: |
             out/jreleaser/trace.log
             out/jreleaser/output.properties
@@ -140,15 +149,36 @@ jobs:
         shell: bash
         id: attestation-data
         run: |
-          echo "HASHES=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
-          echo "TAGNAME=$(grep tagName out/jreleaser/output.properties | awk -F'=' '{print $2}')" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          CHECKSUMS_FILE="out/jreleaser/checksums/checksums_sha256.txt"
+          OUTPUT_PROPS="out/jreleaser/output.properties"
+          if [ ! -s "$CHECKSUMS_FILE" ]; then
+            echo "::error::$CHECKSUMS_FILE is missing or empty"
+            exit 1
+          fi
+          if [ ! -s "$OUTPUT_PROPS" ]; then
+            echo "::error::$OUTPUT_PROPS is missing or empty"
+            exit 1
+          fi
+          TAGNAME=$(grep '^tagName=' "$OUTPUT_PROPS" | head -n1 | cut -d'=' -f2-)
+          if [ -z "$TAGNAME" ]; then
+            echo "::error::tagName not found in $OUTPUT_PROPS"
+            exit 1
+          fi
+          HASHES=$(base64 -w0 < "$CHECKSUMS_FILE")
+          echo "HASHES=$HASHES" >> "$GITHUB_OUTPUT"
+          echo "TAGNAME=$TAGNAME" >> "$GITHUB_OUTPUT"
 
       - name: Trigger documentation update
-        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
-        with:
-          token: ${{ secrets.DISPATCH_TOKEN }}
-          repository: arconia-io/arconia-docs
-          event-type: docs-update
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            /repos/arconia-io/arconia-docs/dispatches \
+            -f event_type='docs-update'
 
   provenance:
     needs: [ build, release ]
