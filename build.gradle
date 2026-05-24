@@ -24,7 +24,7 @@ ext {
     set('arconiaVersion', "0.27.1")
     set('orasJavaVersion', "0.5.2")
     set('picocliVersion', "4.7.7")
-    set('jlineVersion', "3.30.9")
+    set('jlineVersion', "3.30.13")
 }
 
 dependencies {
