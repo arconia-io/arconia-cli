@@ -114,7 +114,7 @@ jobs:
           ls -R artifacts
       
       - name: Release
-        uses: jreleaser/release-action@c4c93fd7f7ae96bfd98f5deb621c42b781455b77 # v2.4.3
+        uses: jreleaser/release-action@2e5125c83b040a84b742546416c6ad65fa6ef3c6 # v2.4.3
         with:
           arguments: full-release
         env:
