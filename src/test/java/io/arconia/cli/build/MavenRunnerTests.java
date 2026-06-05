@@ -199,7 +199,7 @@ class MavenRunnerTests {
             .build();
         var command = runner.constructRewriteRunCommand(options);
 
-        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
     }
 
     @Test

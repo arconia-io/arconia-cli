@@ -183,7 +183,7 @@ public class MavenRunner implements BuildToolRunner {
         command.add("-U");
 
         if (rewriteArguments.dryRun()) {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         } else {
             command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
         }
