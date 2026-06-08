@@ -30,7 +30,7 @@ class SpringBootRecipeTests {
     }
 
     @Test
-    void computeRecipeLibraryThrowsWhenVersionIsUnknown() {
+    void computeRecipeLibraryThrowsWhenVersionHasNoMinor() {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> SpringBootRecipe.computeRecipeLibrary("21"))
                 .withMessageContaining("21");
@@ -52,6 +52,12 @@ class SpringBootRecipeTests {
     void computeRecipeLibraryWithSnapshotVersion() {
         assertThat(SpringBootRecipe.computeRecipeLibrary("3.5.3-SNAPSHOT"))
                 .isEqualTo("io.arconia.rewrite.spring.boot3.UpgradeSpringBoot_3_5");
+    }
+
+    @Test
+    void computeRecipeLibraryWithDifferentMajorVersion() {
+        assertThat(SpringBootRecipe.computeRecipeLibrary("4.0"))
+                .isEqualTo("io.arconia.rewrite.spring.boot4.UpgradeSpringBoot_4_0");
     }
 
 }

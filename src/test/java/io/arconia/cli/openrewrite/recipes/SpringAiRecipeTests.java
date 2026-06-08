@@ -30,7 +30,7 @@ class SpringAiRecipeTests {
     }
 
     @Test
-    void computeRecipeLibraryThrowsWhenVersionIsUnknown() {
+    void computeRecipeLibraryThrowsWhenVersionHasNoMinor() {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> SpringAiRecipe.computeRecipeLibrary("21"))
                 .withMessageContaining("21");
