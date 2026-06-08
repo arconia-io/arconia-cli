@@ -177,7 +177,7 @@ class GradleRunnerTests {
             .build();
         var command = runner.constructRewriteRunCommand(options);
 
-        assertThat(command).contains("--init-script", "rewriteRun");
+        assertThat(command).contains("--init-script", "rewriteRun", "--no-parallel");
         assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_DEFAULT_VERSION);
         assertThat(command).contains("-DactiveRecipe=org.example.MyRecipe");
         assertThat(command).doesNotContain("rewriteDryRun");

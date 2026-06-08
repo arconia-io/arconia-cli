@@ -211,6 +211,8 @@ public class GradleRunner implements BuildToolRunner {
             command.add("-DrewriteConfigFile=" + rewriteArguments.rewriteConfigFile().toAbsolutePath());
         }
 
+        command.add("--no-parallel");
+
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);
         }
