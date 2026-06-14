@@ -1,7 +1,7 @@
 initscript {
     def pluginVersion = System.getProperty('pluginVersion')
     repositories {
-        maven { url "https://plugins.gradle.org/m2" }
+        gradlePluginPortal()
     }
     dependencies { classpath("org.openrewrite:plugin:${pluginVersion}") }
 }
@@ -36,13 +36,6 @@ rootProject {
         exportDatatables = true
         if (rewriteConfigFile != null) {
             configFile = file("${rewriteConfigFile}")
-        }
-    }
-    afterEvaluate {
-        if (repositories.isEmpty()) {
-            repositories {
-                mavenCentral()
-            }
         }
     }
     configurations.named("rewrite") {
