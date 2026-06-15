@@ -10,6 +10,16 @@ def recipeLibrary = System.getProperty('recipeLibrary')
 def recipeVersion = System.getProperty('recipeVersion')
 def rewriteConfigFile = System.getProperty('rewriteConfigFile')
 
+def capturedSettings = null
+gradle.settingsEvaluated { settings ->
+    capturedSettings = settings
+    def drm = settings.dependencyResolutionManagement
+    def mode = drm.repositoriesMode.get().name()
+    if ((mode == 'FAIL_ON_PROJECT_REPOS' || mode == 'PREFER_SETTINGS') && drm.repositories.isEmpty()) {
+        drm.repositories { mavenCentral() }
+    }
+}
+
 rootProject {
     plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
@@ -36,6 +46,14 @@ rootProject {
         exportDatatables = true
         if (rewriteConfigFile != null) {
             configFile = file("${rewriteConfigFile}")
+        }
+    }
+    afterEvaluate {
+        def drm = capturedSettings.dependencyResolutionManagement
+        def mode = drm.repositoriesMode.get().name()
+        def projectReposAllowed = mode != 'FAIL_ON_PROJECT_REPOS' && mode != 'PREFER_SETTINGS'
+        if (projectReposAllowed && repositories.isEmpty() && drm.repositories.isEmpty()) {
+            repositories { mavenCentral() }
         }
     }
     configurations.named("rewrite") {
