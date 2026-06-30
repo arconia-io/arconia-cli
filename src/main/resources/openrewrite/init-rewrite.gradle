@@ -29,7 +29,7 @@ rootProject {
         rewrite "io.arconia.migrations:rewrite-arconia"
         rewrite "io.arconia.migrations:rewrite-docling"
         rewrite "io.arconia.migrations:rewrite-spring"
-        rewrite "io.arconia.migrations:rewrite-test"
+        rewrite "io.arconia.migrations:rewrite-testing"
 
         rewrite "org.openrewrite:rewrite-java"
         rewrite "org.openrewrite.recipe:rewrite-java-dependencies"

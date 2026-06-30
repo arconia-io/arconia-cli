@@ -198,7 +198,7 @@ public class MavenRunner implements BuildToolRunner {
         coordinates.add("io.arconia.migrations:rewrite-arconia:" + arconiaVersion);
         coordinates.add("io.arconia.migrations:rewrite-docling:" + arconiaVersion);
         coordinates.add("io.arconia.migrations:rewrite-spring:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-test:" + arconiaVersion);
+        coordinates.add("io.arconia.migrations:rewrite-testing:" + arconiaVersion);
 
         coordinates.add("org.openrewrite:rewrite-java:" + coreRewriteVersion);
         coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + coreRewriteVersion);
@@ -242,7 +242,7 @@ public class MavenRunner implements BuildToolRunner {
         coordinates.add("io.arconia.migrations:rewrite-arconia:" + arconiaVersion);
         coordinates.add("io.arconia.migrations:rewrite-docling:" + arconiaVersion);
         coordinates.add("io.arconia.migrations:rewrite-spring:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-test:" + arconiaVersion);
+        coordinates.add("io.arconia.migrations:rewrite-testing:" + arconiaVersion);
 
         coordinates.add("org.openrewrite:rewrite-java:" + coreRewriteVersion);
         coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + coreRewriteVersion);

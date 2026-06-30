@@ -58,7 +58,7 @@ The Arconia CLI is configured with the following recipe libraries out of the box
 |`io.arconia.migrations:rewrite-docling`
 |Recipes for https://github.com/docling-project/docling[Docling]-related migrations.
 
-|`io.arconia.migrations:rewrite-test`
+|`io.arconia.migrations:rewrite-testing`
 |Recipes for test framework migrations and improvements, including JUnit and Testcontainers.
 
 |`org.openrewrite:rewrite-java`
