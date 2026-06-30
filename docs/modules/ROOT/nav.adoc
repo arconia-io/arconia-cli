@@ -5,13 +5,13 @@
 ** xref:development/build.adoc[arconia build]
 ** xref:development/dev.adoc[arconia dev]
 ** xref:development/test.adoc[arconia test]
-* Container Image
+* Container Images
 ** xref:image/buildpacks.adoc[arconia image build buildpacks]
 ** xref:image/dockerfile.adoc[arconia image build dockerfile]
 * Migration
 ** xref:migration/rewrite-run.adoc[arconia rewrite run]
 ** xref:migration/rewrite-discover.adoc[arconia rewrite discover]
-* Update
+* Updates
 ** xref:update/framework.adoc[arconia update framework]
 ** xref:update/gradle.adoc[arconia update gradle]
 ** xref:update/maven.adoc[arconia update maven]

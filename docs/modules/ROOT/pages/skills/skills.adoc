@@ -54,13 +54,38 @@ arconia skills add --name my-skill --agent claude --agent vibe
 
 **Options**
 
-* `--ref`: The OCI artifact reference for the agent skill. Can be specified multiple times.
-* `--name`: The skill name to look up from a registered collection. Can be specified multiple times.
-* `--agent`: Additional agent vendors to also install the skill for. Can be specified multiple times. See <<Multi-Agent Vendor Support>> for supported values.
-* `--collection`: The registered collection alias to search. If omitted, searches all registered collections.
-* `--project-dir`: The project root directory (defaults to the current working directory).
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--ref`
+|
+|The OCI artifact reference for the agent skill. Can be specified multiple times.
+
+|`--name`
+|
+|The skill name to look up from a registered collection. Can be specified multiple times.
+
+|`--agent`
+|
+|Additional agent vendors to also install the skill for. Can be specified multiple times. See <<Multi-Agent Vendor Support>> for supported values.
+
+|`--collection`
+|
+|The registered collection alias to search. If omitted, searches all registered collections.
+
+|`--project-dir`
+|_(current directory)_
+|The project root directory.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+|===
 
 === `install`
 
@@ -73,9 +98,22 @@ arconia skills install
 
 **Options**
 
-* `--project-dir`: The project root directory (defaults to the current working directory).
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--project-dir`
+|_(current directory)_
+|The project root directory.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+|===
 
 === `list`
 
@@ -88,7 +126,14 @@ arconia skills list
 
 **Options**
 
-* `--project-dir`: The project root directory (defaults to the current working directory).
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--project-dir`
+|_(current directory)_
+|The project root directory.
+|===
 
 === `remove`
 
@@ -101,9 +146,22 @@ arconia skills remove --name <skill-name>
 
 **Options**
 
-* `--name`: (Required) The name of the agent skill to remove. Can be specified multiple times.
-* `-y, --yes`: Skip confirmation prompt.
-* `--project-dir`: The project root directory (defaults to the current working directory).
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name` (required)
+|
+|The name of the agent skill to remove. Can be specified multiple times.
+
+|`--yes` or `-y`
+|`false`
+|Skip confirmation prompt.
+
+|`--project-dir`
+|_(current directory)_
+|The project root directory.
+|===
 
 === `update`
 
@@ -117,11 +175,30 @@ arconia skills update --name some-skill
 
 **Options**
 
-* `--name`: Update a specific skill by name. Can be specified multiple times. If omitted, updates all installed skills.
-* `--all`: Update all agent skills in the project.
-* `--project-dir`: The project root directory (defaults to the current working directory).
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--name`
+|
+|Update a specific skill by name. Can be specified multiple times. If omitted, updates all installed skills.
+
+|`--all`
+|`false`
+|Update all agent skills in the project.
+
+|`--project-dir`
+|_(current directory)_
+|The project root directory.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+|===
 
 === `push`
 
@@ -136,15 +213,46 @@ arconia skills push --all --ref ghcr.io/org/repo/skills --path skills/ --tag 1.0
 
 **Options**
 
-* `--ref`: (Required) The OCI artifact reference. For a single skill: the full ref. With `--all`: the base ref prefix.
-* `--path`: (Required) The path to the skill directory, or with `--all`: the parent directory containing skill subdirectories.
-* `--tag`: (Required) The semver version tag (e.g. 1.0.0).
-* `--additional-tag`: Additional tags to apply to the artifact.
-* `--annotation`: Extra annotations in key=value format.
-* `--all`: Discover and push all skills found as direct subdirectories of `--path`.
-* `--output-report`: Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as collection pushing (`skills collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
-* `--registry-insecure`: Call the OCI registry over HTTP instead of HTTPS.
-* `--registry-skip-tls-verify`: Allow TLS connections without validating certificates.
+[cols="1,1,3"]
+|===
+|Option |Default |Description
+
+|`--ref` (required)
+|
+|The OCI artifact reference. For a single skill: the full ref. With `--all`: the base ref prefix.
+
+|`--path` (required)
+|
+|The path to the skill directory, or with `--all`: the parent directory containing skill subdirectories.
+
+|`--tag` (required)
+|
+|The semver version tag (e.g. 1.0.0).
+
+|`--additional-tag`
+|
+|Additional tags to apply to the artifact.
+
+|`--annotation`
+|
+|Extra annotations in key=value format.
+
+|`--all`
+|`false`
+|Discover and push all skills found as direct subdirectories of `--path`.
+
+|`--output-report`
+|`publish-skills-report.json`
+|Write a publish report JSON file recording the published artifact(s) including their immutable digests. Defaults to `publish-skills-report.json` when specified without a path. Works with both single and batch (`--all`) push. The report can be used for downstream operations such as collection pushing (`skills collection push --from-report`), artifact signing (e.g. cosign), or SLSA provenance attestation.
+
+|`--registry-insecure`
+|`false`
+|Call the OCI registry over HTTP instead of HTTPS.
+
+|`--registry-skip-tls-verify`
+|`false`
+|Allow TLS connections without validating certificates.
+|===
 
 == See Also
 

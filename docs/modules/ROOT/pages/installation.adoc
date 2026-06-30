@@ -34,12 +34,11 @@ Download the appropriate binary for your operating system from the https://githu
 === macOS and Linux
 
 1. Move the downloaded binary to a directory in your system PATH:
-
++
 [source,shell]
 ----
 mv ~/Downloads/arconia-[version]-[os]/bin/ /usr/local/bin/
 ----
-
 2. Make the binary executable:
 
 [source,shell]

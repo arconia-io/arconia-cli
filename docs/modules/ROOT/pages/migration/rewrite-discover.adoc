@@ -53,7 +53,7 @@ The Arconia CLI is configured with the following recipe libraries out of the box
 |Recipes for migrating between https://docs.arconia.io/arconia/latest/index.html[Arconia Framework] versions.
 
 |`io.arconia.migrations:rewrite-spring`
-|Recipes for migrating between https://spring.io/projects/spring-boot[Spring Boot] and https://spring.io/projects/spring-ai[Spring AI] versions.
+|Recipes for migrating between https://spring.io/projects/spring-boot[Spring Boot], https://spring.io/projects/spring-framework[Spring Framework], https://spring.io/projects/spring-cloud[Spring Cloud], and https://spring.io/projects/spring-ai[Spring AI] versions.
 
 |`io.arconia.migrations:rewrite-docling`
 |Recipes for https://github.com/docling-project/docling[Docling]-related migrations.
@@ -75,11 +75,12 @@ All Arconia Migrations recipes are open-source and released under the Apache 2.0
 Beyond the bundled libraries, you can find more recipes in these catalogs:
 
 * https://docs.openrewrite.org/recipes[OpenRewrite Recipe Catalog] — The comprehensive catalog of all available OpenRewrite recipes. Use `--recipe-library` with xref:migration/rewrite-run.adoc[`arconia rewrite run`] to include recipes from additional libraries.
-* https://github.com/arconia-io/arconia-migrations[Arconia Migrations] — The full set of Arconia migration recipes.
+* https://docs.arconia.io/arconia-migrations/latest/recipe-catalog/[Arconia Migrations Recipe Catalog] — The full catalog of Arconia migration recipes, with their descriptions and options.
 
 WARNING: The OpenRewrite Recipe Catalog includes recipes with different licenses. Some are open-source (Apache 2.0); others use the Moderne Source Available License or Moderne Proprietary License. Review the license of any recipe before running it. See https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module[OpenRewrite module versions] for details.
 
 == See Also
 
 * xref:migration/rewrite-run.adoc[arconia rewrite run]
+* https://docs.arconia.io/arconia-migrations/latest/[Arconia Migrations Documentation]
 * https://docs.openrewrite.org/[OpenRewrite Documentation]

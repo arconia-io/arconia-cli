@@ -8,22 +8,22 @@ Preview what changes will be made without applying them:
 
 [source,shell]
 ----
-arconia update spring-ai --to-version=1.1 --dry-run
+arconia update spring-ai --to-version=2.0 --dry-run
 ----
 
 Apply the update:
 
 [source,shell]
 ----
-arconia update spring-ai --to-version=1.1
+arconia update spring-ai --to-version=2.0
 ----
 
 Pass extra parameters to the underlying build tool using `--`:
 
 [source,shell]
 ----
-arconia update spring-ai --to-version=1.1 -- --stacktrace
-arconia update spring-ai --to-version=1.1 -- -DmyProperty=value
+arconia update spring-ai --to-version=2.0 -- --stacktrace
+arconia update spring-ai --to-version=2.0 -- -DmyProperty=value
 ----
 
 WARNING: Commit your project to version control before running this command so you can review the changes and revert if needed.
@@ -43,7 +43,7 @@ The following options are available:
 |Preview the changes that would be made without modifying any files. Recommended before applying the update.
 
 |`--to-version`
-|`1.1`
+|`-`
 |Spring AI target version to upgrade to.
 
 |`--verbose` or `-v`
@@ -65,5 +65,5 @@ Use `--` to pass parameters directly to the underlying build tool. The `--` sepa
 
 * xref:update/spring-boot.adoc[arconia update spring-boot]
 * xref:migration/rewrite-run.adoc[arconia rewrite run]
-* https://github.com/arconia-io/arconia-migrations[Arconia Migrations]
+* https://docs.arconia.io/arconia-migrations/latest/[Arconia Migrations Documentation]
 * https://spring.io/projects/spring-ai[Spring AI]

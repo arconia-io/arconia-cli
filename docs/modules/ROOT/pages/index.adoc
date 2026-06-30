@@ -51,6 +51,7 @@ Commands:
 
 These commands wrap your build tool (Maven or Gradle) to provide a consistent, tool-agnostic developer experience:
 
+* **xref:create.adoc[arconia create]** — Creates a new Java project from a template.
 * **xref:development/dev.adoc[arconia dev]** — Runs your application in development mode, activating the Arconia Framework's `dev` Spring profile and automatically starting any declared https://docs.arconia.io/arconia/latest/dev-services/[Arconia Dev Services] (databases, message brokers, AI inference servers, etc.) as containers. No boilerplate code required.
 * **xref:development/build.adoc[arconia build]** — Compiles, tests, and packages your application as a JAR or a GraalVM native executable.
 * **xref:development/test.adoc[arconia test]** — Runs your test suite, with Arconia Dev Services automatically provisioned for integration tests.
@@ -75,11 +76,15 @@ These commands use https://docs.openrewrite.org/[OpenRewrite] recipes to automat
 * **xref:migration/rewrite-run.adoc[arconia rewrite run]** — Runs any OpenRewrite recipe for custom migration or refactoring tasks beyond the built-in `update` commands.
 * **xref:migration/rewrite-discover.adoc[arconia rewrite discover]** — Discovers available OpenRewrite recipes.
 
-=== Projects
+=== Templates
 
-* **xref:project/project.adoc[arconia project create]** — Creates a new project from a template.
-* **xref:project/project.adoc[arconia project push]** — Publishes a project (or a batch of projects) as OCI artifact(s).
-* **xref:project/collection.adoc[arconia project collection]** — Manages collections of projects distributed as OCI artifacts.
+* **xref:template/template.adoc[arconia template]** — Manages and publishes project templates as OCI artifacts.
+* **xref:template/catalog.adoc[arconia template catalog]** — Manages catalogs of project templates distributed as OCI indexes.
+
+=== Skills
+
+* **xref:skills/skills.adoc[arconia skills]** — Installs and manages AI agent skills, distributed as OCI artifacts.
+* **xref:skills/collection.adoc[arconia skills collection]** — Manages collections of agent skills distributed as OCI indexes.
 
 == Authors
 

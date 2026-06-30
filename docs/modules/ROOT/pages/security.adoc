@@ -8,7 +8,7 @@ All Arconia CLI release artifacts are signed with PGP. Follow these steps to ver
 
 1. Download the Arconia CLI http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x7DF66939ADCE2CF84244C4A5E8CD1A1C72CAFA26[public key] and save it as `arconia.asc`.
 2. Verify the key fingerprint matches the following:
-
++
 [source,shell]
 ----
 $ gpg --show-keys arconia.asc
@@ -19,20 +19,19 @@ sub   cv25519 2026-01-10 [E] [expires: 2028-01-10]
 ----
 
 3. Import the public key into your GPG keyring:
-
++
 [source,shell]
 ----
 $ gpg --import arconia.asc
 ----
-
 4. Download the Arconia CLI binary archive and its corresponding signature file from the desired https://github.com/arconia-io/arconia-cli/releases[release].
 For example:
-
++
 * `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip`
 * `arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip.asc`.
 
 5. Verify the signature against the downloaded binary:
-
++
 [source,shell]
 ----
 $ gpg --verify arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip.asc arconia-cli-0.9.8-SNAPSHOT-linux-amd64.zip

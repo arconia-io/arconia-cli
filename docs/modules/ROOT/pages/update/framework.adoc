@@ -8,22 +8,22 @@ Preview what changes will be made without applying them:
 
 [source,shell]
 ----
-arconia update framework --to-version=0.24 --dry-run
+arconia update framework --to-version=0.28 --dry-run
 ----
 
 Apply the update:
 
 [source,shell]
 ----
-arconia update framework --to-version=0.24
+arconia update framework --to-version=0.28
 ----
 
 Pass extra parameters to the underlying build tool using `--`:
 
 [source,shell]
 ----
-arconia update framework --to-version=0.23 -- --stacktrace
-arconia update framework --to-version=0.23 -- -DmyProperty=value
+arconia update framework --to-version=0.28 -- --stacktrace
+arconia update framework --to-version=0.28 -- -DmyProperty=value
 ----
 
 == Options
@@ -39,7 +39,7 @@ The following options are available:
 |Preview the changes that would be made without modifying any files. Recommended before applying the update.
 
 |`--to-version`
-|`0.24`
+|`-`
 |Arconia Framework target version to upgrade to.
 
 |`--verbose` or `-v`
@@ -60,5 +60,5 @@ Use `--` to pass parameters directly to the underlying build tool. The `--` sepa
 == See Also
 
 * xref:migration/rewrite-run.adoc[arconia rewrite run]
-* https://github.com/arconia-io/arconia-migrations/tree/main[Arconia Migrations]
-* https://docs.arconia.io/arconia/latest/index.html[Arconia Framework documentation]
+* https://docs.arconia.io/arconia-migrations/latest/[Arconia Migrations Documentation]
+* https://docs.arconia.io/arconia/latest/index.html[Arconia Framework Documentation]

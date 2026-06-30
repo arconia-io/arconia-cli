@@ -99,5 +99,5 @@ Use `--` to pass parameters directly to the underlying build tool. The `--` sepa
 * xref:update/spring-boot.adoc[arconia update spring-boot]
 * xref:update/spring-ai.adoc[arconia update spring-ai]
 * xref:update/framework.adoc[arconia update framework]
-* https://github.com/arconia-io/arconia-migrations[Arconia Migrations]
+* https://docs.arconia.io/arconia-migrations/latest/[Arconia Migrations Documentation]
 * https://docs.openrewrite.org/[OpenRewrite Documentation]

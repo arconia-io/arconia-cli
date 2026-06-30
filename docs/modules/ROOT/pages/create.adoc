@@ -2,6 +2,8 @@
 
 The `arconia create` command creates a new Java project from a template.
 
+== Usage
+
 [source,shell]
 ----
 arconia create \
@@ -21,7 +23,9 @@ arconia create \
 ----
 <1> Automatically resolved from a registered template catalog.
 
-**Options**
+== Options
+
+The following options are available:
 
 [cols="1,1,3"]
 |===
