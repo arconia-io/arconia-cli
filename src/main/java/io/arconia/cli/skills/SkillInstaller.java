@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import land.oras.OCI;
 import org.springframework.util.Assert;
 
 import land.oras.ContainerRef;
@@ -120,7 +121,7 @@ public final class SkillInstaller {
         // 4. Pull the artifact content to a project-local temp directory, then extract
         Path tempDir = IoUtils.createTempDirectory(projectRoot);
         try {
-            registry.pullArtifact(containerRef, tempDir, true);
+            registry.pullArtifact(containerRef, tempDir, OCI.PullOptions.overwrite());
 
             // 5. Find the downloaded tar.gz and extract it to the skills directory
             Path tarGzFile = IoUtils.findTarGzFile(tempDir);

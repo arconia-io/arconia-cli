@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import land.oras.OCI;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -141,7 +142,7 @@ public final class SkillPublisher {
         // 8. Push the artifact
         ContainerRef containerRef = targetRef.toContainerRef();
         ArtifactType artifactType = ArtifactType.from(SkillMediaTypes.SKILL_ARTIFACT_TYPE);
-        Manifest manifest = registry.pushArtifact(containerRef, artifactType, annotations, config, contentLayer);
+        Manifest manifest = registry.pushArtifact(containerRef, artifactType, annotations, config, OCI.PushOptions.defaults(), contentLayer);
 
         // 9. Resolve the digest from the pushed manifest
         SkillRef resolvedRef = targetRef.mutate().digest(manifest.getDigest()).build();
