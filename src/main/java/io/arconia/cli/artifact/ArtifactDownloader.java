@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import land.oras.ContainerRef;
+import land.oras.OCI;
 import land.oras.Registry;
 import land.oras.utils.ArchiveUtils;
 import land.oras.utils.SupportedCompression;
@@ -39,7 +40,7 @@ public final class ArtifactDownloader {
 
         Path tempDir = IoUtils.createTempDirectory(targetParentDirectory);
         try {
-            registry.pullArtifact(containerRef, tempDir, true);
+            registry.pullArtifact(containerRef, tempDir, OCI.PullOptions.overwrite());
             Path tarGzFile = IoUtils.findTarGzFile(tempDir);
             ArchiveUtils.uncompressuntar(tarGzFile, tempDir, SupportedCompression.GZIP.getMediaType());
 
