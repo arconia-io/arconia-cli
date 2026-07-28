@@ -6,7 +6,7 @@ public final class ArconiaRecipe {
 
     public static final String RECIPE_LIBRARY = "io.arconia.migrations:rewrite-arconia";
 
-    private static final String RECIPE_PREFIX = "io.arconia.rewrite.UpgradeArconia_";
+    private static final String RECIPE_PREFIX = "io.arconia.rewrite.framework.UpgradeArconia_";
 
     private ArconiaRecipe() {}
 
