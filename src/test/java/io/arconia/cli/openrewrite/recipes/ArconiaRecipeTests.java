@@ -39,19 +39,19 @@ class ArconiaRecipeTests {
     @Test
     void computeRecipeLibraryWithMajorMinorVersion() {
         assertThat(ArconiaRecipe.computeRecipeLibrary("0.21"))
-                .isEqualTo("io.arconia.rewrite.UpgradeArconia_0_21");
+                .isEqualTo("io.arconia.rewrite.framework.UpgradeArconia_0_21");
     }
 
     @Test
     void computeRecipeLibraryWithPatchVersion() {
         assertThat(ArconiaRecipe.computeRecipeLibrary("0.21.3"))
-                .isEqualTo("io.arconia.rewrite.UpgradeArconia_0_21");
+                .isEqualTo("io.arconia.rewrite.framework.UpgradeArconia_0_21");
     }
 
     @Test
     void computeRecipeLibraryWithSnapshotVersion() {
         assertThat(ArconiaRecipe.computeRecipeLibrary("0.21.3-SNAPSHOT"))
-                .isEqualTo("io.arconia.rewrite.UpgradeArconia_0_21");
+                .isEqualTo("io.arconia.rewrite.framework.UpgradeArconia_0_21");
     }
 
 }
