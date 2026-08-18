@@ -1,6 +1,11 @@
 { pkgs, lib, config, inputs, ... }:
 
 {
+  # https://devenv.sh/packages/
+  packages = [
+    pkgs.jreleaser-cli
+  ];
+
   # https://devenv.sh/languages/
   languages.java = {
     enable = true;
