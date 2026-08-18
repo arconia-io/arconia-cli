@@ -33,6 +33,7 @@
 **Install (macOS / Linux)**
 
 ```shell
+brew trust arconia-io/tap
 brew install arconia-io/tap/arconia-cli
 ```
 
