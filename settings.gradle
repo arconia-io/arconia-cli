@@ -3,16 +3,3 @@ plugins {
 }
 
 rootProject.name = 'arconia-cli'
-
-gradle.settingsEvaluated {
-    gradle.allprojects { project ->
-        project.configurations.configureEach {
-            resolutionStrategy.dependencySubstitution {
-                // Override managed dependency in CycloneDX to fix CVEs
-                substitute module('com.fasterxml.jackson.core:jackson-core') using module('com.fasterxml.jackson.core:jackson-core:2.22.1')
-                // Override managed dependency in CycloneDX to fix CVEs
-                substitute module('com.fasterxml.jackson.core:jackson-databind') using module('com.fasterxml.jackson.core:jackson-databind:2.22.1')
-            }
-        }
-    }
-}
