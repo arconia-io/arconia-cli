@@ -21,7 +21,11 @@ import io.arconia.cli.utils.IoUtils;
  */
 public class MavenRunner implements BuildToolRunner {
 
-    static final String OPEN_REWRITE_DEFAULT_VERSION = "LATEST";
+    static final String OPEN_REWRITE_PLUGIN_VERSION = "6.46.1";
+    static final String OPEN_REWRITE_CORE_VERSION = "8.90.4";
+    static final String OPEN_REWRITE_JAVA_DEPENDENCIES_VERSION = "1.60.2";
+    static final String ARCONIA_MIGRATIONS_GROUP_ID = "io.arconia.migrations";
+    static final String LATEST_VERSION = "LATEST";
 
     private final OutputOptions outputOptions;
     private final List<String> additionalParameters;
@@ -183,30 +187,19 @@ public class MavenRunner implements BuildToolRunner {
         command.add("-U");
 
         if (rewriteArguments.dryRun()) {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(OPEN_REWRITE_PLUGIN_VERSION));
         } else {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_PLUGIN_VERSION));
         }
 
         command.add("-Drewrite.activeRecipes=" + rewriteArguments.rewriteRecipeName());
 
-        List<String> coordinates = new ArrayList<>();
-
-        String arconiaVersion = "LATEST";
-        String coreRewriteVersion = OPEN_REWRITE_DEFAULT_VERSION;
-
-        coordinates.add("io.arconia.migrations:rewrite-arconia:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-docling:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-spring:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-testing:" + arconiaVersion);
-
-        coordinates.add("org.openrewrite:rewrite-java:" + coreRewriteVersion);
-        coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + coreRewriteVersion);
+        List<String> coordinates = defaultRecipeCoordinates();
 
         if (StringUtils.hasText(rewriteArguments.rewriteRecipeLibrary())) {
             var recipeVersion = StringUtils.hasText(rewriteArguments.rewriteRecipeVersion())
                     ? rewriteArguments.rewriteRecipeVersion()
-                    : OPEN_REWRITE_DEFAULT_VERSION;
+                    : LATEST_VERSION;
             coordinates.add("%s:%s".formatted(rewriteArguments.rewriteRecipeLibrary(), recipeVersion));
         }
 
@@ -232,22 +225,9 @@ public class MavenRunner implements BuildToolRunner {
 
         command.add("-U");
 
-        command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:discover".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+        command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:discover".formatted(OPEN_REWRITE_PLUGIN_VERSION));
 
-        List<String> coordinates = new ArrayList<>();
-
-        String arconiaVersion = "LATEST";
-        String coreRewriteVersion = OPEN_REWRITE_DEFAULT_VERSION;
-
-        coordinates.add("io.arconia.migrations:rewrite-arconia:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-docling:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-spring:" + arconiaVersion);
-        coordinates.add("io.arconia.migrations:rewrite-testing:" + arconiaVersion);
-
-        coordinates.add("org.openrewrite:rewrite-java:" + coreRewriteVersion);
-        coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + coreRewriteVersion);
-
-        command.add("-Drewrite.recipeArtifactCoordinates=" + String.join(",", coordinates));
+        command.add("-Drewrite.recipeArtifactCoordinates=" + String.join(",", defaultRecipeCoordinates()));
 
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);
@@ -264,14 +244,14 @@ public class MavenRunner implements BuildToolRunner {
         command.add("-U");
 
         if (updateArguments.dryRun()) {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(OPEN_REWRITE_PLUGIN_VERSION));
         } else {
-            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_DEFAULT_VERSION));
+            command.add("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(OPEN_REWRITE_PLUGIN_VERSION));
         }
 
         command.add("-Drewrite.activeRecipes=" + updateArguments.rewriteRecipeName());
 
-        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateArguments.rewriteRecipeLibrary(), OPEN_REWRITE_DEFAULT_VERSION));
+        command.add("-Drewrite.recipeArtifactCoordinates=" + "%s:%s".formatted(updateArguments.rewriteRecipeLibrary(), LATEST_VERSION));
 
         command.add("-Drewrite.exportDatatables=true");
 
@@ -280,6 +260,20 @@ public class MavenRunner implements BuildToolRunner {
         }
 
         return command;
+    }
+
+    private List<String> defaultRecipeCoordinates() {
+        List<String> coordinates = new ArrayList<>();
+
+        coordinates.add(ARCONIA_MIGRATIONS_GROUP_ID + ":rewrite-arconia:" + LATEST_VERSION);
+        coordinates.add(ARCONIA_MIGRATIONS_GROUP_ID + ":rewrite-docling:" + LATEST_VERSION);
+        coordinates.add(ARCONIA_MIGRATIONS_GROUP_ID + ":rewrite-spring:" + LATEST_VERSION);
+        coordinates.add(ARCONIA_MIGRATIONS_GROUP_ID + ":rewrite-testing:" + LATEST_VERSION);
+
+        coordinates.add("org.openrewrite:rewrite-java:" + OPEN_REWRITE_CORE_VERSION);
+        coordinates.add("org.openrewrite.recipe:rewrite-java-dependencies:" + OPEN_REWRITE_JAVA_DEPENDENCIES_VERSION);
+
+        return coordinates;
     }
 
 }

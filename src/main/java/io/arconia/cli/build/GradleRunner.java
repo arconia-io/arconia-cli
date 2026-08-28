@@ -23,7 +23,7 @@ import io.arconia.cli.utils.IoUtils;
  */
 public class GradleRunner implements BuildToolRunner {
 
-    static final String OPEN_REWRITE_DEFAULT_VERSION = "latest.release";
+    static final String OPEN_REWRITE_PLUGIN_VERSION = "7.39.0";
 
     private final OutputOptions outputOptions;
     private final List<String> additionalParameters;
@@ -195,16 +195,15 @@ public class GradleRunner implements BuildToolRunner {
             command.add("rewriteRun");
         }
 
-        command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+        command.add("-DpluginVersion=" + OPEN_REWRITE_PLUGIN_VERSION);
 
         command.add("-DactiveRecipe=" + rewriteArguments.rewriteRecipeName());
 
         if (StringUtils.hasText(rewriteArguments.rewriteRecipeLibrary())) {
-            var recipeVersion = StringUtils.hasText(rewriteArguments.rewriteRecipeVersion())
-                    ? rewriteArguments.rewriteRecipeVersion()
-                    : OPEN_REWRITE_DEFAULT_VERSION;
             command.add("-DrecipeLibrary=" + rewriteArguments.rewriteRecipeLibrary());
-            command.add("-DrecipeVersion=" + recipeVersion);
+            if (StringUtils.hasText(rewriteArguments.rewriteRecipeVersion())) {
+                command.add("-DrecipeVersion=" + rewriteArguments.rewriteRecipeVersion());
+            }
         }
 
         if (rewriteArguments.rewriteConfigFile() != null) {
@@ -235,7 +234,7 @@ public class GradleRunner implements BuildToolRunner {
 
         command.add("rewriteDiscover");
 
-        command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+        command.add("-DpluginVersion=" + OPEN_REWRITE_PLUGIN_VERSION);
 
         if (!CollectionUtils.isEmpty(additionalParameters)) {
             command.addAll(additionalParameters);
@@ -263,7 +262,7 @@ public class GradleRunner implements BuildToolRunner {
             command.add("rewriteRun");
         }
 
-        command.add("-DpluginVersion=" + OPEN_REWRITE_DEFAULT_VERSION);
+        command.add("-DpluginVersion=" + OPEN_REWRITE_PLUGIN_VERSION);
 
         command.add("-DactiveRecipe=" + updateArguments.rewriteRecipeName());
 

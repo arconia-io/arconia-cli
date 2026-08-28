@@ -178,7 +178,7 @@ class GradleRunnerTests {
         var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("--init-script", "rewriteRun", "--no-parallel");
-        assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_DEFAULT_VERSION);
+        assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_PLUGIN_VERSION);
         assertThat(command).contains("-DactiveRecipe=org.example.MyRecipe");
         assertThat(command).doesNotContain("rewriteDryRun");
     }
@@ -208,6 +208,28 @@ class GradleRunnerTests {
         assertThat(command).contains("-DrecipeVersion=1.0.0");
     }
 
+    @Test
+    void rewriteRunCommandWithRecipeLibraryWithoutVersion() {
+        var options = RewriteArguments.builder()
+            .rewriteRecipeName("org.example.MyRecipe")
+            .rewriteRecipeLibrary("org.example:my-recipes")
+            .build();
+        var command = runner.constructRewriteRunCommand(options);
+
+        assertThat(command).contains("-DrecipeLibrary=org.example:my-recipes");
+        assertThat(command).noneMatch(arg -> arg.startsWith("-DrecipeVersion="));
+    }
+
+    // -- constructRewriteDiscoverCommand tests --
+
+    @Test
+    void rewriteDiscoverCommand() {
+        var command = runner.constructRewriteDiscoverCommand();
+
+        assertThat(command).contains("--init-script", "rewriteDiscover");
+        assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_PLUGIN_VERSION);
+    }
+
     // -- constructUpdateCommand tests --
 
     @Test
@@ -219,6 +241,7 @@ class GradleRunnerTests {
         var command = runner.constructUpdateCommand(options);
 
         assertThat(command).contains("rewriteRun", "--no-parallel");
+        assertThat(command).contains("-DpluginVersion=" + GradleRunner.OPEN_REWRITE_PLUGIN_VERSION);
         assertThat(command).contains("-DactiveRecipe=org.example.UpdateRecipe");
         assertThat(command).contains("-DrecipeLibrary=org.example:update-recipes");
     }

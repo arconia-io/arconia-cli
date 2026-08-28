@@ -186,7 +186,7 @@ class MavenRunnerTests {
         var command = runner.constructRewriteRunCommand(options);
 
         assertThat(command).contains("-U");
-        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(MavenRunner.OPEN_REWRITE_PLUGIN_VERSION));
         assertThat(command).contains("-Drewrite.activeRecipes=org.example.MyRecipe");
         assertThat(command).contains("-Drewrite.exportDatatables=true");
     }
@@ -199,7 +199,25 @@ class MavenRunnerTests {
             .build();
         var command = runner.constructRewriteRunCommand(options);
 
-        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(MavenRunner.OPEN_REWRITE_PLUGIN_VERSION));
+    }
+
+    @Test
+    void rewriteRunCommandPinsOpenRewriteDependencies() {
+        var options = RewriteArguments.builder()
+            .rewriteRecipeName("org.example.MyRecipe")
+            .build();
+        var command = runner.constructRewriteRunCommand(options);
+
+        assertThat(command).anySatisfy(arg -> assertThat(arg)
+            .contains("org.openrewrite:rewrite-java:" + MavenRunner.OPEN_REWRITE_CORE_VERSION)
+            .contains("org.openrewrite.recipe:rewrite-java-dependencies:" + MavenRunner.OPEN_REWRITE_JAVA_DEPENDENCIES_VERSION)
+            .contains("io.arconia.migrations:rewrite-arconia:LATEST")
+            .contains("io.arconia.migrations:rewrite-docling:LATEST")
+            .contains("io.arconia.migrations:rewrite-spring:LATEST")
+            .contains("io.arconia.migrations:rewrite-testing:LATEST")
+            .doesNotContain("org.openrewrite:rewrite-java:LATEST")
+            .doesNotContain("org.openrewrite.recipe:rewrite-java-dependencies:LATEST"));
     }
 
     @Test
@@ -211,7 +229,32 @@ class MavenRunnerTests {
             .build();
         var command = runner.constructRewriteRunCommand(options);
 
-        assertThat(command).anySatisfy(arg -> assertThat(arg).contains("org.example:my-recipes:2.0.0"));    }
+        assertThat(command).anySatisfy(arg -> assertThat(arg).contains("org.example:my-recipes:2.0.0"));
+    }
+
+    @Test
+    void rewriteRunCommandWithRecipeLibraryWithoutVersion() {
+        var options = RewriteArguments.builder()
+            .rewriteRecipeName("org.example.MyRecipe")
+            .rewriteRecipeLibrary("org.example:my-recipes")
+            .build();
+        var command = runner.constructRewriteRunCommand(options);
+
+        assertThat(command).anySatisfy(arg -> assertThat(arg).contains("org.example:my-recipes:LATEST"));
+    }
+
+    // -- constructRewriteDiscoverCommand tests --
+
+    @Test
+    void rewriteDiscoverCommand() {
+        var command = runner.constructRewriteDiscoverCommand();
+
+        assertThat(command).contains("-U");
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:discover".formatted(MavenRunner.OPEN_REWRITE_PLUGIN_VERSION));
+        assertThat(command).anySatisfy(arg -> assertThat(arg)
+            .contains("org.openrewrite:rewrite-java:" + MavenRunner.OPEN_REWRITE_CORE_VERSION)
+            .contains("org.openrewrite.recipe:rewrite-java-dependencies:" + MavenRunner.OPEN_REWRITE_JAVA_DEPENDENCIES_VERSION));
+    }
 
     // -- constructUpdateCommand tests --
 
@@ -224,9 +267,9 @@ class MavenRunnerTests {
         var command = runner.constructUpdateCommand(options);
 
         assertThat(command).contains("-U");
-        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:run".formatted(MavenRunner.OPEN_REWRITE_PLUGIN_VERSION));
         assertThat(command).contains("-Drewrite.activeRecipes=org.example.UpdateRecipe");
-        assertThat(command).contains("-Drewrite.recipeArtifactCoordinates=org.example:update-recipes:%s".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("-Drewrite.recipeArtifactCoordinates=org.example:update-recipes:LATEST");
         assertThat(command).contains("-Drewrite.exportDatatables=true");
     }
 
@@ -239,7 +282,7 @@ class MavenRunnerTests {
             .build();
         var command = runner.constructUpdateCommand(options);
 
-        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dry-run".formatted(MavenRunner.OPEN_REWRITE_DEFAULT_VERSION));
+        assertThat(command).contains("org.openrewrite.maven:rewrite-maven-plugin:%s:dryRun".formatted(MavenRunner.OPEN_REWRITE_PLUGIN_VERSION));
     }
 
 }
