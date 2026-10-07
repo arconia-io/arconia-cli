@@ -25,6 +25,10 @@ ext {
     set('orasJavaVersion', "0.8.5")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.17")
+
+    // Customize Spring Boot's managed versions
+    set('jackson-bom.version', "3.1.7")
+    set('logback.version', "1.6.5")
 }
 
 dependencies {
