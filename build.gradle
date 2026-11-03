@@ -27,8 +27,7 @@ ext {
     set('jlineVersion', "3.30.17")
 
     // Customize Spring Boot's managed versions
-    set('jackson-bom.version', "3.1.7")
-    set('logback.version', "1.6.5")
+    set('logback.version', "1.6.6")
 }
 
 dependencies {
