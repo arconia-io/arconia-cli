@@ -11,104 +11,128 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class VersionSelectorTests {
 
+    private static final String LATEST = "latest";
+
+    // --- highestVersion ---
+
     @Test
-    void whenEmptyTagListThenReturnNull() {
+    void highestVersionWithEmptyListReturnsNull() {
         assertThat(VersionSelector.highestVersion(List.of())).isNull();
     }
 
     @Test
-    void whenAllTagsHaveSuffixThenReturnNull() {
+    void highestVersionWithSingleValidVersionReturnsIt() {
+        assertThat(VersionSelector.highestVersion(List.of("1.0.0")))
+                .isEqualTo("1.0.0");
+    }
+
+    @Test
+    void highestVersionWhenAllTagsHaveSuffixReturnsNull() {
         assertThat(VersionSelector.highestVersion(List.of("1.0.0-M4", "2.1.0-SNAPSHOT"))).isNull();
     }
 
     @Test
-    void whenSomeTagsHaveSuffixThenIgnoreThem() {
+    void highestVersionWhenSomeTagsHaveSuffixIgnoresThem() {
         assertThat(VersionSelector.highestVersion(List.of("1.0.0-M4", "2.1.0", "3.0.0-SNAPSHOT")))
                 .isEqualTo("2.1.0");
     }
 
     @Test
-    void whenNonSemanticVersionThenIgnoreIt() {
+    void highestVersionWhenNonSemanticVersionIgnoresIt() {
         assertThat(VersionSelector.highestVersion(List.of("abc", "2.1.0", "1.0.0")))
                 .isEqualTo("2.1.0");
     }
 
     @Test
-    void whenAllNonSemanticVersionsThenReturnNull() {
+    void highestVersionWhenAllNonSemanticVersionsReturnsNull() {
         assertThat(VersionSelector.highestVersion(List.of("abc", "foo", "bar")))
                 .isNull();
     }
 
     @Test
-    void whenLatestPresentThenReturnLatest() {
-        assertThat(VersionSelector.highestVersion(List.of("1.0.0", "2.1.0", "latest")))
-                .isEqualTo("latest");
+    void highestVersionWhenMalformedSemverReturnsNull() {
+        assertThat(VersionSelector.highestVersion(List.of(".1.0", "1.0.", "1..0", "1.2.3.4", "-1.0")))
+                .isNull();
     }
 
     @Test
-    void whenOnlyLatestThenReturnLatest() {
-        assertThat(VersionSelector.highestVersion(List.of("latest")))
-                .isEqualTo("latest");
+    void highestVersionWhenLatestPresentReturnsLatest() {
+        assertThat(VersionSelector.highestVersion(List.of("1.0.0", "2.1.0", LATEST)))
+                .isEqualTo(LATEST);
     }
 
     @Test
-    void whenLatestAmongSuffixedTagsThenReturnLatest() {
-        assertThat(VersionSelector.highestVersion(List.of("1.0.0-M4", "latest", "2.1.0-SNAPSHOT")))
-                .isEqualTo("latest");
+    void highestVersionWhenOnlyLatestReturnsLatest() {
+        assertThat(VersionSelector.highestVersion(List.of(LATEST)))
+                .isEqualTo(LATEST);
     }
 
     @Test
-    void whenDuplicateLatestTagsThenReturnLatest() {
-        assertThat(VersionSelector.highestVersion(List.of("latest", "latest", "1.0.0")))
-                .isEqualTo("latest");
+    void highestVersionWhenLatestAmongSuffixedTagsReturnsLatest() {
+        assertThat(VersionSelector.highestVersion(List.of("1.0.0-M4", LATEST, "2.1.0-SNAPSHOT")))
+                .isEqualTo(LATEST);
     }
 
-    // Standard 3-part semver comparison
+    @Test
+    void highestVersionWhenDuplicateLatestTagsReturnsLatest() {
+        assertThat(VersionSelector.highestVersion(List.of(LATEST, LATEST, "1.0.0")))
+                .isEqualTo(LATEST);
+    }
+
+    // Standard semver comparison
 
     @Test
-    void whenMultipleValidVersionsThenReturnHighestPatch() {
+    void highestVersionReturnsHighestPatch() {
         assertThat(VersionSelector.highestVersion(List.of("1.0.0", "1.0.1", "1.0.2")))
                 .isEqualTo("1.0.2");
     }
 
     @Test
-    void whenMultipleValidVersionsThenReturnHighestMinor() {
+    void highestVersionReturnsHighestMinor() {
         assertThat(VersionSelector.highestVersion(List.of("1.0.0", "1.9.0", "1.11.0")))
                 .isEqualTo("1.11.0");
     }
 
     @Test
-    void whenMultipleValidVersionsThenReturnHighestMajor() {
+    void highestVersionReturnsHighestMajor() {
         assertThat(VersionSelector.highestVersion(List.of("1.0.0", "2.0.0", "3.0.0")))
                 .isEqualTo("3.0.0");
     }
 
     @Test
-    void whenSingleValidVersionThenReturnIt() {
-        assertThat(VersionSelector.highestVersion(List.of("1.0.0-M4", "2.1.0", "3.0.0-SNAPSHOT")))
-                .isEqualTo("2.1.0");
+    void highestVersionHandlesUnsortedVersions() {
+        assertThat(VersionSelector.highestVersion(List.of("1.0.2", "1.0.0", "1.0.1")))
+                .isEqualTo("1.0.2");
+        assertThat(VersionSelector.highestVersion(List.of("3.0.0", "1.0.0", "2.0.0")))
+                .isEqualTo("3.0.0");
     }
 
     @Test
-    void whenOnePartVersionThenConsiderValid() {
+    void highestVersionWhenOnePartVersionConsidersValid() {
         assertThat(VersionSelector.highestVersion(List.of("1", "2", "3")))
                 .isEqualTo("3");
     }
 
     @Test
-    void whenTwoPartVersionThenConsiderValid() {
+    void highestVersionWhenTwoPartVersionConsidersValid() {
         assertThat(VersionSelector.highestVersion(List.of("1.0", "1.1", "2.0")))
                 .isEqualTo("2.0");
     }
 
     @Test
-    void whenMixedPartVersionsThenCompareCorrectly() {
+    void highestVersionWhenMixedPartVersionsComparesCorrectly() {
         assertThat(VersionSelector.highestVersion(List.of("1", "1.1", "1.1.1")))
                 .isEqualTo("1.1.1");
+        assertThat(VersionSelector.highestVersion(List.of("1.2", "1.1.9")))
+                .isEqualTo("1.2");
+        assertThat(VersionSelector.highestVersion(List.of("2", "1.9.9")))
+                .isEqualTo("2");
+        assertThat(VersionSelector.highestVersion(List.of("2.0", "2.0.1")))
+                .isEqualTo("2.0.1");
     }
 
     @Test
-    void whenOneAndThreePartVersionsEquivalentThenReturnOne() {
+    void highestVersionWhenOneAndThreePartVersionsEquivalentReturnsFirstEquivalent() {
         assertThat(VersionSelector.highestVersion(List.of("1", "1.0.0")))
                 .isEqualTo("1");
     }
