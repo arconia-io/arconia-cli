@@ -58,7 +58,7 @@ jobs:
 
       - name: Export devenv toolchain
         shell: devenv shell bash -- -e {0}
-        run: |
+        run: |\
           set -euo pipefail
           echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
           echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
@@ -72,7 +72,7 @@ jobs:
       - name: Set VERSION environment variable
         id: set_version
         shell: devenv shell bash -- -e {0}
-        run: |
+        run: |\
           set -euo pipefail
           VERSION=$(./gradlew -q --no-daemon properties | grep '^version:' | awk '{print $2}')
           if [ -z "$VERSION" ]; then
@@ -85,6 +85,16 @@ jobs:
       - name: Compile and test
         shell: devenv shell bash -- -e {0}
         run: ./gradlew build
+
+      - name: Upload test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-reports
+          path: |
+            build/reports/tests/test/
+            build/reports/jacoco/test/
+          retention-days: 7
 
       - name: Native compile and test
         shell: devenv shell bash -- -e {0}
@@ -142,7 +152,7 @@ jobs:
 
       - name: Inspect artifacts
         shell: bash
-        run: |
+        run: |\
           set -euo pipefail
           if [ ! -d artifacts ] || [ -z "$(ls -A artifacts 2>/dev/null)" ]; then
             echo "::error::No artifacts found in artifacts/ directory"
@@ -169,14 +179,14 @@ jobs:
         with:
           retention-days: 1
           name: jreleaser-output
-          path: |
+          path: |\
             out/jreleaser/trace.log
             out/jreleaser/output.properties
       
       - name: Identify data for attestation
         shell: bash
         id: attestation-data
-        run: |
+        run: |\
           set -euo pipefail
           CHECKSUMS_FILE="out/jreleaser/checksums/checksums_sha256.txt"
           OUTPUT_PROPS="out/jreleaser/output.properties"
@@ -200,7 +210,7 @@ jobs:
       - name: Trigger documentation update
         env:
           GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
-        run: |
+        run: |\
           set -euo pipefail
           gh api \
             --method POST \
