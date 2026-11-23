@@ -3,7 +3,7 @@ import org.cyclonedx.Version
 plugins {
     id 'java'
     id 'distribution'
-    id 'org.springframework.boot' version '4.1.3'
+    id 'org.springframework.boot' version '4.2.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.graalvm.buildtools.native' version '1.1.19'
     id 'org.cyclonedx.bom' version '3.6.1'
@@ -25,9 +25,6 @@ ext {
     set('orasJavaVersion', "0.9.3")
     set('picocliVersion', "4.7.7")
     set('jlineVersion', "3.30.17")
-
-    // Customize Spring Boot's managed versions
-    set('logback.version', "1.6.6")
 }
 
 dependencies {
@@ -84,7 +81,7 @@ tasks.named('test') {
 cyclonedxDirectBom {
     includeConfigs = ["runtimeClasspath"]
     projectType = "application"
-    schemaVersion = Version.VERSION_16
+    schemaVersion = Version.VERSION_17
 }
 
 distributions {
