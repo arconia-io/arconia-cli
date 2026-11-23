@@ -38,6 +38,7 @@ public class ArconiaCliRuntimeHints implements RuntimeHintsRegistrar {
      * that is not present in the 3.1.2 metadata at all.
      */
     private static final List<String> CAFFEINE_CLASSES = List.of(
+        "com.github.benmanes.caffeine.cache.PSMS",
         "com.github.benmanes.caffeine.cache.SSMS",
         "com.github.benmanes.caffeine.cache.SSSMSA"
     );
