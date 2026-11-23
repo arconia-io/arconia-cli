@@ -11,7 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class OciIntegrationTests {
 
     @Container
-    public static final GenericContainer<?> zotContainer = new GenericContainer<>("ghcr.io/project-zot/zot-minimal:v2.1.15")
+    public static final GenericContainer<?> zotContainer = new GenericContainer<>("ghcr.io/project-zot/zot-minimal:v2.1.23")
             .withExposedPorts(5000);
 
 }
